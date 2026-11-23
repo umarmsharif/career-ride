@@ -659,3 +659,16 @@ a.btn {
     animation: none;
   }
 }
+
+/* On wide screens project and board cards sit to the left, clear of the rider. */
+@media (min-width: 760px) {
+  .project,
+  .board {
+    align-self: flex-start;
+    max-width: 25rem;
+  }
+  .hud:has(.project) #close-card,
+  .hud:has(.board) #close-card {
+    align-self: flex-start;
+  }
+}

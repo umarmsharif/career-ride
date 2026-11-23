@@ -104,7 +104,9 @@ export default function World({ entries }) {
     window.__ride = { ...(window.__ride || {}), info: () => ({ ...gl.info.render }) }
   }, [scene, gl])
 
-  const mounted = [current, current + 1].filter((i) => i < islands.length)
+  // The next island is only drawn once the rider is heading for it, to stay inside the budget.
+  const leaving = useGame((s) => s.phase === 'ride' || s.nearExit)
+  const mounted = (leaving ? [current, current + 1] : [current]).filter((i) => i < islands.length)
   return (
     <>
       <Sky />
