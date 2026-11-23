@@ -1,0 +1,266 @@
+{
+  "person": {
+    "name": "Umar Muhammad Sharif",
+    "tagline": "AI transformation and training, after two decades in telecom, fintech and digital platforms",
+    "links": {
+      "linkedin": "https://www.linkedin.com/in/umarmsharif",
+      "github": "https://github.com/umarmsharif",
+      "cv": "/cv"
+    }
+  },
+  "islands": [
+    {
+      "id": 1,
+      "name": "The Workshop",
+      "company": "Ultimus and Teradata (NCR)",
+      "years": "2004 to 2008",
+      "role": "Founding Engineer at Ultimus; Consultant at Teradata",
+      "summary": "Started as a software engineer and consultant, working across Islamabad, Brussels and Madrid.",
+      "theme": "An engineer's workshop with a road leading out toward two small European towns",
+      "pickups": [
+        {
+          "fact": "BS Software Engineering, Foundation University, on a Ministry of Science and Technology merit scholarship"
+        },
+        {
+          "fact": "Founding Engineer at Ultimus"
+        },
+        {
+          "fact": "Worked in Islamabad, Brussels and Madrid"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Campus Hill",
+      "company": "Lahore University of Management Sciences (LUMS)",
+      "years": "2008 to 2010",
+      "role": "MBA, Marketing and Strategy",
+      "summary": "Stepped out of engineering to study marketing and strategy.",
+      "theme": "A campus on a green hill with a library and a clock tower",
+      "pickups": [
+        {
+          "fact": "MBA in Marketing and Strategy"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Signal Valley",
+      "company": "Jazz (then Mobilink, VEON Group)",
+      "years": "2010 to 2012",
+      "role": "Specialist, Business Analysis and Growth Strategy",
+      "summary": "First telecom role, in business analysis and growth strategy in Islamabad.",
+      "theme": "A valley dotted with signal towers that light up as the rider passes",
+      "pickups": [
+        {
+          "fact": "Business analysis and growth strategy for a national mobile operator"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Telecom City",
+      "company": "Telenor Pakistan",
+      "years": "2012 to 2020",
+      "role": "Four roles, from Assistant Manager to Product Manager",
+      "summary": "Eight years across pricing and analytics, the high-value segment, mobile wallet growth and personalised offers.",
+      "theme": "A small city in two districts",
+      "districts": [
+        {
+          "name": "Signal City",
+          "theme": "Rooftops and antennas, with offers flying to individual houses",
+          "pickups": [
+            {
+              "fact": "+5% incremental ARPU against control through one-to-one personalisation"
+            },
+            {
+              "fact": "Loyalty programme for high-value customers reached 8% engagement, built with a 10-member cross-functional team"
+            },
+            {
+              "fact": "Secured PKR 50M investment from JS Bank for a co-branded proposition"
+            }
+          ]
+        },
+        {
+          "name": "Wallet Bazaar",
+          "theme": "A market street where shopkeepers pay by phone",
+          "pickups": [
+            {
+              "fact": "Managed a PKR 1B per month fintech portfolio on the EasyPaisa mobile wallet"
+            },
+            {
+              "fact": "Grew telco bundle penetration from 17% to 25%"
+            },
+            {
+              "fact": "Go Getter Award 2018 and 2019; Employee of the Quarter 2018"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Parcel Port",
+      "company": "Daraz (Alibaba Group)",
+      "years": "2020",
+      "role": "Head of Performance and Cost, Platform Logistics",
+      "summary": "Ran logistics performance and cost for Pakistan's largest e-commerce marketplace.",
+      "theme": "A port and depot with delivery routes drawn across the island as glowing lines",
+      "pickups": [
+        {
+          "fact": "Modelled 10,000+ origin-destination permutations across 10 logistics partners"
+        },
+        {
+          "fact": "Cut customer promise times by 40%"
+        },
+        {
+          "fact": "Payment risk model raised transaction success by 3% and cut shipping costs by 4%"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Kitchen Street",
+      "company": "Foodpanda Pakistan",
+      "years": "2020 to 2024",
+      "role": "Head of Growth and Performance, then Head of Merchant Performance, Content and Experience",
+      "summary": "Built a new vertical from zero, then ran merchant performance and experience for the platform.",
+      "theme": "A street-food market in two districts",
+      "districts": [
+        {
+          "name": "Home Kitchens",
+          "theme": "Houses with kitchen windows that open into food stalls",
+          "pickups": [
+            {
+              "fact": "Built the Home Kitchens vertical from zero to 15,000 orders a day at peak, with 4,000+ active merchants"
+            },
+            {
+              "fact": "Became the platform's second most profitable unit; the playbook was exported to Malaysia and Singapore"
+            },
+            {
+              "fact": "60% GMV increase alongside a 30% cut in subsidy per order"
+            }
+          ]
+        },
+        {
+          "name": "Merchant Row",
+          "theme": "Restaurant fronts with menu boards and a help desk",
+          "pickups": [
+            {
+              "fact": "A Llama model wrote dish descriptions across the catalogue, lifting orders by 18%"
+            },
+            {
+              "fact": "Partner NPS grew fivefold; escalations fell 70%"
+            },
+            {
+              "fact": "Partner fail rates down 33% and order delays down 30%"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "The Airfield",
+      "company": "Delivery Hero (Foodpanda, Yemeksepeti, Foodora)",
+      "years": "2025",
+      "role": "Head of Merchant Health and Engagement, Partner Growth",
+      "summary": "Steered merchant strategy for a global food delivery group across APAC, the EU and Turkey.",
+      "theme": "A small airfield ringed by 18 plain coloured flags, with roads forking toward different regions",
+      "pickups": [
+        {
+          "fact": "Merchant strategy across 18 countries, reporting to C-level"
+        },
+        {
+          "fact": "Designed and launched the Regional Incubation Program in all 18 markets"
+        },
+        {
+          "fact": "Relaunched the partner health score and set OKR cycles across Product, Finance and Operations"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "The AI Lab",
+      "company": "Independent consulting, AI and digital platforms",
+      "years": "2025 to 2026",
+      "role": "Builder, fractional AI lead and co-founder",
+      "summary": "Left corporate life to build AI agents that do real work.",
+      "theme": "A workshop yard of four machines; riding up to one switches it on and opens its project card",
+      "machines": [
+        {
+          "title": "Multilingual GenAI agent",
+          "client": "Sarmaaya Financials (Fractional Head of AI and Transformation, 2026)",
+          "card": "diagram",
+          "facts": [
+            "A production agent in Urdu, Roman Urdu and English, built on Gemini and FastAPI",
+            "2,000 to 3,000 active user interactions per day",
+            "Qualified leads routed to CRM after a five-interaction threshold",
+            "Part of an enterprise AI roadmap designed as a three-layer Revenue Funnelling System"
+          ]
+        },
+        {
+          "title": "BlockNow",
+          "client": "Co-founder, UK healthcare AI venture, 2025 to present",
+          "card": "footage",
+          "media": "/media/blocknow.mp4",
+          "facts": [
+            "A voice agent, front-end interface and dashboard for GP staff",
+            "Handles appointment booking calls for GP practices",
+            "Designed to run under UK data-protection rules"
+          ]
+        },
+        {
+          "title": "Urdu voice agent for restaurant leads",
+          "client": "foodpanda Pakistan, 2025 to 2026",
+          "card": "diagram",
+          "facts": [
+            "Calls restaurants, answers merchant queries and qualifies pre-signup leads",
+            "Built on Python, ElevenLabs and n8n with calendar-integrated scheduling"
+          ]
+        },
+        {
+          "title": "A ten-minute animated film for kids",
+          "client": "Personal project, 2026",
+          "card": "footage",
+          "media": "/media/kids-film.mp4",
+          "facts": [
+            "70 scenes drawn in Python, with no design tool",
+            "97 lines of narration voiced through ElevenLabs and timed to each scene"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "The Classroom",
+      "company": "Today",
+      "years": "2026 onward",
+      "role": "AI training and transformation for leadership teams",
+      "summary": "The rider gets off the bike and starts teaching.",
+      "theme": "An open-air classroom on a summit, with boards the visitor can read and an open door",
+      "boards": [
+        {
+          "title": "Where a beginner should start",
+          "body": "What AI is in plain language, the few tools a beginner needs, and three paths to go deeper: content and media, automation and agents, building with code."
+        },
+        {
+          "title": "Picking the right model for the job",
+          "body": "Most teams overpay by running everything on their biggest model."
+        },
+        {
+          "title": "What makes an agent",
+          "body": "Memory, tools and a way to act. Without all three it is a chatbot."
+        }
+      ],
+      "cards": [
+        {
+          "title": "Top Search Agency",
+          "body": "Co-founder. SEO and AI search for early-stage SaaS founders.",
+          "removable": true
+        }
+      ],
+      "closing": "Eighteen years of building things that work. Now teaching others to do the same with AI."
+    }
+  ]
+}
