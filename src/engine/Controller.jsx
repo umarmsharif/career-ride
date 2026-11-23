@@ -1,10 +1,12 @@
 // One loop that moves the rider, fires triggers and drives the camera.
-// It knows nothing about a particular island: everything comes from `island` and `ride`.
+// It works in the current island's own coordinates: the world is slid under the rider
+// so the island being ridden always sits at the origin.
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { rider, clock, input, useGame, damp, clamp, wrapAngle, smooth } from './state.js'
 import { insideOutline } from './kit.js'
+import { audio } from './sound.js'
 
 const MAX_SPEED = 10.5
 const REVERSE_SPEED = -3
@@ -12,10 +14,10 @@ const WHEEL_R = 0.42 * 1.18
 const Y_AXIS = new THREE.Vector3(0, 1, 0)
 const READ_TIME = 4.6
 
-export default function Controller({ island, ride, stub }) {
+export default function Controller({ islands, origins, rides, worldRef }) {
   const { camera, size } = useThree()
   const s = useRef({
-    camHeading: island.spawn.heading,
+    camHeading: Math.PI / 2,
     look: new THREE.Vector3(0, 2, 0),
     camPos: new THREE.Vector3(),
     fallT: 0,
@@ -26,35 +28,26 @@ export default function Controller({ island, ride, stub }) {
     tourIdx: 0,
     waitUntil: 0,
     introT: 0,
-    arrivedT: 0,
+    closeT: 0,
     lastPhase: '',
     lastReset: -1,
+    lastAuto: false,
     snap: true,
     zoom: 1,
+    idx: 0,
   }).current
   const sample = useMemo(
-    () => ({
-      pos: new THREE.Vector3(),
-      tangent: new THREE.Vector3(),
-      left: new THREE.Vector3(),
-      normal: new THREE.Vector3(),
-      quat: new THREE.Quaternion(),
-      bank: 0,
-    }),
+    () => ({ pos: new THREE.Vector3(), tangent: new THREE.Vector3(0, 0, 1), left: new THREE.Vector3(1, 0, 0), normal: new THREE.Vector3(), quat: new THREE.Quaternion(), bank: 0 }),
     []
   )
-  const tmp = useMemo(() => ({ v: new THREE.Vector3(), w: new THREE.Vector3() }), [])
+  const tmp = useMemo(() => ({ v: new THREE.Vector3(), w: new THREE.Vector3(), d: new THREE.Vector3() }), [])
 
-  // Keyboard.
   useEffect(() => {
-    const map = {
-      ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down',
-      ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right',
-    }
+    const map = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' }
     const onKey = (down) => (e) => {
       const k = map[e.code]
       if (!k) return
-      if (e.target?.closest?.('button')) return
+      if (e.target?.closest?.('button, a')) return
       e.preventDefault()
       input[k] = down
       const g = useGame.getState()
@@ -73,7 +66,7 @@ export default function Controller({ island, ride, stub }) {
     }
   }, [])
 
-  function placeAtSpawn() {
+  function placeAtSpawn(island) {
     rider.pos.set(island.spawn.x, 0, island.spawn.z)
     rider.heading = island.spawn.heading
     rider.speed = 0
@@ -85,7 +78,7 @@ export default function Controller({ island, ride, stub }) {
     s.waitUntil = 0
   }
 
-  function nearestTourIndex() {
+  function nearestTourIndex(island) {
     let best = 0
     let bd = Infinity
     island.tour.forEach(([x, z], i) => {
@@ -98,7 +91,7 @@ export default function Controller({ island, ride, stub }) {
     return Math.min(island.tour.length - 1, best + 1)
   }
 
-  function stepIsland(dt, g) {
+  function stepIsland(dt, g, island) {
     let turn = 0
     let throttle = 0
     if (g.autopilot) {
@@ -113,8 +106,8 @@ export default function Controller({ island, ride, stub }) {
         turn = clamp(diff * 2.6, -1, 1)
         throttle = Math.abs(diff) > 0.9 ? 0.4 : 0.82
         if (dist < 1.5) {
-          if (s.tourIdx === island.signStop && !g.signRead) {
-            useGame.setState({ waiting: true, signRead: true })
+          if (s.tourIdx === island.signStop && !g.signRead[island.id]) {
+            useGame.setState({ waiting: true, signRead: { ...g.signRead, [island.id]: true } })
             s.waitUntil = clock.t + READ_TIME + 1.5
           }
           if (s.tourIdx < island.tour.length - 1) s.tourIdx++
@@ -125,14 +118,12 @@ export default function Controller({ island, ride, stub }) {
       throttle = (input.up ? 1 : 0) - (input.down ? 1 : 0)
     }
 
-    // Speed.
     const target = throttle > 0 ? MAX_SPEED * throttle : throttle < 0 ? REVERSE_SPEED : 0
     const braking = (throttle < 0 && rider.speed > 0) || (g.autopilot && g.waiting)
     const rate = braking ? 20 : throttle !== 0 ? 8.5 : 4.5
-    const diffV = target - rider.speed
-    rider.speed += clamp(diffV, -rate * dt, rate * dt)
+    rider.speed += clamp(target - rider.speed, -rate * dt, rate * dt)
 
-    // Turning: a bicycle turns with its speed, but never gets stuck at a standstill.
+    // A bicycle turns with its speed, but never gets stuck at a standstill.
     const turnRate = 2.3 * clamp(Math.abs(rider.speed) / 5, 0.3, 1)
     rider.heading += turn * turnRate * dt * (rider.speed < -0.2 ? -1 : 1)
     rider.steer = damp(rider.steer, turn * 0.5, 10, dt)
@@ -145,7 +136,6 @@ export default function Controller({ island, ride, stub }) {
     rider.pedalling = throttle > 0 && rider.speed > 0.3
     if (rider.pedalling) rider.pedal += step * 0.95
 
-    // Buildings push the rider back out.
     for (const c of island.colliders) {
       const dx = rider.pos.x - c.x
       const dz = rider.pos.z - c.z
@@ -161,58 +151,77 @@ export default function Controller({ island, ride, stub }) {
 
     // Triggers.
     const patch = {}
-    island.pickups.forEach((p, i) => {
-      if (g.collected.includes(i)) return
-      if ((p.x - rider.pos.x) ** 2 + (p.z - rider.pos.z) ** 2 < 2.3 ** 2) {
-        g.collect(i)
+    island.stops.forEach((p, i) => {
+      const d2 = (p.x - rider.pos.x) ** 2 + (p.z - rider.pos.z) ** 2
+      const key = `${island.id}:${i}`
+      const had = g.collected.includes(key)
+      if (!had && d2 < 2.3 ** 2) {
+        g.collect(island.id, i)
+        audio.chime()
         if (g.autopilot) {
           patch.waiting = true
-          s.waitUntil = clock.t + READ_TIME
+          s.waitUntil = clock.t + READ_TIME + (p.kind === 'fact' ? 0 : 3)
         }
+      } else if (had && p.kind !== 'fact' && !g.autopilot) {
+        // Machines and boards reopen when the rider comes back to them.
+        const isOpen = g.open && g.open.island === g.island && g.open.index === i
+        if (d2 < 2.3 ** 2 && !isOpen && !s.left?.[key]) g.collect(island.id, i)
+        if (d2 > 5 ** 2) (s.left ||= {})[key] = false
+        else if (isOpen) (s.left ||= {})[key] = true
       }
     })
     const nearSign = Math.hypot(island.sign.x - rider.pos.x, island.sign.z - rider.pos.z) < island.sign.radius
     if (nearSign !== g.nearSign) patch.nearSign = nearSign
-    if (nearSign && !g.signRead && !g.autopilot) patch.signRead = true
+    if (nearSign && !g.signRead[island.id] && !g.autopilot) patch.signRead = { ...g.signRead, [island.id]: true }
     const district = island.districtAt(rider.pos.x, rider.pos.z)
     if (district !== g.district) patch.district = district
     const ex = island.exitGate
-    const nearExit = Math.hypot(ex.x - rider.pos.x, ex.z - rider.pos.z) < 9
+    const nearExit = !!ex && Math.hypot(ex.x - rider.pos.x, ex.z - rider.pos.z) < 9
     if (nearExit !== g.nearExit) patch.nearExit = nearExit
     if (Object.keys(patch).length) useGame.setState(patch)
 
-    if (rider.pos.x > ex.x + 0.6 && Math.abs(rider.pos.z - ex.z) < ex.halfWidth) {
+    if (ex && rider.pos.x > ex.x + 0.6 && Math.abs(rider.pos.z - ex.z) < ex.halfWidth) {
       s.rideS = 0
       s.rideT = 0
       s.rideFrom.copy(rider.pos)
       s.rideFromQ.copy(rider.quat)
-      useGame.setState({ phase: 'ride', fact: null, waiting: false, nearSign: false, nearExit: false, year: island.data.years.slice(-4) })
+      useGame.setState({ phase: 'ride', open: null, waiting: false, nearSign: false, nearExit: false, year: island.endYear })
+      return
+    }
+    const fin = island.finish
+    if (fin && Math.hypot(fin.x - rider.pos.x, fin.z - rider.pos.z) < fin.radius) {
+      s.closeT = 0
+      rider.speed = 0
+      rider.pedalling = false
+      useGame.setState({ phase: 'closing', open: null, waiting: false, nearSign: false })
       return
     }
     if (!insideOutline(island.outline, rider.pos.x, rider.pos.z)) {
       s.fallT = 0
-      useGame.setState({ phase: 'falling', fact: null, nearSign: false })
+      audio.whoosh()
+      useGame.setState({ phase: 'falling', open: null, nearSign: false })
     }
   }
 
-  function stepFall(dt) {
+  function stepFall(dt, island) {
     s.fallT += dt
     rider.pos.x += Math.sin(rider.heading) * rider.speed * dt * 0.6
     rider.pos.z += Math.cos(rider.heading) * rider.speed * dt * 0.6
     rider.pos.y -= (4 + s.fallT * 26) * dt
     rider.tumble += dt * 3.2
     if (s.fallT > 1.25) {
-      const idx = s.tourIdx
-      placeAtSpawn()
-      s.tourIdx = Math.min(idx, 1)
+      placeAtSpawn(island)
+      s.tourIdx = 1
       useGame.setState({ phase: 'island', waiting: false })
     }
   }
 
-  function stepRide(dt) {
+  function stepRide(dt, g) {
+    const ride = rides[s.idx]
+    const next = islands[s.idx + 1]
     s.rideT += dt
     const remaining = ride.length - s.rideS
-    const target = Math.min(17.5, 3 + remaining * 0.55)
+    const target = Math.min(21, 4 + remaining * 0.6)
     rider.speed = damp(rider.speed, target, 1.6, dt)
     s.rideS = Math.min(ride.length, s.rideS + rider.speed * dt)
     ride.sample(s.rideS / ride.length, sample)
@@ -224,18 +233,36 @@ export default function Controller({ island, ride, stub }) {
     rider.wheel += (rider.speed * dt) / WHEEL_R
     rider.pedalling = true
     rider.pedal += rider.speed * dt * 0.55
+    // The year counter ticks from the year being left to the year being entered.
     const u = s.rideS / ride.length
-    const g = useGame.getState()
-    if (u > 0.5 && g.year !== stub.year) useGame.setState({ year: stub.year })
-    if (remaining < 0.15) {
-      rider.speed = 0
-      rider.pedalling = false
-      s.arrivedT = 0
-      useGame.setState({ phase: 'arrived' })
+    const a = islands[s.idx].endYear
+    const b = next.startYear
+    const year = Math.round(a + (b - a) * smooth((u - 0.15) / 0.6))
+    if (year !== g.year) {
+      useGame.setState({ year })
+      audio.tick()
+    }
+    if (remaining < 0.2) {
+      // Arrive: slide the world so the new island sits at the origin.
+      tmp.d.copy(origins[s.idx + 1]).sub(origins[s.idx])
+      rider.pos.sub(tmp.d)
+      rider.pos.y = 0
+      s.camPos.sub(tmp.d)
+      s.look.sub(tmp.d)
+      s.idx += 1
+      rider.heading = Math.PI / 2
+      rider.quat.setFromAxisAngle(Y_AXIS, rider.heading)
+      rider.speed = 5
+      s.camHeading = rider.heading
+      s.tourIdx = 0
+      s.zoom = 1
+      worldRef.current.position.copy(origins[s.idx]).multiplyScalar(-1)
+      const visited = g.visited.includes(s.idx) ? g.visited : [...g.visited, s.idx]
+      useGame.setState({ phase: 'island', island: s.idx, visited, year: null, district: 0, splash: g.splash + 1 })
     }
   }
 
-  function updateCamera(dt, phase) {
+  function updateCamera(dt, phase, island) {
     const portrait = size.width / size.height < 0.9
     const fov = portrait ? 62 : 46
     if (camera.fov !== fov) {
@@ -245,7 +272,7 @@ export default function Controller({ island, ride, stub }) {
     const want = tmp.v
     const look = tmp.w
     let kPos = 3.2
-    let kLook = 6
+    const kLook = 6
     if (phase === 'intro') {
       s.introT += dt
       const a = 2.5 + s.introT * 0.06
@@ -254,44 +281,45 @@ export default function Controller({ island, ride, stub }) {
       look.set(0, portrait ? -22 : -16, 0)
       kPos = 1.5
     } else if (phase === 'ride') {
+      const ride = rides[s.idx]
       const u = s.rideS / ride.length
       const dist = portrait ? 17 : 13
       const swing = Math.sin(u * Math.PI * 2.2 + 0.6)
+      const settle = smooth((1 - u) / 0.12)
       want.copy(rider.pos)
         .addScaledVector(sample.tangent, -dist * (0.75 + 0.25 * Math.cos(u * Math.PI * 2)))
         .addScaledVector(Y_AXIS, 5 + 3.2 * Math.sin(u * Math.PI))
-        .addScaledVector(sample.left, -sample.bank * 16 + swing * 6.5)
+        .addScaledVector(sample.left, (-sample.bank * 16 + swing * 6.5) * settle)
       look.copy(rider.pos).addScaledVector(sample.tangent, 3).addScaledVector(Y_AXIS, 1.4)
       kPos = 2.2
-    } else if (phase === 'arrived') {
-      s.arrivedT += dt
-      const a = s.arrivedT * 0.18 + 2.4
-      want.set(rider.pos.x + Math.sin(a) * 22, rider.pos.y + 9, rider.pos.z + Math.cos(a) * 22)
-      look.set(rider.pos.x, rider.pos.y + 2, rider.pos.z)
+    } else if (phase === 'closing') {
+      s.closeT += dt
+      const a = s.closeT * 0.14 + 4.2
+      const r = portrait ? 34 : 26
+      want.set(rider.pos.x + Math.sin(a) * r, 11, rider.pos.z + Math.cos(a) * r)
+      look.set(rider.pos.x, portrait ? -1 : 0.5, rider.pos.z)
       kPos = 1.2
     } else if (phase === 'falling') {
-      // Stay put and watch the rider drop, instead of following them over the edge.
       want.copy(s.camPos)
       look.set(rider.pos.x, Math.max(rider.pos.y, -10) + 1, rider.pos.z)
     } else {
       s.camHeading += wrapAngle(rider.heading - s.camHeading) * (1 - Math.exp(-2.6 * dt))
       const dist = portrait ? 15 : 10.2
       const height = portrait ? 10 : 7.2
-      const y = Math.max(rider.pos.y, -3)
-      want.set(rider.pos.x - Math.sin(s.camHeading) * dist, y + height, rider.pos.z - Math.cos(s.camHeading) * dist)
+      want.set(rider.pos.x - Math.sin(s.camHeading) * dist, height, rider.pos.z - Math.cos(s.camHeading) * dist)
       const ahead = 4.5 * s.zoom * s.zoom
-      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, Math.max(rider.pos.y, -6) + 1.0, rider.pos.z + Math.cos(s.camHeading) * ahead)
+      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, 1.0, rider.pos.z + Math.cos(s.camHeading) * ahead)
     }
     if (phase === 'island') {
       // Pull the camera in when a building or gate would sit between it and the rider.
       const bx = rider.pos.x
       const bz = rider.pos.z
-      const by = Math.max(rider.pos.y, -3) + 1.5
+      const by = 1.5
       const dx = bx - want.x
       const dz = bz - want.z
       const a = dx * dx + dz * dz
       let need = 1
-      for (const list of [island.colliders, island.blockers || []]) {
+      for (const list of [island.colliders, island.blockers]) {
         for (const c of list) {
           const fx = want.x - c.x
           const fz = want.z - c.z
@@ -302,8 +330,7 @@ export default function Controller({ island, ride, stub }) {
           const t1 = (-b - root) / (2 * a)
           const t2 = (-b + root) / (2 * a)
           if (t2 <= 0 || t1 >= 1 || t2 >= 0.97) continue
-          const sightHeight = want.y + (by - want.y) * t2
-          if (sightHeight > (c.h ?? 7)) continue
+          if (want.y + (by - want.y) * t2 > (c.h ?? 7)) continue
           need = Math.min(need, 1 - (t2 + 0.03))
         }
       }
@@ -329,29 +356,43 @@ export default function Controller({ island, ride, stub }) {
     clock.t += dt
     const g = useGame.getState()
     if (g.resetKey !== s.lastReset) {
+      // A jump from the map, or a restart: put the rider at that island's entrance.
       s.lastReset = g.resetKey
-      placeAtSpawn()
+      s.idx = g.island
+      placeAtSpawn(islands[s.idx])
       s.camHeading = rider.heading
+      s.snap = true
+      s.left = {}
     }
+    const island = islands[s.idx]
+    worldRef.current.position.copy(origins[s.idx]).multiplyScalar(-1)
     if (g.phase !== s.lastPhase) {
-      if (g.phase === 'island' && g.autopilot && s.lastPhase !== 'falling') s.tourIdx = nearestTourIndex()
+      if (g.phase === 'island' && g.autopilot && s.lastPhase === 'intro') s.tourIdx = nearestTourIndex(island)
       s.lastPhase = g.phase
     }
     if (g.autopilot !== s.lastAuto) {
-      if (g.autopilot && g.phase === 'island') s.tourIdx = nearestTourIndex()
+      if (g.autopilot && g.phase === 'island') s.tourIdx = nearestTourIndex(island)
       s.lastAuto = g.autopilot
     }
-    if (g.phase === 'island') stepIsland(dt, g)
-    else if (g.phase === 'falling') stepFall(dt)
-    else if (g.phase === 'ride') stepRide(dt)
-    updateCamera(dt, g.phase)
+    // `__timeScale` is a test hook: it runs the simulation several steps per frame.
+    for (let n = window.__timeScale || 1; n > 0; n--) {
+      if (n < (window.__timeScale || 1)) clock.t += dt
+      const now = useGame.getState()
+      if (now.phase === 'island') stepIsland(dt, now, islands[s.idx])
+      else if (now.phase === 'falling') stepFall(dt, islands[s.idx])
+      else if (now.phase === 'ride') stepRide(dt, now)
+    }
+    audio.update(g, rider, island)
+    updateCamera(dt, useGame.getState().phase, islands[s.idx])
   })
 
   // Hooks for automated screenshots.
   useEffect(() => {
     window.__ride = {
+      ...(window.__ride || {}),
       rider,
       game: useGame,
+      islands,
       teleport(x, z, heading) {
         rider.pos.set(x, 0, z)
         if (heading !== undefined) rider.heading = heading
@@ -359,7 +400,7 @@ export default function Controller({ island, ride, stub }) {
         s.snap = true
       },
       jumpRide(u) {
-        s.rideS = ride.length * u
+        s.rideS = rides[s.idx].length * u
       },
     }
   }, [])

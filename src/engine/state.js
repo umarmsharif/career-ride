@@ -17,8 +17,12 @@ export const rider = {
 
 export const clock = { t: 0 }
 
-// Time (in clock seconds) at which each pickup was collected, for scenery animations.
-export const collectedAt = []
+// collectedAt[islandId][stopIndex] = clock time the stop was found, for scenery animations.
+export const collectedAt = {}
+export const sinceOf = (id) => (i) => {
+  const at = collectedAt[id]?.[i]
+  return at === undefined ? -1 : clock.t - at
+}
 
 export const input = { up: false, down: false, left: false, right: false }
 
@@ -26,51 +30,67 @@ const coarse = typeof window !== 'undefined' && window.matchMedia?.('(pointer: c
 
 // Slow-changing values that the HTML layer shows.
 export const useGame = create((set, get) => ({
-  phase: 'intro', // intro | island | falling | ride | arrived
+  phase: 'intro', // intro | island | falling | ride | closing
+  mode: 'story', // story | map
   touch: !!coarse,
   autopilot: false,
-  waiting: false, // autopilot is paused at a pickup or the signboard
-  collected: [],
-  fact: null, // index of the pickup whose fact is on screen
+  waiting: false, // a hands-free ride is paused at a stop
+  island: 0, // index into the island list
+  visited: [0],
+  collected: [], // keys like "6:2"
+  open: null, // the stop whose card is on screen: { island, index }
   nearSign: false,
-  signRead: false,
+  signRead: {},
   nearExit: false,
   district: 0,
   year: null,
+  splash: 0, // bumps when a new island is entered, to show its name
   resetKey: 0,
+  sound: false,
+  view: 'ride', // ride | timeline
 
-  start(autopilot) {
-    set({ phase: 'island', autopilot: autopilot || get().touch })
+  start(mode, autopilot) {
+    set({ phase: 'island', mode, autopilot: autopilot || get().touch, splash: get().splash + 1 })
   },
   setAutopilot(v) {
     set({ autopilot: v, waiting: false })
   },
-  collect(i) {
-    if (get().collected.includes(i)) return
-    collectedAt[i] = clock.t
-    set({ collected: [...get().collected, i], fact: i })
+  collect(islandId, i) {
+    const key = `${islandId}:${i}`
+    const idx = get().island
+    if (get().collected.includes(key)) {
+      set({ open: { island: idx, index: i } })
+      return false
+    }
+    ;(collectedAt[islandId] ||= [])[i] = clock.t
+    set({ collected: [...get().collected, key], open: { island: idx, index: i } })
+    return true
   },
-  dismissFact() {
-    set({ fact: null })
+  dismiss() {
+    set({ open: null })
   },
   resume() {
-    set({ waiting: false, fact: null })
+    set({ waiting: false, open: null })
   },
-  restart() {
-    collectedAt.length = 0
+  jumpTo(i) {
+    const s = get()
     set({
+      island: i,
+      visited: s.visited.includes(i) ? s.visited : [...s.visited, i],
       phase: 'island',
-      collected: [],
-      fact: null,
+      open: null,
       waiting: false,
       nearSign: false,
-      signRead: false,
       nearExit: false,
       district: 0,
       year: null,
-      autopilot: get().touch,
-      resetKey: get().resetKey + 1,
+      resetKey: s.resetKey + 1,
+      splash: s.splash + 1,
     })
+  },
+  restart() {
+    Object.keys(collectedAt).forEach((k) => delete collectedAt[k])
+    set({ collected: [], signRead: {}, visited: [0], phase: 'intro', island: 0, open: null, waiting: false, autopilot: false, resetKey: get().resetKey + 1 })
   },
 }))
 

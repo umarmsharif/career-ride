@@ -2,38 +2,56 @@
 // spiral, then a banked sweep down to the next island's landing strip.
 import * as THREE from 'three'
 
-export function buildRide({ start, stub }) {
+// `start` is the exit gate of this island. `end` is the next island's spawn point and
+// `tip` the western tip of its land, both measured from this island's centre.
+export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
   const pts = []
-  const add = (x, y, z) => pts.push(new THREE.Vector3(x, y, z))
+  const add = (x, y, z) => pts.push(new THREE.Vector3(x, y, start.z + (z - start.z) * side + 0))
+  const mix = (a, b, k) => a + (b - a) * k
 
-  // Leave the gate and climb.
   add(start.x, 0.06, start.z)
   add(start.x + 6, 0.06, start.z)
-  add(start.x + 14, 1.2, start.z)
-  add(start.x + 21, 3.4, start.z)
-
-  // One full left-hand spiral, climbing 12 units.
-  const R = 14
-  const cx = start.x + 27
-  const cz = start.z - R
-  const turns = 1
-  const steps = 14
-  for (let i = 0; i <= steps; i++) {
-    const th = Math.PI / 2 + (i / steps) * Math.PI * 2 * turns
-    add(cx - R * Math.cos(th), 5 + (i / steps) * 12, cz + R * Math.sin(th))
+  // Where the last straight begins, lined up with the next island's gate.
+  const ax = tip.x - 24
+  let fromX = start.x + 14
+  let fromY = 1.2
+  if (style === 'spiral') {
+    add(start.x + 14, 1.2, start.z)
+    add(start.x + 21, 3.4, start.z)
+    const R = 14
+    const cx = start.x + 27
+    const cz = start.z - R
+    for (let i = 0; i <= 14; i++) {
+      const th = Math.PI / 2 + (i / 14) * Math.PI * 2
+      add(cx - R * Math.cos(th), 5 + (i / 14) * 12, cz + R * Math.sin(th))
+    }
+    fromX = cx + 18
+    fromY = 17
+    add(fromX, fromY, start.z + 3)
+  } else if (style === 'dive') {
+    add(start.x + 16, 3, start.z)
+    add(start.x + 30, 12, start.z - 6)
+    add(start.x + 44, 20, start.z - 2)
+    fromX = start.x + 56
+    fromY = 18
+    add(fromX, fromY, start.z + 6)
+  } else {
+    add(fromX, fromY, start.z)
   }
-
-  // Banked sweep down to the landing strip.
-  const d = stub.dir
-  const land = new THREE.Vector3(stub.x - d.x * 13.5, stub.y + 0.06, stub.z - d.z * 13.5)
-  const end = new THREE.Vector3(stub.x + d.x * 5, stub.y + 0.06, stub.z + d.z * 5)
-  add(cx + 20, 16.6, cz + R + 3)
-  add(cx + 40, 15.4, cz + R + 1)
-  add(land.x - d.x * 22 + 4, stub.y + 2.6, land.z - d.z * 22 + 8)
-  add(land.x - d.x * 9, stub.y + 0.7, land.z - d.z * 9)
-  pts.push(land)
-  pts.push(new THREE.Vector3().lerpVectors(land, end, 0.5))
-  pts.push(end)
+  // Rolling sweeps the rest of the way.
+  const sideEnd = (end.z - start.z) * side + start.z
+  const n = style === 'wave' ? 5 : 3
+  for (let k = 1; k <= n; k++) {
+    const u = k / (n + 1)
+    const sway = Math.sin(u * Math.PI * (style === 'wave' ? 2.4 : 1.5)) * (style === 'wave' ? 16 : 9) * (1 - u * 0.5)
+    const hill = Math.sin(u * Math.PI * (style === 'wave' ? 3 : 1)) * (style === 'wave' ? 5 : 2)
+    add(mix(fromX, ax, u), mix(fromY, end.y + 2.2, u) + hill, mix(start.z, sideEnd, u) + sway)
+  }
+  add(ax, end.y + 1.6, sideEnd)
+  add(tip.x - 10, end.y + 0.4, sideEnd)
+  add(tip.x - 1, end.y + 0.06, sideEnd)
+  add(mix(tip.x, end.x, 0.5), end.y + 0.06, sideEnd)
+  add(end.x, end.y + 0.06, sideEnd)
 
   const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal')
   const length = curve.getLength()
@@ -62,7 +80,7 @@ export function buildRide({ start, stub }) {
       s += raw[q]
       c++
     }
-    const flat = Math.min(1, i / 40, (N - i) / 60)
+    const flat = Math.min(1, i / 40, (N - i) / 70)
     const bank = THREE.MathUtils.clamp((s / c) * 7.5, -0.6, 0.6) * Math.max(0, flat)
     const f = frames[i]
     const left = new THREE.Vector3().crossVectors(up, f.t).normalize()

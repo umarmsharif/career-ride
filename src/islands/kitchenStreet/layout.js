@@ -56,7 +56,6 @@ const pickupSpots = [
   [11.5, 3.4], [22, 4.6], [31.5, 3.2],
 ]
 
-const facts = data.districts.flatMap((d, di) => d.pickups.map((p) => ({ fact: p.fact, district: di })))
 
 // `h` is how tall the thing is, so the camera knows when it would hide the rider.
 const colliders = [
@@ -66,14 +65,10 @@ const colliders = [
   { x: helpDesk.x, z: helpDesk.z, r: 1.8, h: 4 },
   { x: well.x, z: well.z, r: 1.3, h: 3.4 },
   { x: scoreboard.x, z: scoreboard.z, r: 1.6, h: 4.6 },
-  { x: -38.5, z: 6.2, r: 1.5, h: 5 }, // signboard
-  { x: -42, z: 4.4, r: 0.7 }, { x: -42, z: -4.4, r: 0.7 }, // entrance gate pillars
-  { x: 43, z: 4.4, r: 0.7 }, { x: 43, z: -4.4, r: 0.7 }, // exit gate pillars
 ]
 
-export default {
-  id: 6,
-  data,
+// Positions only. `index.js` hands these to defineIsland.
+const L = {
   outline: makeOutline(),
   road,
   houses,
@@ -82,24 +77,9 @@ export default {
   helpDesk,
   well,
   scoreboard,
-  spawn: { x: -38.6, z: 0, heading: Math.PI / 2 },
-  entranceGate: { x: -42, z: 0, year: '2020' },
-  exitGate: { x: 43, z: 0, year: '2025', halfWidth: 3.6 },
-  sign: { x: -38.5, z: 6.2, face: -2.2, radius: 7.5 },
-  districts: data.districts.map((d) => d.name),
-  districtAt: (x) => (x < 0 ? 0 : 1),
-  banners: [
-    { x: -35.5, z: -6.6, face: 0.5, text: data.districts[0].name },
-    { x: 5.5, z: -5.2, face: 0.35, text: data.districts[1].name },
-  ],
-  pickups: pickupSpots.map(([x, z], i) => ({ x, z, ...facts[i] })),
   colliders,
-  // Things the rider can pass under but the camera should not sit behind.
-  blockers: [-3.2, 0, 3.2].flatMap((z) => [{ x: -42, z, r: 2.1, h: 12 }, { x: 43, z, r: 2.1, h: 12 }]),
-  // The line "Ride for me" follows. It passes through every pickup.
-  tour: [
-    [-38, 0], [-35.6, 0.2], [-29.5, -2.6], [-25, 0.6], [-22, 3.4], [-17.5, 0], [-11.5, -3],
-    [-4, -0.8], [3, 0.6], [11.5, 3.4], [17, 4.4], [22, 4.6], [31.5, 3.2], [38, 0.8], [45.5, 0],
-  ],
-  signStop: 1, // index in `tour` where the tour pauses to read the signboard
+  stops: pickupSpots.map(([x, z]) => ({ x, z })),
+  pickupSpots,
+  len: 47,
 }
+export default L

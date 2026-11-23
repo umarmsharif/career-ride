@@ -3,58 +3,13 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { Kit, ribbonXZ, insideOutline, rng, textTexture } from '../../engine/kit.js'
+import { Kit, ribbonXZ, rng, textTexture } from '../../engine/kit.js'
+import { beam, stripes, tree, clearance, CREAM, WOOD, SLATE } from '../../engine/props.js'
 import { Static, toyMaterial } from '../../engine/IslandParts.jsx'
-import { clock, collectedAt, smooth } from '../../engine/state.js'
+import { clock, sinceOf, smooth } from '../../engine/state.js'
 import L from './layout.js'
 
-const CREAM = '#fff6e4'
-const WOOD = '#8b5e3c'
-const SLATE = '#2f3a4f'
-
-// Seconds since pickup `i` was collected, or -1.
-const since = (i) => (collectedAt[i] === undefined ? -1 : clock.t - collectedAt[i])
-
-function beam(k, a, b, thick, color) {
-  const dx = b[0] - a[0]
-  const dy = b[1] - a[1]
-  const dz = b[2] - a[2]
-  const len = Math.hypot(dx, dy, dz)
-  k.box(thick, thick, len, color, {
-    p: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2],
-    r: [-Math.atan2(dy, Math.hypot(dx, dz)), Math.atan2(dx, dz), 0],
-  })
-}
-
-function stripes(k, w, d, color, t, n = 5) {
-  // A slab made of alternating strips, starting at local z = 0 and reaching out to z = d.
-  k.at(t, () => {
-    for (let i = 0; i < n; i++) {
-      k.box(w / n + 0.005, 0.1, d, i % 2 ? CREAM : color, { p: [-w / 2 + (i + 0.5) * (w / n), 0, d / 2] })
-    }
-    k.box(w, 0.26, 0.1, color, { p: [0, -0.12, d] })
-  })
-}
-
-function tree(k, x, z, s, kind, r) {
-  k.at({ p: [x, 0, z], r: [0, r() * 6, 0], s }, () => {
-    if (kind === 0) {
-      k.cyl(0.22, 0.3, 1.8, WOOD, { p: [0, 0.9, 0] }, 6)
-      k.ball(1.5, '#5fae5a', { p: [0, 2.9, 0], s: [1, 0.9, 1] })
-      k.ball(1.05, '#7cc36a', { p: [0.8, 3.7, 0.3] })
-      k.ball(0.9, '#4f9f58', { p: [-0.8, 2.4, -0.5] })
-    } else if (kind === 1) {
-      k.cyl(0.2, 0.26, 1.2, WOOD, { p: [0, 0.6, 0] }, 6)
-      k.cone(1.5, 2.0, '#3f9a6d', { p: [0, 2.0, 0] }, 7)
-      k.cone(1.15, 1.7, '#4fae78', { p: [0, 3.1, 0] }, 7)
-      k.cone(0.8, 1.4, '#62bd84', { p: [0, 4.1, 0] }, 7)
-    } else {
-      k.cyl(0.18, 0.24, 1.4, WOOD, { p: [0, 0.7, 0] }, 6)
-      k.ball(1.2, '#f2a541', { p: [0, 2.3, 0] })
-      k.ball(0.8, '#f6bd60', { p: [0.5, 3.0, 0.2] })
-    }
-  })
-}
+const since = sinceOf(6)
 
 function house(k, h) {
   k.at({ p: [h.x, 0, h.z], r: [0, h.face, 0] }, () => {
@@ -221,22 +176,12 @@ function buildTown(k) {
   })
 
   // Trees, bushes, rocks and flowers, kept clear of roads and buildings.
-  const roadPts = []
-  for (let i = 0; i <= 60; i++) {
-    const p = mid.getPointAt(i / 60)
-    roadPts.push([p.x, p.z])
-  }
+  const free = clearance(L)
   const clear = (x, z, pad) => {
-    for (const o of [[0, 0], [pad, 0], [-pad, 0], [0, pad], [0, -pad]]) {
-      if (!insideOutline(L.outline, x + o[0] * 1.6, z + o[1] * 1.6)) return false
-    }
     if (Math.abs(x + 0.5) < 3.4) return false
     if (Math.hypot(x + 22.5, z - 5.2) < 7.4) return false
     if (x > 6 && x < 38 && z > -8.5 && z < 11) return false
-    for (const [rx, rz] of roadPts) if (Math.hypot(x - rx, z - rz) < 3.6 + pad) return false
-    for (const c of L.colliders) if (Math.hypot(x - c.x, z - c.z) < c.r + 1.2 + pad) return false
-    for (const p of L.pickups) if (Math.hypot(x - p.x, z - p.z) < 3.5) return false
-    return true
+    return free(x, z, pad)
   }
   let placed = 0
   for (let i = 0; i < 900 && placed < 46; i++) {

@@ -14,6 +14,7 @@ export const toyMaterialDouble = new THREE.MeshStandardMaterial({
 })
 
 export function Land({ outline, grass = '#a5d86e', colors, seed = 7, y = 0 }) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const body = useMemo(() => islandBody(outline, colors, seed), [outline, colors, seed])
   const top = useMemo(() => islandTop(outline), [outline])
   return (
@@ -35,7 +36,7 @@ export function Static({ build, deps = [], double = false }) {
   return <mesh geometry={geo} material={double ? toyMaterialDouble : toyMaterial} castShadow receiveShadow />
 }
 
-function Pickup({ index, x, z }) {
+function Stop({ id, index, x, z, kind }) {
   const group = useRef()
   const gem = useRef()
   const ring = useRef()
@@ -52,7 +53,7 @@ function Pickup({ index, x, z }) {
 
   useFrame(() => {
     const t = clock.t
-    const at = collectedAt[index]
+    const at = collectedAt[id]?.[index]
     const since = at === undefined ? -1 : t - at
     const live = since < 0
     gem.current.rotation.y = t * 1.6 + index
@@ -90,7 +91,7 @@ function Pickup({ index, x, z }) {
       <group ref={group}>
         <mesh ref={gem} castShadow>
           <octahedronGeometry args={[0.62, 0]} />
-          <meshStandardMaterial color="#ffd23f" emissive="#ff9f1c" emissiveIntensity={0.75} roughness={0.3} flatShading />
+          <meshStandardMaterial color={kind === 'fact' ? '#ffd23f' : '#7fe3d4'} emissive={kind === 'fact' ? '#ff9f1c' : '#1f9d8f'} emissiveIntensity={0.75} roughness={0.3} flatShading />
         </mesh>
         <mesh ref={ring}>
           <torusGeometry args={[0.98, 0.05, 6, 28]} />
@@ -117,14 +118,14 @@ function Pickup({ index, x, z }) {
   )
 }
 
-export function Pickups({ pickups }) {
-  const resetKey = useGame((s) => s.resetKey)
-  return pickups.map((p, i) => <Pickup key={`${resetKey}-${i}`} index={i} x={p.x} z={p.z} />)
+// The tokens (and machine, board and card markers) of one island.
+export function Stops({ island }) {
+  return island.stops.map((p, i) => <Stop key={i} id={island.id} index={i} x={p.x} z={p.z} kind={p.kind} />)
 }
 
 // An archway with a year plaque. The exit gate glows.
 export function Gate({ x, z, y = 0, year, glow = false, face = Math.PI / 2 }) {
-  const tex = useMemo(() => textTexture(year, { w: 384, h: 160, size: 112, bg: '#22304f', fg: '#fff6e4' }), [year])
+  const tex = useMemo(() => textTexture(String(year), { w: 384, h: 160, size: 112, bg: '#22304f', fg: '#fff6e4' }), [year])
   const portal = useRef()
   useFrame(() => {
     if (portal.current) {
@@ -192,9 +193,9 @@ export function Banner({ x, z, face, text }) {
 }
 
 // The signboard: riding near it opens the role summary in the HUD.
-export function Signboard({ x, z, face }) {
+export function Signboard({ id, x, z, face }) {
   const marker = useRef()
-  const read = useGame((s) => s.signRead)
+  const read = useGame((s) => !!s.signRead[id])
   useFrame(() => {
     marker.current.position.y = 5.5 + Math.sin(clock.t * 2.6) * 0.22
     marker.current.rotation.y = clock.t * 1.4
