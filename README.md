@@ -32,3 +32,19 @@ checks it; `node tools/story.mjs` plays the whole story.
 
 At most 200 draw calls and 90,000 triangles, measured with shadows on. In the last full run the
 peak was 191 draw calls and 91,025 triangles (The AI Lab, in the moment the next island is also drawn).
+
+## Deploying
+
+The site is a static Vite build. On Vercel: import this repository, keep the detected Vite settings (`vercel.json` pins them), and deploy. `npm run build` writes `dist/`, including the plain CV page at `/cv`.
+
+## Working on it
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+All facts live in `src/content/career.json`. Each island is a folder in `src/islands/`; `docs/ISLAND_GUIDE.md` explains how they are built and checked.
