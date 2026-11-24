@@ -167,7 +167,7 @@ Save this exactly as `src/content/career.json`. Facts come from Umar's CV of rec
     },
     {
       "id": 6,
-      "name": "Kitchen Street",
+      "name": "Food Delivery Street",
       "company": "Foodpanda Pakistan",
       "years": "2020 to 2024",
       "role": "Head of Growth and Performance, then Head of Merchant Performance, Content and Experience",

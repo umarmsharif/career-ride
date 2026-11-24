@@ -1,4 +1,4 @@
-// Kitchen Street (island 6): where things are. Facts come from career.json;
+// Food Delivery Street (island 6): where things are. Facts come from career.json;
 // this file only holds positions and the shape of the land.
 import career from '../../content/career.json'
 

@@ -1,4 +1,4 @@
-// Kitchen Street scenery: a street-food town in two districts.
+// Food Delivery Street scenery: a street-food town in two districts.
 // Static props go into one merged mesh; only the parts that react to pickups are separate.
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
