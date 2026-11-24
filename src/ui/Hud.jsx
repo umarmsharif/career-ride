@@ -48,7 +48,14 @@ function StartScreen() {
         <p className="fine">
           {touch ? 'The rider steers for you. Sit back and watch.' : 'Steer with the arrow keys or W A S D. Story plays the years in order; Open map lets you start anywhere.'}
         </p>
-        <CvLink className="text-link" />
+        <div className="row">
+          <CvLink className="text-link" />
+          {career.person.links.site && (
+            <a id="start-site" className="text-link" href={career.person.links.site}>
+              Back to umarmsharif.com
+            </a>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -237,16 +244,23 @@ function Closing({ total }) {
   return (
     <section className="card closing">
       {career.person.photo && <img className="avatar" src={career.person.photo.replace(/^\//, '')} alt={career.person.name} width="96" height="96" />}
-      {last.brand.logo && <img className="finale-logo" src={last.brand.logo} alt={finale.title} />}
       <p className="eyebrow">Now</p>
-      <h2>{finale.title}</h2>
+      <h2 className="finale-title">
+        {last.brand.logo && <img className="finale-logo" src={last.brand.logo.replace(/^\//, '')} alt="" width="48" height="48" />}
+        {finale.title}
+      </h2>
       <p>{finale.body}</p>
       <p className="closing-line">{last.closing}</p>
       <p className="fine">
         You found {g.collected.length} of {total} tokens and loaded {g.profiles.length} company profiles.
       </p>
       <div className="row">
-        <a id="link-linkedin" className="btn primary" href={links.linkedin} target="_blank" rel="noopener">
+        {links.site && (
+          <a id="link-site" className="btn primary" href={links.site}>
+            Back to umarmsharif.com
+          </a>
+        )}
+        <a id="link-linkedin" className="btn" href={links.linkedin} target="_blank" rel="noopener">
           LinkedIn
         </a>
         <a id="link-github" className="btn" href={links.github} target="_blank" rel="noopener">

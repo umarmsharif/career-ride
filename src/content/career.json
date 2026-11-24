@@ -5,7 +5,8 @@
     "links": {
       "linkedin": "https://www.linkedin.com/in/umarmsharif",
       "github": "https://github.com/umarmsharif",
-      "cv": "/cv"
+      "cv": "/cv",
+      "site": "https://umarmsharif.com/"
     },
     "photo": "/media/umar-sharif.jpg"
   },
@@ -319,9 +320,9 @@
       "brand": {
         "label": "Top Search Agency",
         "primary": "#22304f",
-        "secondary": "#f0553f",
+        "secondary": "#ff36a9",
         "ink": "#fff6e4",
-        "logo": null,
+        "logo": "/media/top-search-agency.png",
         "signLabel": "The Classroom"
       }
     }

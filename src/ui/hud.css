@@ -765,3 +765,6 @@ a.btn {
 .card.closing { max-width: 40rem; padding: 22px 26px; }
 .closing .eyebrow, .closing h2, .closing h2 + p { padding-right: 128px; }
 @media (max-width: 560px) { .closing .avatar { width: 72px; height: 72px; } .card.closing { padding: 16px 18px; } .closing .eyebrow, .closing h2, .closing h2 + p { padding-right: 92px; } }
+
+.finale-title { display: flex; align-items: center; gap: 10px; }
+.closing .finale-logo { width: 48px; height: 48px; max-width: none; max-height: none; margin: 0; flex: none; background: #fff; border-radius: 10px; border: 2px solid var(--card-edge); padding: 3px; }

@@ -276,13 +276,32 @@ export function BrandSign({ brand, x, y, z, face = 0, scale = 1 }) {
     if (brand.logo) {
       const img = new Image()
       img.onload = () => {
-        ctx.fillStyle = '#ffffff'
+        // The logo sits beside the name on a white board.
+        ctx.fillStyle = '#f4ead6'
         ctx.fillRect(0, 0, W, H)
-        const k = Math.min((W * 0.86) / img.width, (H * 0.8) / img.height)
-        ctx.drawImage(img, (W - img.width * k) / 2, (H - img.height * k) / 2, img.width * k, img.height * k)
+        ctx.fillStyle = brand.secondary
+        ctx.fillRect(0, H * 0.9, W, H * 0.1)
+        const lh = H * 0.7
+        const lw = (img.width / img.height) * lh
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'middle'
+        let size = H * 0.42
+        ctx.font = `700 ${size}px Fredoka, "Trebuchet MS", sans-serif`
+        const gap = H * 0.12
+        let tw = ctx.measureText(brand.label).width
+        const room = W * 0.92 - lw - gap
+        if (tw > room) {
+          size *= room / tw
+          ctx.font = `700 ${size}px Fredoka, "Trebuchet MS", sans-serif`
+          tw = ctx.measureText(brand.label).width
+        }
+        const x0 = (W - (lw + gap + tw)) / 2
+        ctx.drawImage(img, x0, H * 0.45 - lh / 2, lw, lh)
+        ctx.fillStyle = brand.primary
+        ctx.fillText(brand.label, x0 + lw + gap, H * 0.47)
         t.needsUpdate = true
       }
-      img.src = brand.logo
+      img.src = brand.logo.replace(/^\//, '')
     }
     return t
   }, [brand, w, hgt])
