@@ -187,9 +187,9 @@ function boatBuild(k) {
 function buildScene(k) {
   baseRoad(k, { road: L.road }, { color: '#e9dcc2', edge: '#cdbd98', dash: '#fff6e4' })
   // Paving.
-  k.box(20, 0.08, 6.4, '#e4d3ae', { p: [-1, 0.04, 7.4] })
+  k.box(15, 0.08, 6.4, '#e4d3ae', { p: [-1.5, 0.04, 7.4] })
   k.box(12, 0.08, 5, '#e4d3ae', { p: [1, 0.04, -7.4] })
-  k.box(20, 0.08, 8.6, '#d9cdb4', { p: [-21, 0.04, 11.8] })
+  k.box(19, 0.08, 8.6, '#d9cdb4', { p: [-24, 0.04, 11.8] })
   warehouse(k)
   // Container yard.
   L.stacks.forEach((s, si) => {
@@ -198,10 +198,10 @@ function buildScene(k) {
   crane(k)
   L.belts.forEach((b) => conveyor(k, b))
   // Loose pallets around the depot and yard.
-  ;[[-34.5, -6.2], [-18.5, -6.2], [-17.2, -4.7], [-33.2, 9.6], [-17.8, 6.0], [-9, -6.3], [12, 7.4], [14.2, 6.6]].forEach(([x, z], i) => pallet(k, x, z, i))
+  ;[[-34.5, -6.2], [-18.5, -6.2], [-17.2, -4.7], [-33.2, 9.6], [-17.8, 6.0], [-9, -6.3], [24, 7.4], [26.2, 6.6]].forEach(([x, z], i) => pallet(k, x, z, i))
   L.vans.forEach((v, i) => van(k, v, L.VAN_COLORS[i]))
   // Van parking kerb.
-  k.box(28, 0.12, 0.3, '#fff6e4', { p: [21.3, 0.08, -9.2] })
+  k.box(20, 0.12, 0.3, '#fff6e4', { p: [30, 0.08, -9.2] })
   quayAndBoatStatic(k)
   // Clock board for the tiles.
   const B = L.board
@@ -221,7 +221,7 @@ function buildScene(k) {
   })
   scatter(k, { outline: L.outline, road: L.road, colliders: L.colliders, stops: L.pickupSpots.map(([x, z]) => ({ x, z })), len: L.len }, rng(77), {
     trees: 16, cover: 50, kinds: [0, 2], treeColors: ['#5fae5a', '#7cc36a', '#4f9f58', '#3f9a6d', '#4fae78', '#62bd84', '#f2a541', '#f6bd60'],
-    keepOut: [{ x: 26, z: 13, r: 13 }, { x: -22, z: 12, r: 11 }, { x: -3, z: 0, r: 10 }, { x: -26, z: -10, r: 6 }, { x: 22, z: -11, r: 16 }, { x: 38, z: 10, r: 7 }],
+    keepOut: [{ x: 29, z: 13, r: 13 }, { x: -22, z: 12, r: 11 }, { x: -1, z: 0, r: 10 }, { x: -26, z: -10, r: 6 }, { x: 30, z: -11, r: 14 }, { x: 38, z: 10, r: 7 }],
   })
 }
 function quayAndBoatStatic(k) {

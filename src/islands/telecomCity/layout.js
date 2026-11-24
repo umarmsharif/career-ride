@@ -23,7 +23,7 @@ const houses = [
 
 const tower = { x: -23.5, z: 11.5 }
 const clubhouse = { x: -19, z: -13 }
-const bank = { x: -6.5, z: 10.5, face: Math.PI }
+const bank = { x: -8.6, z: 10.5, face: Math.PI }
 
 // Wallet Bazaar stalls (face 0 looks south, face PI looks north), sorted west to east.
 const stalls = [

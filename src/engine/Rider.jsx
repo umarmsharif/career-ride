@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { rider, clock, useGame, wrapAngle } from './state.js'
+import { Kit } from './kit.js'
 import career from '../content/career.json'
 
 const brandOf = (id) => career.islands.find((i) => i.id === id).brand
@@ -134,6 +135,17 @@ export default function Rider({ ids }) {
   const limbGeo = useMemo(() => new THREE.CylinderGeometry(0.085, 0.075, 1, 8), [])
   const armGeo = useMemo(() => new THREE.CylinderGeometry(0.07, 0.06, 1, 8), [])
   const crankGeo = useMemo(() => new THREE.CylinderGeometry(0.025, 0.025, 1, 6), [])
+  const crateGeo = useMemo(() => {
+    const k = new Kit()
+    k.box(0.46, 0.06, 0.44, '#a86b47', { p: [0, 0.93, -0.95] })
+    k.box(0.46, 0.2, 0.03, '#c98a5e', { p: [0, 1.04, -1.16] })
+    k.box(0.46, 0.2, 0.03, '#c98a5e', { p: [0, 1.04, -0.74] })
+    k.box(0.03, 0.2, 0.44, '#c98a5e', { p: [0.22, 1.04, -0.95] })
+    k.box(0.03, 0.2, 0.44, '#c98a5e', { p: [-0.22, 1.04, -0.95] })
+    k.box(0.04, 0.5, 0.04, '#aab4c0', { p: [0, 0.67, -0.8], r: [0.55, 0, 0] })
+    return k.build()
+  }, [])
+  const crateMat = useMemo(() => new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.8 }), [])
   const flagGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, -0.34, 0, 0, -0.17, -0.5], 3))
@@ -295,28 +307,12 @@ export default function Rider({ ids }) {
         </group>
 
         {/* Rear crate: one folder for every company profile picked up so far */}
-        <Tube a={REAR} b={new THREE.Vector3(0, 0.9, -0.95)} color={C.metal} r={0.02} />
-        <mesh castShadow position={[0, 0.93, -0.95]}>
-          <boxGeometry args={[0.46, 0.06, 0.44]} />
-          {std('#a86b47')}
-        </mesh>
-        {[[0, 1.04, -1.16, 0.46, 0.2, 0.03], [0, 1.04, -0.74, 0.46, 0.2, 0.03], [0.22, 1.04, -0.95, 0.03, 0.2, 0.44], [-0.22, 1.04, -0.95, 0.03, 0.2, 0.44]].map(([x, y, z, w, h, d], i) => (
-          <mesh key={i} position={[x, y, z]}>
-            <boxGeometry args={[w, h, d]} />
-            {std('#c98a5e')}
-          </mesh>
-        ))}
+        <mesh castShadow geometry={crateGeo} material={crateMat} />
         {profiles.map((id, i) => (
-          <group key={id} position={[0, 1.16, -1.12 + i * 0.042]} rotation={[0.08, 0, 0]}>
-            <mesh castShadow>
-              <boxGeometry args={[0.36, 0.42, 0.03]} />
-              {std('#f6dfa6')}
-            </mesh>
-            <mesh position={[0.02 * ((i % 3) - 1) * 4, 0.19, 0]}>
-              <boxGeometry args={[0.37, 0.1, 0.034]} />
-              <meshStandardMaterial color={brandOf(id).primary} roughness={0.6} />
-            </mesh>
-          </group>
+          <mesh key={id} position={[((i % 3) - 1) * 0.015, 1.17, -1.12 + i * 0.042]} rotation={[0.08, 0, 0]}>
+            <boxGeometry args={[0.36, 0.42, 0.032]} />
+            <meshStandardMaterial color={brandOf(id).primary} roughness={0.6} />
+          </mesh>
         ))}
 
         {/* Rider */}

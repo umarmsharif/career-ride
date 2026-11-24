@@ -21,6 +21,7 @@ function tower(k, t) {
     const tp = 0.3
     const corners = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
     k.cyl(1.9, 2.1, 0.3, '#c9a27a', { p: [0, 0.15, 0] }, 8)
+    k.cyl(1.95, 1.95, 1.6, '#c9a27a', { p: [0, -0.7, 0] }, 8)
     corners.forEach(([sx, sz]) => beam(k, [sx * b, 0.3, sz * b], [sx * tp, h, sz * tp], 0.17, CREAM))
     // Cross braces on each face, at three levels.
     const lv = [0.3, h * 0.36, h * 0.68, h]
@@ -54,6 +55,7 @@ function tower(k, t) {
 function house(k, h) {
   k.at({ p: [h.x, 0, h.z], r: [0, h.face, 0] }, () => {
     k.box(4.8, 0.25, 4.2, '#c9a27a', { p: [0, 0.12, 0] })
+    k.box(4.6, 1.8, 4.0, '#c9a27a', { p: [0, -0.8, 0] })
     k.box(4.4, 2.9, 3.8, h.wall, { p: [0, 1.7, 0] })
     k.roof(5.1, 1.9, 4.6, h.roof, { p: [0, 3.15, 0] })
     k.box(1.0, 1.9, 0.14, WOOD, { p: [-1.1, 1.2, 1.94] })
@@ -71,6 +73,7 @@ function hut(k) {
   const { x, z } = L.hut
   k.at({ p: [x, 0, z] }, () => {
     k.box(5.4, 0.25, 4.6, '#c9a27a', { p: [0, 0.12, 0] })
+    k.box(5.2, 1.8, 4.4, '#c9a27a', { p: [0, -0.8, 0] })
     k.box(4.8, 2.7, 4.0, '#fff1dc', { p: [0, 1.6, 0] })
     k.roof(5.5, 1.7, 4.8, TEAL, { p: [0, 2.95, 0] })
     k.box(1.0, 1.9, 0.14, WOOD, { p: [-1.2, 1.2, 2.04] })
@@ -78,14 +81,13 @@ function hut(k) {
     k.box(1.8, 0.14, 0.2, CREAM, { p: [1.2, 1.15, 2.08] })
     k.box(2.0, 0.5, 0.9, WOOD, { p: [1.2, 0.5, 2.5] })
     // Mini mast on the roof.
-    k.cyl(0.07, 0.1, 2.2, SLATE, { p: [-1.6, 5.6, -0.6] }, 6)
-    k.cyl(0.35, 0.06, 0.14, CREAM, { p: [-1.6, 5.0, -0.1], r: [Math.PI / 2.2, 0, 0] }, 8)
-    k.ball(0.14, CORAL, { p: [-1.6, 6.8, -0.6] }, 0)
+    k.cyl(0.07, 0.1, 1.4, SLATE, { p: [1.8, 4.5, -0.6] }, 6)
+    k.ball(0.14, CORAL, { p: [1.8, 5.3, -0.6] }, 0)
   })
   // Chart board on two posts.
   const b = L.board
   k.at({ p: [b.x, 0, b.z] }, () => {
-    for (const s of [-1, 1]) k.box(0.2, 3.4, 0.2, WOOD, { p: [s * 2.0, 1.7, 0] })
+    for (const s of [-1, 1]) k.box(0.2, 4.6, 0.2, WOOD, { p: [s * 2.0, 1.1, 0] })
     k.box(4.6, 3.0, 0.2, WOOD, { p: [0, BOARD_Y + 0.3, 0] })
     k.box(4.2, 2.6, 0.12, '#fff6e4', { p: [0, BOARD_Y + 0.3, 0.1] })
     // Grid lines and the axis.
@@ -152,7 +154,8 @@ const COOL = ['#4f9f68', '#6cbf7e', '#43926a', '#3a9a7d', '#4fae8c', '#62bd94', 
 // --- Animated parts -------------------------------------------------------------
 
 const RINGS = 3
-function Beacons() {
+function Beacons({ island }) {
+  const gy = (x, z) => island.h(x, z)
   const lamp = useRef()
   const glow = useRef()
   const rings = useRef()
@@ -179,7 +182,7 @@ function Beacons() {
       const l = lit.current[i]
       const pulse = 1 + Math.sin(clock.t * 6 + i) * 0.12 * l
       // Beacon lamp and halo.
-      dummy.position.set(t.beacon[0], t.beacon[1], t.beacon[2])
+      dummy.position.set(t.beacon[0], t.beacon[1] + gy(t.x, t.z), t.beacon[2])
       dummy.rotation.set(0, 0, 0)
       dummy.scale.setScalar((0.8 + l * 0.35) * pulse)
       dummy.updateMatrix()
@@ -202,7 +205,7 @@ function Beacons() {
           a = local < 0 || local > 1.6 ? 0 : (1 - ph) * 1.4
           ph = ph * 1.6
         }
-        dummy.position.set(t.beacon[0], j < 2 ? t.beacon[1] - 0.2 : t.beacon[1] - 0.4, t.beacon[2])
+        dummy.position.set(t.beacon[0], gy(t.x, t.z) + (j < 2 ? t.beacon[1] - 0.2 : t.beacon[1] - 0.4), t.beacon[2])
         dummy.scale.setScalar(0.5 + ph * 9)
         dummy.updateMatrix()
         rings.current.setMatrixAt(i * RINGS + j, dummy.matrix)
@@ -272,7 +275,7 @@ export default function SignalValleyScenery({ island }) {
   return (
     <>
       <Static build={(k) => valley(k, island)} />
-      <Beacons />
+      <Beacons island={island} />
       <ChartBars />
     </>
   )

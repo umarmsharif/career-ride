@@ -14,18 +14,18 @@ const machines = [
 // The token stands on the road side of its machine.
 const stops = machines.map((m) => [m.x, m.z < 0 ? -3.7 : 3.7])
 
-const hut = { x: 0, z: -12.5 }
+const hut = { x: -8, z: -12.5 }
 const restaurant = { x: 25, z: -12 }
 const turbine = { x: 36, z: -10.5 }
 const benches = [
-  { x: -14, z: -11, rot: 0 },
-  { x: 6, z: 11.5, rot: Math.PI },
-  { x: -33, z: -11, rot: 0.2 },
+  { x: -22, z: 6, rot: Math.PI },
+  { x: 7, z: 11.5, rot: Math.PI },
+  { x: -38, z: -11, rot: 0.2 },
 ]
 const racks = [
-  { x: -17.5, z: 12.5, rot: Math.PI },
-  { x: 18, z: 12.5, rot: Math.PI },
-  { x: -4.5, z: -12.8, rot: 0 },
+  { x: -24, z: 13.5, rot: Math.PI },
+  { x: 12, z: 13, rot: Math.PI },
+  { x: -21.5, z: -15, rot: 0 },
 ]
 
 const colliders = [

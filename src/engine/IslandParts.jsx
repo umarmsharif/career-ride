@@ -205,8 +205,10 @@ export function Banner({ x, y = 0, z, face, text }) {
 }
 
 // The signboard: riding near it opens the role summary in the HUD.
-export function Signboard({ id, x, y = 0, z, face }) {
+export function Signboard({ id, x, y = 0, z, face, brand }) {
   const marker = useRef()
+  // The company name, in its colour, across the top of the board.
+  const tex = useMemo(() => (brand ? textTexture(brand.label, { w: 768, h: 230, size: brand.label.length > 12 ? 78 : 120, bg: brand.primary, fg: brand.ink }) : null), [brand])
   const read = useGame((s) => !!s.signRead[id])
   useFrame(() => {
     marker.current.position.y = 5.5 + Math.sin(clock.t * 2.6) * 0.22
@@ -220,10 +222,16 @@ export function Signboard({ id, x, y = 0, z, face }) {
           k.box(4.8, 3.0, 0.3, '#a86b47', { p: [0, 3.0, 0] })
           k.box(4.4, 2.6, 0.1, '#fff6e4', { p: [0, 3.0, 0.2] })
           k.box(4.4, 0.55, 0.12, '#f0553f', { p: [0, 4.02, 0.21] })
-          ;[3.45, 3.05, 2.65, 2.25].forEach((y, i) => k.box(i === 3 ? 2.2 : 3.6, 0.16, 0.12, '#22304f', { p: [i === 3 ? -0.7 : 0, y, 0.21] }))
+          ;[2.65, 2.3, 1.95].forEach((y, i) => k.box(i === 2 ? 2.2 : 3.6, 0.16, 0.12, '#22304f', { p: [i === 2 ? -0.7 : 0, y, 0.21] }))
           k.box(5.2, 0.3, 0.7, '#e2674a', { p: [0, 4.65, 0] })
         }}
       />
+      {tex && (
+        <mesh position={[0, 3.62, 0.3]}>
+          <planeGeometry args={[4.3, 1.3]} />
+          <meshBasicMaterial map={tex} toneMapped={false} />
+        </mesh>
+      )}
       <mesh ref={marker} position={[0, 5.5, 0]} visible={!read}>
         <octahedronGeometry args={[0.36, 0]} />
         <meshBasicMaterial color="#1f9d8f" />
@@ -316,20 +324,10 @@ export function ProfileStand({ id, x, y, z, face, color }) {
           k.box(0.8, 0.07, 0.6, '#fff1dc', { p: [0, 1.12, 0], r: [0.35, 0, 0] })
         }}
       />
-      <group ref={folder} position={[0, 1.5, 0]}>
-        <mesh castShadow>
-          <boxGeometry args={[0.56, 0.72, 0.09]} />
-          <meshStandardMaterial color="#f6dfa6" roughness={0.7} flatShading />
-        </mesh>
-        <mesh position={[0, 0.2, 0]}>
-          <boxGeometry args={[0.58, 0.2, 0.1]} />
-          <meshStandardMaterial color={color} roughness={0.6} emissive={color} emissiveIntensity={0.25} />
-        </mesh>
-        <mesh position={[0.16, 0.41, 0]}>
-          <boxGeometry args={[0.2, 0.12, 0.08]} />
-          <meshStandardMaterial color={color} roughness={0.6} />
-        </mesh>
-      </group>
+      <mesh ref={folder} position={[0, 1.5, 0]} castShadow>
+        <boxGeometry args={[0.56, 0.72, 0.09]} />
+        <meshStandardMaterial color={color} roughness={0.6} emissive={color} emissiveIntensity={0.2} flatShading />
+      </mesh>
     </group>
   )
 }
@@ -340,7 +338,7 @@ float hash(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x 
 void main(){ vec3 d = normalize(vDir); float h = d.y;
 vec3 c = h > 0.0 ? mix(mid, top, pow(h, 0.55)) : mix(mid, low, pow(-h, 0.5));
 float s = max(dot(d, sunDir), 0.0);
-c += sunCol * (pow(s, 6.0) * 0.22 + pow(s, 60.0) * 0.35);
+c += sunCol * (pow(s, 6.0) * 0.12 + pow(s, 60.0) * 0.3);
 c = mix(c, vec3(1.0, 0.97, 0.86), smoothstep(0.99905, 0.9993, s));
 if (night > 0.0 && h > 0.02) { vec3 g = floor(d * 90.0); float st = step(0.9965, hash(g)); c += vec3(st) * night * smoothstep(0.02, 0.3, h) * 0.9; }
 gl_FragColor = vec4(c, 1.0); }`

@@ -33,7 +33,7 @@ for (let x = -33; x <= 35; x += 4) streamPts.push([x, roadAt(x) + 5.4 + Math.sin
 // Signal towers: side -1 is north of the road, +1 south, beyond the stream.
 const towerSpec = [[-26, -1], [-18, 1], [-9, -1], [-1, 1], [11, -1], [19, 1], [27, -1], [33, 1]]
 const towers = towerSpec.map(([x, side], i) => {
-  const z = roadAt(x) + (side < 0 ? -7.2 : 10.2)
+  const z = roadAt(x) + (side < 0 ? -7.2 : 12)
   return { x, z, i, side, h: 9, beacon: [x, 9.7, z] }
 })
 

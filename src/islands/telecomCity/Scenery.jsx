@@ -227,7 +227,7 @@ const ISLAND_REF = { current: null }
 // --- Parts that react to pickups ------------------------------------------------
 
 // Pickup 0: offers fly from the tower to individual houses and their windows light up.
-function Offers() {
+function Offers({ island }) {
   const panes = useRef([])
   const env = useRef()
   const beacon = useRef()
@@ -245,11 +245,12 @@ function Offers() {
     () =>
       L.houses.map((h) => {
         const [fx, fz] = front(h.face, 2.2)
-        return { pane: [h.x + fx, topY(h) - 0.8, h.z + fz], hit: [h.x + fx * 1.3, topY(h) - 0.8, h.z + fz * 1.3] }
+        const gy = island.h(h.x, h.z)
+        return { pane: [h.x + fx, gy + topY(h) - 0.8, h.z + fz], hit: [h.x + fx * 1.3, gy + topY(h) - 0.8, h.z + fz * 1.3] }
       }),
-    []
+    [island]
   )
-  const src = [L.tower.x, 16.2, L.tower.z]
+  const src = [L.tower.x, 16.2 + island.h(L.tower.x, L.tower.z), L.tower.z]
   useFrame(() => {
     const s = since(0)
     L.houses.forEach((h, i) => {
@@ -413,10 +414,10 @@ function BankDoors() {
 }
 
 // Pickup 3: coins hop from stall to stall along the bazaar in a chain.
-function CoinChain() {
+function CoinChain({ island }) {
   const coins = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
-  const path = useMemo(() => L.stalls.map((s) => [s.x, 1.95, s.z + Math.cos(s.face) * 0.5]), [])
+  const path = useMemo(() => L.stalls.map((s) => [s.x, 1.95 + island.h(s.x, s.z), s.z + Math.cos(s.face) * 0.5]), [island])
   const N = path.length
   const COINS = 4
   useFrame(() => {
@@ -450,7 +451,7 @@ function CoinChain() {
 }
 
 // Pickup 4: eight phones, 96 tiles. About 17% (16 tiles) light up, then it grows to 25% (24 tiles).
-function PhoneTiles() {
+function PhoneTiles({ island }) {
   const mesh = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const dark = useMemo(() => new THREE.Color('#34456a'), [])
@@ -467,14 +468,14 @@ function PhoneTiles() {
         const row = Math.floor(j / 3)
         const rank = order.indexOf(j)
         out.push({
-          pos: [p.x - (col_ - 1) * 0.46, 3.0 + 0.1 + (1.5 - row) * 0.46 - 0.0, p.z - 0.23],
+          pos: [p.x - (col_ - 1) * 0.46, island.h(p.x, p.z) + 3.0 + 0.1 + (1.5 - row) * 0.46 - 0.0, p.z - 0.23],
           stage: rank < 2 ? 1 : rank === 2 ? 2 : 0,
           order: pi * 2 + rank,
         })
       }
     })
     return out
-  }, [])
+  }, [island])
   useFrame(() => {
     const s = since(4)
     tiles.forEach((t, i) => {
@@ -554,11 +555,11 @@ export default function TelecomCityScenery({ island }) {
   return (
     <>
       <Static build={buildTown} />
-      <Offers />
+      <Offers island={island} />
       <Loyalty />
       <BankDoors />
-      <CoinChain />
-      <PhoneTiles />
+      <CoinChain island={island} />
+      <PhoneTiles island={island} />
       <Trophies />
     </>
   )

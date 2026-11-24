@@ -293,7 +293,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.rideT = 0
       s.rideFrom.copy(rider.pos)
       s.rideFromQ.copy(rider.quat)
-      useGame.setState({ phase: 'ride', open: null, waiting: false, nearSign: false, nearExit: false, year: island.endYear })
+      useGame.setState({ phase: 'ride', rideLate: false, open: null, waiting: false, nearSign: false, nearExit: false, year: island.endYear })
       return
     }
     const fin = island.finish
@@ -346,6 +346,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     const a = islands[s.idx].endYear
     const b = next.startYear
     const year = Math.round(a + (b - a) * smooth((u - 0.15) / 0.6))
+    if (u > 0.42 !== !!g.rideLate) useGame.setState({ rideLate: u > 0.42 })
     if (year !== g.year) {
       useGame.setState({ year })
       audio.tick()
@@ -366,7 +367,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.zoom = 1
       worldRef.current.position.copy(origins[s.idx]).multiplyScalar(-1)
       const visited = g.visited.includes(s.idx) ? g.visited : [...g.visited, s.idx]
-      useGame.setState({ phase: 'island', island: s.idx, visited, year: null, district: 0, splash: g.splash + 1 })
+      useGame.setState({ phase: 'island', island: s.idx, visited, rideLate: false, year: null, district: 0, splash: g.splash + 1 })
     }
   }
 
@@ -415,8 +416,9 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       const dist = portrait ? 15 : 10.2
       const height = portrait ? 10 : 7.2
       want.set(rider.pos.x - Math.sin(s.camHeading) * dist, rider.pos.y + height, rider.pos.z - Math.cos(s.camHeading) * dist)
-      const ahead = 4.5 * s.zoom * s.zoom
-      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, rider.pos.y + 1.0, rider.pos.z + Math.cos(s.camHeading) * ahead)
+      // Look far enough ahead that the horizon, the sky and rooftop boards are in the picture.
+      const ahead = 7 * s.zoom * s.zoom
+      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, rider.pos.y + 1.0 + 1.5 * s.zoom, rider.pos.z + Math.cos(s.camHeading) * ahead)
     }
     if (phase === 'island') {
       // Pull the camera in when a building or gate would sit between it and the rider.

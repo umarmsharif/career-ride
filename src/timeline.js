@@ -37,7 +37,8 @@ export function timelineHtml() {
         <p class="tl-years">${esc(i.years)}</p>
         <h2>${esc(i.company)}</h2>
         <p class="tl-role">${esc(i.role)}</p>
-        <p>${esc(i.summary)}</p>
+        <p>${esc(i.summary)}</p>${i.about ? `
+        <p class="tl-about">${esc(i.about)}</p>` : ''}
         ${items(i)}
       </div>
     </li>`
@@ -63,7 +64,7 @@ export const timelineCss = `
 .tl-stop{display:flex;gap:16px;align-items:flex-start}
 .tl-dot{flex:none;width:40px;height:40px;border-radius:50%;background:#ffd23f;border:3px solid #22304f;box-shadow:0 3px 0 #22304f;display:grid;place-items:center;font-family:'Fredoka',sans-serif;font-weight:700}
 .tl-body{min-width:0;background:#fff6e4;border:3px solid #22304f;border-radius:18px;box-shadow:0 5px 0 #22304f;padding:14px 18px;flex:1}
-.tl-role{font-weight:800}
+.tl-role{font-weight:800}.tl-about{font-style:italic;opacity:.8}
 .tl-client{color:#55627d;font-weight:700}
 .tl ul{margin:6px 0 0;padding-left:1.2em}
 .tl li{margin:3px 0}

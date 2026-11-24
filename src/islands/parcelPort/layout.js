@@ -31,21 +31,21 @@ const depotDoor = [-26, -6.4]
 // Container stacks: x, z, levels, colour order.
 const COLORS = ['#f0553f', '#1f9d8f', '#f2a541', '#fff1dc', '#22304f']
 const stacks = [
-  { x: -27, z: 10.2, n: 3, c: [0, 1, 2] }, { x: -20.5, z: 10.2, n: 2, c: [3, 0] }, { x: -14, z: 10.2, n: 3, c: [4, 2, 1] },
-  { x: -27, z: 13.4, n: 2, c: [1, 3] }, { x: -20.5, z: 13.4, n: 3, c: [2, 4, 0] }, { x: -14, z: 13.4, n: 1, c: [0] },
+  { x: -30, z: 10.2, n: 3, c: [0, 1, 2] }, { x: -24.5, z: 10.2, n: 2, c: [3, 0] }, { x: -19, z: 10.2, n: 3, c: [4, 2, 1] },
+  { x: -30, z: 13.4, n: 2, c: [1, 3] }, { x: -24.5, z: 13.4, n: 3, c: [2, 4, 0] }, { x: -19, z: 13.4, n: 1, c: [0] },
 ]
-const crane = { x: -9.5, z0: 7.2, z1: 15.8 }
+const crane = { x: -7, z0: 7.2, z1: 15.8 }
 
 const belts = [
-  { x0: -6, x1: 8, z: 7.2, dir: 1 },
-  { x0: -4, x1: 6, z: -7.4, dir: -1 },
+  { x0: -4, x1: 5.5, z: 7.2, dir: 1 },
+  { x0: -4, x1: 5.5, z: -7.4, dir: -1 },
 ]
 const clockPos = { x: warehouse.x, y: 7.5, z: warehouse.z + 4.15 }
 const board = { x: 0, z: -12.5 }
-const kiosk = { x: 31, z: 5.4 }
-const quay = { x0: 15, x1: 36, z0: 11.4, z1: 15.2 }
-const boat = { x: 26, z: 21.6 }
-const vans = Array.from({ length: 10 }, (_, i) => ({ x: 8.6 + i * 2.7, z: -11.2 }))
+const kiosk = { x: 32, z: 5.4 }
+const quay = { x0: 21, x1: 37, z0: 11.4, z1: 15.2 }
+const boat = { x: 27.5, z: 21.6 }
+const vans = Array.from({ length: 8 }, (_, i) => ({ x: 22 + i * 2.4, z: -11.2 }))
 const VAN_COLORS = ['#f0553f', '#1f9d8f', '#f2a541', '#fff1dc', '#22304f', '#ff8fa3', '#7fc4d8', '#7cc36a', '#ff8a3d', '#a58be0']
 
 const colliders = [
@@ -76,10 +76,10 @@ function makePins() {
     const z = -19 + r() * 38
     if (!free(x, z, 1.2)) continue
     if (!insideOutline(outline, x * 1.1, z * 1.12)) continue
-    if (x > 10 && z > 9.5) continue // quay
+    if (x > 8 && z > 9.5) continue // quay
     if (x < -10 && z > 5.5 && z < 16.5) continue // container yard
     if (x < -10 && z < -5) continue // depot yard
-    if (x > 5 && x < 40 && z < -8) continue // vans
+    if (x > 18 && x < 42 && z < -8) continue // vans
     if (Math.hypot(x - kiosk.x, z - kiosk.z) < 5) continue
     if (Math.abs(x - board.x) < 6 && z < -9) continue
     if (x > 38 || x < -40) continue

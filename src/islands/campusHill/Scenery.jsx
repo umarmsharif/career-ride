@@ -216,8 +216,8 @@ function buildCampus(k, island) {
   k.disc(L.quad.r, '#ecd3a2', { p: [L.quad.x, 0.06, L.quad.z] }, 24)
   k.disc(L.quad.r - 1.1, '#f6e3bd', { p: [L.quad.x, 0.08, L.quad.z] }, 24)
   k.disc(2.8, '#ecd3a2', { p: [L.quad.x, 0.1, L.quad.z - 3.8] }, 16)
-  k.add(ribbonXZ([[L.hill.x, L.hill.z + 11], [L.hill.x, L.hill.z + 14.5], [L.quad.x, 6.4]], 2.8, 0.05), '#ecd3a2')
-  k.add(ribbonXZ([[-12, 4.2], [-14, -2], [L.library.x, L.library.z + 8.6]], 3.2, 0.05), '#ecd3a2')
+  k.add(ribbonXZ([[L.hill.x, L.hill.z + L.hill.rBase], [L.hill.x, 3.4], [L.quad.x, 6.4]], 2.8, 0.05), '#ecd3a2')
+  k.add(ribbonXZ([[L.library.x, -1.5], [L.library.x, L.library.z + 8.6]], 3.2, 0.05), '#ecd3a2')
   k.add(ribbonXZ([[18, 5], [21, -2], [L.tower.x, L.tower.z + 3.4]], 2.6, 0.05), '#ecd3a2')
 
   hall(k)

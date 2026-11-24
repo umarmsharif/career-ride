@@ -374,7 +374,7 @@ function buildAll(k, island) {
     ...L.pennants.map((p) => ({ x: p.x, z: p.z, r: 2.4 })),
   ]
   scatter(k, island, r, {
-    trees: 34, cover: 90, keepOut: keep,
+    trees: 10, cover: 25, keepOut: keep,
   })
 }
 
@@ -436,7 +436,7 @@ function Graduation() {
 }
 
 // Stop 1: shed windows (front and sawtooth glass) light up and chimney smoke puffs.
-function Windows() {
+function Windows({ island }) {
   const panes = useRef()
   const smoke = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
@@ -457,7 +457,7 @@ function Windows() {
     const s = since(1)
     items.forEach((it, i) => {
       const k = s < 0 ? 0 : smooth((s - it.order * 0.22) / 0.4)
-      dummy.position.set(...it.p)
+      dummy.position.set(it.p[0], it.p[1] + island.h(it.p[0], it.p[2]), it.p[2])
       dummy.scale.set(...it.s)
       dummy.updateMatrix()
       panes.current.setMatrixAt(i, dummy.matrix)
@@ -469,7 +469,7 @@ function Windows() {
     for (let j = 0; j < 4; j++) {
       const life = (clock.t * 0.4 + j / 4) % 1
       const on = s < 0 ? 0 : smooth(s / 1.2)
-      dummy.position.set(x + 6.5 + life * 1.2, h + 3.8 + life * 3.5, z - 2.2)
+      dummy.position.set(x + 6.5 + life * 1.2, h + 3.8 + life * 3.5 + island.h(x + 6.5, z - 2.2), z - 2.2)
       dummy.scale.setScalar(on * (0.3 + life * 0.6) * (1 - life * 0.7))
       dummy.updateMatrix()
       smoke.current.setMatrixAt(j, dummy.matrix)
@@ -546,7 +546,7 @@ export default function WorkshopScenery({ island }) {
     <>
       <Static build={(k) => buildAll(k, island)} deps={[island]} />
       <GearWall />
-      <Windows />
+      <Windows island={island} />
       <Graduation />
       <Pennants />
     </>

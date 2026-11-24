@@ -35,7 +35,7 @@ function RideRoad({ ride, tipX, endY }) {
   )
 }
 
-function Island({ entry, exitYear }) {
+function Island({ entry, exitYear, lite }) {
   const { island, Scenery } = entry
   const h = island.h
   const brand = island.data.brand
@@ -44,18 +44,25 @@ function Island({ entry, exitYear }) {
   return (
     <>
       <Land island={island} seed={island.id * 3 + 1} />
-      <Grounded island={island}>
-        <Scenery island={island} />
-      </Grounded>
-      <Stops island={island} />
-      <Signboard id={island.id} {...island.sign} y={h(island.sign.x, island.sign.z)} />
+      {!lite && (
+        <Grounded island={island}>
+          <Scenery island={island} />
+        </Grounded>
+      )}
+      {!lite && <Stops island={island} />}
+      {!lite && (
+        <>
+      <Signboard id={island.id} {...island.sign} y={h(island.sign.x, island.sign.z)} brand={brand} />
       <ProfileStand id={island.id} x={st.x} z={st.z} y={h(st.x, st.z)} face={island.sign.face} color={brand.primary} />
       <BrandSign brand={brand} {...bs} y={h(bs.x, bs.z) + bs.y} />
+        </>
+      )}
       <Gate {...island.entranceGate} y={h(island.entranceGate.x, 0)} year={island.startYear} />
       {island.exitGate && <Gate {...island.exitGate} y={h(island.exitGate.x, 0)} year={exitYear} glow />}
-      {island.banners.map((b, i) => (
-        <Banner key={i} {...b} y={h(b.x, b.z)} text={b.text ?? island.districts[b.district ?? 0]} />
-      ))}
+      {!lite &&
+        island.banners.map((b, i) => (
+          <Banner key={i} {...b} y={h(b.x, b.z)} text={b.text ?? island.districts[b.district ?? 0]} />
+        ))}
     </>
   )
 }
@@ -113,7 +120,10 @@ export default function World({ entries }) {
   }, [scene, gl])
 
   // The next island is only drawn once the rider is heading for it, to stay inside the budget.
+  // While both are in view only one has its scenery: the one being left for the first part of
+  // the ride, the one being approached for the rest. The other is bare land.
   const leaving = useGame((s) => s.phase === 'ride' || s.nearExit)
+  const late = useGame((s) => s.phase === 'ride' && s.rideLate)
   const mounted = (leaving ? [current, current + 1] : [current]).filter((i) => i < islands.length)
   return (
     <>
@@ -123,7 +133,7 @@ export default function World({ entries }) {
       <group ref={worldRef}>
         {mounted.map((i) => (
           <group key={islands[i].id} position={origins[i]}>
-            <Island entry={entries[i]} exitYear={islands[i + 1]?.startYear} />
+            <Island entry={entries[i]} exitYear={islands[i + 1]?.startYear} lite={leaving && (i === current) === late} />
             {rides[i] && i === current && <RideRoad ride={rides[i]} tipX={origins[i + 1].x - origins[i].x - islands[i + 1].len} endY={islands[i].ride.dy + islands[i + 1].h(islands[i + 1].spawn.x, 0)} />}
           </group>
         ))}

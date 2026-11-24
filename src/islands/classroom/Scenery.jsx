@@ -148,9 +148,18 @@ const LANTERNS = [
   [31, -3.6], [31, 3.6], [34.8, -3.6], [34.8, 3.6], [38.2, -3.6], [38.2, 3.6],
 ]
 
-function bunting(k, a, b, sag, n, seed) {
+function bunting(k, island, a0, b0, sag, n, seed) {
   const r = rng(seed)
-  for (const p of [a, b]) k.cyl(0.1, 0.14, p[1], '#22304f', { p: [p[0], p[1] / 2, p[2]] }, 6)
+  // Placed in one group at the island origin, so heights are added by hand relative to it.
+  const h0 = island.h(0, 0)
+  const up = (p) => [p[0], p[1] + island.h(p[0], p[2]) - h0, p[2]]
+  const a = up(a0)
+  const b = up(b0)
+  k.at({ p: [0, 0, 0] }, () => {
+  for (const [p, q] of [[a, a0], [b, b0]]) {
+    const base = p[1] - q[1]
+    k.cyl(0.1, 0.14, q[1], '#22304f', { p: [p[0], base + q[1] / 2, p[2]] }, 6)
+  }
   let prev = a
   const pts = [a]
   for (let i = 1; i <= n; i++) {
@@ -166,6 +175,7 @@ function bunting(k, a, b, sag, n, seed) {
     const p = pts[i]
     k.cone(0.34, 0.8, FLAGS[Math.floor(r() * FLAGS.length)], { p: [p[0], p[1] - 0.42, p[2]], r: [Math.PI, dir - Math.PI / 2, 0], s: [1, 1, 0.1] }, 3)
   }
+  })
 }
 
 function build(k, island) {
@@ -225,10 +235,10 @@ function build(k, island) {
   })
 
   // Prayer-flag bunting behind the boards, behind the benches, and over the road at both ends.
-  for (let i = 0; i < 4; i++) bunting(k, [-40 + i * 21, 6.4, -11.6], [-23 + i * 21, 6.4, -11.6], 0.9, 11, 11 + i)
-  for (let i = 0; i < 2; i++) bunting(k, [-36 + i * 26, 5.2, 11.8], [-13 + i * 26, 5.2, 11.8], 0.8, 10, 31 + i)
-  bunting(k, [43.5, 6.9, -2.4], [48, 5.4, -9], 0.5, 6, 53)
-  bunting(k, [43.5, 6.9, 2.4], [48, 5.4, 9], 0.5, 6, 54)
+  for (let i = 0; i < 4; i++) bunting(k, island, [-40 + i * 21, 6.4, -11.6], [-23 + i * 21, 6.4, -11.6], 0.9, 11, 11 + i)
+  for (let i = 0; i < 2; i++) bunting(k, island, [-36 + i * 26, 5.2, 11.8], [-13 + i * 26, 5.2, 11.8], 0.8, 10, 31 + i)
+  bunting(k, island, [43.5, 6.9, -2.4], [48, 5.4, -9], 0.5, 6, 53)
+  bunting(k, island, [43.5, 6.9, 2.4], [48, 5.4, 9], 0.5, 6, 54)
 
   scatter(k, island, r, {
     trees: 16,
@@ -295,7 +305,7 @@ const pegGeo = (() => {
   return k.build()
 })()
 
-function Pegs() {
+function Pegs({ island }) {
   const mesh = useRef()
   const col = useMemo(() => new THREE.Color(), [])
   useLayoutEffect(() => {
@@ -314,7 +324,7 @@ function Pegs() {
         k = u >= 1 ? 1 : Math.max(0.001, k * u + (1 - u) * u)
         hop = local > 0.5 ? Math.max(0, Math.sin(clock.t * 2.2 + i * 1.9)) * 0.06 : 0
       }
-      dummy.position.set(p.x, p.y + hop, p.z)
+      dummy.position.set(p.x, p.y + hop + island.h(p.x, p.z), p.z)
       dummy.rotation.set(0, p.yaw + Math.sin(clock.t * 0.8 + i) * 0.15, 0)
       dummy.scale.setScalar(Math.max(0.001, k))
       dummy.updateMatrix()
@@ -335,7 +345,7 @@ const arrowGeo = (() => {
   return k.build()
 })()
 
-function Magnifier() {
+function Magnifier({ island }) {
   const group = useRef()
   const arrows = useRef()
   const col = useMemo(() => new THREE.Color(), [])
@@ -354,7 +364,7 @@ function Magnifier() {
     for (let i = 0; i < 6; i++) {
       const life = s < 0 ? 0 : ((s * 0.4 + i / 6) % 1)
       const on = s < 0 ? 0 : Math.min(1, s / 0.5)
-      dummy.position.set(L.kiosk.x + (i - 2.5) * 0.62, 2.0 + life * 4.2, L.kiosk.z + 2.4 + Math.sin(i * 2.1) * 0.3)
+      dummy.position.set(L.kiosk.x + (i - 2.5) * 0.62, 2.0 + life * 4.2 + island.h(L.kiosk.x, L.kiosk.z), L.kiosk.z + 2.4 + Math.sin(i * 2.1) * 0.3)
       dummy.rotation.set(0, clock.t * 1.4 + i, 0)
       dummy.scale.setScalar(Math.max(0.001, Math.sin(life * Math.PI) * 1.2 * on))
       dummy.updateMatrix()
@@ -392,7 +402,7 @@ function Magnifier() {
 }
 
 // The open door: light pours through it, gently pulsing, all the time.
-function DoorLight() {
+function DoorLight({ island }) {
   const glow = useRef()
   const halo = useRef()
   const floor = useRef()
@@ -414,8 +424,7 @@ function DoorLight() {
     return t
   }, [])
   const floorGeo = useMemo(() => {
-    const x = L.door.x - 0.2
-    const v = [x, 0.1, -1.9, x, 0.1, 1.9, x - 10, 0.1, 5.2, x, 0.1, -1.9, x - 10, 0.1, 5.2, x - 10, 0.1, -5.2]
+    const v = [0, 0.1, -1.9, 0, 0.1, 1.9, -10, 0.1, 5.2, 0, 0.1, -1.9, -10, 0.1, 5.2, -10, 0.1, -5.2]
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3))
     const n = [1, 0.7, 0.3]
@@ -430,7 +439,7 @@ function DoorLight() {
     halo.current.opacity = 0.22 + 0.16 * p
     floor.current.opacity = 0.55 + 0.35 * p
     LANTERNS.forEach(([x, z], i) => {
-      dummy.position.set(x, LANTERN_H + 0.2, z)
+      dummy.position.set(x, LANTERN_H + 0.2 + island.h(x, z), z)
       dummy.rotation.set(0, 0, 0)
       dummy.scale.setScalar(0.9 + 0.12 * Math.sin(clock.t * 1.5 + i * 0.7))
       dummy.updateMatrix()
@@ -439,7 +448,7 @@ function DoorLight() {
     orbs.current.instanceMatrix.needsUpdate = true
     moteSeeds.forEach((m, i) => {
       const life = (clock.t * 0.08 + m.b) % 1
-      dummy.position.set(L.door.x - 0.8 - life * 8, 0.6 + ((m.a * 3) % 3) + Math.sin(clock.t * 0.9 + m.a) * 0.3 + life * 0.8, m.z * (1.4 + life * 3.2))
+      dummy.position.set(L.door.x - 0.8 - life * 8, island.h(L.door.x, 0) + 0.6 + ((m.a * 3) % 3) + Math.sin(clock.t * 0.9 + m.a) * 0.3 + life * 0.8, m.z * (1.4 + life * 3.2))
       dummy.rotation.set(0, 0, 0)
       dummy.scale.setScalar(Math.max(0.001, Math.sin(life * Math.PI) * 0.9))
       dummy.updateMatrix()
@@ -457,7 +466,7 @@ function DoorLight() {
         <planeGeometry args={[5.4, 6.4]} />
         <meshBasicMaterial ref={halo} color="#ffd98a" transparent opacity={0.3} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
       </mesh>
-      <mesh geometry={floorGeo}>
+      <mesh geometry={floorGeo} position={[L.door.x - 0.2, 0, 0]}>
         <meshBasicMaterial ref={floor} vertexColors transparent opacity={0.8} depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} toneMapped={false} />
       </mesh>
       <instancedMesh ref={orbs} args={[null, null, LANTERNS.length]} frustumCulled={false}>
@@ -503,17 +512,17 @@ function Sky() {
   })
   return (
     <>
-      <mesh ref={a} geometry={geos[0]}>
+      <mesh ref={a} geometry={geos[0]} userData={{ noLift: true }}>
         <meshBasicMaterial vertexColors toneMapped={false} />
       </mesh>
-      <mesh ref={b} geometry={geos[1]}>
+      <mesh ref={b} geometry={geos[1]} userData={{ noLift: true }}>
         <meshBasicMaterial vertexColors toneMapped={false} />
       </mesh>
-      <mesh position={[92, 16, 0]} rotation={[0, -Math.PI / 2, 0]}>
+      <mesh position={[92, 12, 0]} rotation={[0, -Math.PI / 2, 0]} userData={{ noLift: true }}>
         <circleGeometry args={[7, 28]} />
         <meshBasicMaterial color="#ffe08a" fog={false} toneMapped={false} />
       </mesh>
-      <mesh position={[91, 16, 0]} rotation={[0, -Math.PI / 2, 0]}>
+      <mesh position={[91, 12, 0]} rotation={[0, -Math.PI / 2, 0]} userData={{ noLift: true }}>
         <circleGeometry args={[13, 28]} />
         <meshBasicMaterial color="#ffd27a" transparent opacity={0.3} fog={false} toneMapped={false} depthWrite={false} />
       </mesh>
@@ -528,9 +537,9 @@ export default function ClassroomScenery({ island }) {
       <Chalk index={0} />
       <Chalk index={1} />
       <Chalk index={2} />
-      <Pegs />
-      <Magnifier />
-      <DoorLight />
+      <Pegs island={island} />
+      <Magnifier island={island} />
+      <DoorLight island={island} />
       <Sky />
     </>
   )

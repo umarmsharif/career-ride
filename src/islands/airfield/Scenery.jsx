@@ -125,7 +125,7 @@ function buildAirfield(k, island) {
   // Aprons: hangar forecourt, parking pad and a link to the runway.
   k.box(L.apron.w, 0.04, L.apron.d, APRON, { p: [L.apron.x, 0.02, L.apron.z] })
   k.box(L.apron.w + 0.8, 0.03, L.apron.d + 0.8, SHOULDER, { p: [L.apron.x, 0.015, L.apron.z] })
-  k.box(4.5, 0.045, 3.2, APRON, { p: [-20, 0.022, 5.0] })
+  k.box(4.5, 0.045, 3.2, APRON, { p: [-8.5, 0.022, 5.0] })
   k.add(new THREE.CircleGeometry(6.6, 18).rotateX(-Math.PI / 2), SHOULDER, { p: [35, 0.015, 9.5] })
   k.add(new THREE.CircleGeometry(6.0, 18).rotateX(-Math.PI / 2), APRON, { p: [35, 0.025, 9.5] })
   k.box(4.5, 0.045, 3.6, APRON, { p: [31, 0.022, 5.4] })
@@ -205,7 +205,7 @@ function buildAirfield(k, island) {
   // Luggage carts.
   L.carts.forEach((c) => cart(k, c.x, c.z, c.ry))
   // A few loose cases beside the hangar door.
-  ;[[-21.2, 6.5, 0.3, '#e2674a'], [-20.4, 6.7, -0.4, '#1f9d8f'], [-21.0, 6.0, 0.9, '#f2a541']].forEach(([x, z, ry, c]) => k.box(0.7, 0.5, 0.45, c, { p: [x, 0.3, z], r: [0, ry, 0] }))
+  ;[[-14.2, 6.5, 0.3, '#e2674a'], [-13.4, 6.7, -0.4, '#1f9d8f'], [-14.0, 6.0, 0.9, '#f2a541']].forEach(([x, z, ry, c]) => k.box(0.7, 0.5, 0.45, c, { p: [x, 0.3, z], r: [0, ry, 0] }))
 
   // Runway light poles (the glowing bulbs are animated).
   for (const s of [1, -1]) for (let x = -39; x <= 41; x += 4) k.cyl(0.05, 0.08, 0.5, SLATE, { p: [x, 0.25, s * 4.7] }, 5)
@@ -246,7 +246,8 @@ function buildAirfield(k, island) {
   // Trees, bushes and flowers on the grass, clear of everything above.
   const keepOut = [
     { x: L.apron.x, z: L.apron.z, r: 15 },
-    { x: -8, z: 10, r: 8 },
+    { x: 1.8, z: 11.8, r: 6 },
+    { x: 14, z: -10.5, r: 6 },
     { x: 35, z: 9.5, r: 8 },
     { x: 31, z: 5.4, r: 4 },
     { x: L.dial.x, z: L.dial.z, r: 5 },
@@ -479,7 +480,7 @@ function Windsock() {
 }
 
 // Runway lights chase along both edges, always.
-function RunwayLights() {
+function RunwayLights({ island }) {
   const mesh = useRef()
   const spots = useMemo(() => {
     const out = []
@@ -492,7 +493,7 @@ function RunwayLights() {
   const col = useMemo(() => new THREE.Color(), [])
   useFrame(() => {
     spots.forEach(([x, z], i) => {
-      dummy.position.set(x, 0.56, z)
+      dummy.position.set(x, 0.56 + island.h(x, z), z)
       dummy.updateMatrix()
       mesh.current.setMatrixAt(i, dummy.matrix)
       const k = 0.5 + 0.5 * Math.sin(clock.t * 4 - x * 0.35)
@@ -510,7 +511,7 @@ function RunwayLights() {
 }
 
 // Pickup 2: seedlings sprout in sequence along the three taxiways and grow into saplings.
-function Seedlings() {
+function Seedlings({ island }) {
   const trunks = useRef()
   const crowns = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
@@ -522,13 +523,13 @@ function Seedlings() {
       const k = s < 0 ? 0 : smooth((s - p.order) / 1.5)
       const over = k + Math.sin(Math.min(1, k) * Math.PI) * 0.12
       const h = k <= 0 ? 0.001 : 0.1 + 1.0 * smooth((k - 0.25) / 0.75)
-      dummy.position.set(p.x, 0.5, p.z)
+      dummy.position.set(p.x, 0.5 + island.h(p.x, p.z), p.z)
       dummy.rotation.set(0, 0, 0)
       dummy.scale.set(1, h, 1)
       dummy.updateMatrix()
       trunks.current.setMatrixAt(i, dummy.matrix)
       const cs = k <= 0 ? 0.001 : 0.2 + 0.8 * over
-      dummy.position.set(p.x, 0.5 + h + 0.08 * cs, p.z)
+      dummy.position.set(p.x, 0.5 + island.h(p.x, p.z) + h + 0.08 * cs, p.z)
       dummy.rotation.set(0, i, 0)
       dummy.scale.set(cs * 1.2, cs * 0.9, cs * 1.2)
       dummy.updateMatrix()
@@ -599,8 +600,8 @@ export default function AirfieldScenery({ island }) {
       <ParkedPlanes />
       <Departures />
       <Windsock />
-      <RunwayLights />
-      <Seedlings />
+      <RunwayLights island={island} />
+      <Seedlings island={island} />
       <Dial />
     </>
   )

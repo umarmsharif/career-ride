@@ -184,7 +184,7 @@ function buildTown(k) {
     return free(x, z, pad)
   }
   let placed = 0
-  for (let i = 0; i < 900 && placed < 46; i++) {
+  for (let i = 0; i < 900 && placed < 38; i++) {
     const x = -46 + r() * 92
     const z = -21 + r() * 42
     if (!clear(x, z, 3.2)) continue
@@ -197,7 +197,7 @@ function buildTown(k) {
     const z = -21 + r() * 42
     if (!clear(x, z, 0)) continue
     const kind = r()
-    if (kind < 0.3) k.ball(0.5 + r() * 0.45, r() < 0.5 ? '#6dbb5e' : '#86cc6f', { p: [x, 0.3, z], s: [1.2, 0.8, 1.1] })
+    if (kind < 0.3) k.ball(0.5 + r() * 0.45, r() < 0.5 ? '#6dbb5e' : '#86cc6f', { p: [x, 0.3, z], s: [1.2, 0.8, 1.1] }, 0)
     else if (kind < 0.45) k.ball(0.35 + r() * 0.5, '#b9c2cc', { p: [x, 0.12, z], s: [1.2, 0.7, 1], r: [r(), r(), r()] }, 0)
     else if (kind < 0.8) {
       k.cyl(0.03, 0.03, 0.4, '#4f9f58', { p: [x, 0.2, z] }, 4)
@@ -222,7 +222,7 @@ function roadZ(x) {
 // --- Parts that react to pickups ------------------------------------------------
 
 // Pickup 1: kitchens open one by one. Shutters lift into awnings, windows glow, chimneys steam.
-function Kitchens() {
+function Kitchens({ island }) {
   const shutters = useRef([])
   const panes = useRef()
   const steam = useRef()
@@ -244,12 +244,12 @@ function Kitchens() {
     () =>
       L.houses.map((h) => {
         const o = new THREE.Object3D()
-        o.position.set(h.x, 0, h.z)
+        o.position.set(h.x, island.h(h.x, h.z), h.z)
         o.rotation.y = h.face
         o.updateMatrixWorld()
         return o
       }),
-    []
+    [island]
   )
   const v = useMemo(() => new THREE.Vector3(), [])
 
@@ -488,7 +488,7 @@ function Hearts() {
 }
 
 // Pickup 6: the lanterns along the row turn from amber to green, one string at a time.
-function Lanterns() {
+function Lanterns({ island }) {
   const mesh = useRef()
   const spots = useMemo(() => {
     const out = []
@@ -496,11 +496,11 @@ function Lanterns() {
       const zr = roadZ(x)
       for (let i = 1; i <= 5; i++) {
         const u = i / 6
-        out.push({ p: [x, 5.3 - Math.sin(u * Math.PI) * 0.9 - 0.3, zr + 4.3 - 8.6 * u], order: si * 5 + i })
+        out.push({ p: [x, island.h(x, zr) + 5.3 - Math.sin(u * Math.PI) * 0.9 - 0.3, zr + 4.3 - 8.6 * u], order: si * 5 + i })
       }
     })
     return out
-  }, [])
+  }, [island])
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const amber = useMemo(() => new THREE.Color('#ff9f1c'), [])
   const green = useMemo(() => new THREE.Color('#58d68d'), [])
@@ -526,16 +526,16 @@ function Lanterns() {
   )
 }
 
-export default function KitchenStreetScenery() {
+export default function KitchenStreetScenery({ island }) {
   return (
     <>
       <Static build={buildTown} />
-      <Kitchens />
+      <Kitchens island={island} />
       <PaperPlanes />
       <GrowthBars />
       <MenuWriting />
       <Hearts />
-      <Lanterns />
+      <Lanterns island={island} />
     </>
   )
 }

@@ -87,7 +87,8 @@ const peaks = []
     const z = oz * 0.93
     const west = x < -20 ? 1.25 : 1
     const base = (3.3 + r() * 1.5) * (Math.abs(oz) < 8 ? 0.85 : 1)
-    const h = (6 + r() * 6.5) * west
+    const east = x > 30 ? 0.5 : 1
+    const h = (6 + r() * 6.5) * west * east
     peaks.push({ x, z, base, h, tint: Math.floor(r() * 3), rot: r() * 6 })
   }
 }

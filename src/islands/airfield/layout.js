@@ -6,7 +6,7 @@ const road = [[-47, 0], [-24, 0], [0, 0], [24, 0], [47, 0]]
 
 // Three taxiways fork off toward three departure gates, one colour per region.
 const forks = [
-  { pts: [[-10, 0], [-8.8, -4], [-7, -8], [-5.4, -11.2]], color: '#f0553f', house: 4.6, plane: ['#fff1dc', '#f0553f'] },
+  { pts: [[-10, 0], [-8.8, -4], [-7, -8], [-5.4, -11.2]], color: '#f0553f', house: -4.6, plane: ['#fff1dc', '#f0553f'] },
   { pts: [[6, 0], [7.4, 4], [9.4, 8], [11.6, 11.2]], color: '#1f9d8f', house: -4.6, plane: ['#fff1dc', '#1f9d8f'] },
   { pts: [[24, 0], [25.4, -3.8], [27, -7.6], [28.4, -10.6]], color: '#f2a541', house: 4.6, plane: ['#fff1dc', '#f2a541'] },
 ]
@@ -28,19 +28,19 @@ const flags = FLAG_COLORS.map((color, i) => {
   }
 })
 
-const tower = { x: -26, z: -11 }
-const hangar = { x: -27, z: 12.2 }
-const apron = { x: -20, z: 10.8, w: 28, d: 12.4 }
+const tower = { x: -13, z: -11 }
+const hangar = { x: -8.5, z: 12.2 }
+const apron = { x: -5.5, z: 10.8, w: 20, d: 12.4 }
 const dial = { x: 20.5, z: 8.4, face: Math.PI }
-const windsock = { x: -15, z: -7 }
+const windsock = { x: -14.5, z: -5.5 }
 const parked = [
-  { x: -16.5, z: 9.8, ry: 0.5, body: '#fbe6a8', accent: '#1f9d8f' },
-  { x: -9.5, z: 12.8, ry: 2.5, body: '#fff1dc', accent: '#f0553f' },
+  { x: 1.8, z: 11.8, ry: 0.5, body: '#fbe6a8', accent: '#1f9d8f' },
+  { x: 14, z: -10.5, ry: 2.5, body: '#fff1dc', accent: '#f0553f' },
   { x: 35, z: 10.5, ry: -0.6, body: '#dcecf2', accent: '#f2a541' },
 ]
-const carts = [{ x: -8.5, z: 6.4, ry: 0 }, { x: 30, z: 6.8, ry: 0.05 }]
+const carts = [{ x: -3, z: 5.8, ry: 0 }, { x: 30, z: 6.8, ry: 0.05 }]
 
-const pickupSpots = [[-26, 0], [0, 0], [17, 0]]
+const pickupSpots = [[-9.5, 0], [0, 0], [17, 0]]
 
 const colliders = [
   { x: tower.x, z: tower.z, r: 3.2, h: 17 },
@@ -59,7 +59,7 @@ const L = {
   stops: pickupSpots.map(([x, z]) => ({ x, z })),
   pickupSpots,
   tour: [
-    [-38, 0], [-35.6, 0.2], [-26, 0], [-13, 0.3], [0, 0], [8, -0.3], [17, 0], [30, 0], [45.5, 0],
+    [-38, 0], [-35.6, 0.2], [-26, 0], [-9.5, 0], [0, 0], [8, -0.3], [17, 0], [30, 0], [45.5, 0],
   ],
   len: 47,
 }
