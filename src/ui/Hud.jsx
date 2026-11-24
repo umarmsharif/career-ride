@@ -104,6 +104,8 @@ function Footage({ src, title }) {
       </div>
     )
   }
+  // A still image (for example a screenshot of the live product) or a video clip.
+  if (/\.(jpe?g|png|webp)$/i.test(src)) return <img className="clip" src={src.replace(/^\//, '')} alt={`${title}: the live product`} onError={() => setMissing(true)} />
   return <video className="clip" src={src.replace(/^\//, '')} controls muted playsInline preload="metadata" onError={() => setMissing(true)} />
 }
 

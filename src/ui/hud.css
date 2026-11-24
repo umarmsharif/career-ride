@@ -746,3 +746,5 @@ a.btn {
 .dial-step:focus-visible { outline: 3px solid var(--teal); outline-offset: 1px; }
 .closing-line { font-weight: 800; margin-top: 0.6em; }
 .finale-logo { display: block; max-width: 220px; max-height: 70px; margin: 0 0 10px; }
+
+.card.toast img.clip { max-height: none; height: auto; object-fit: cover; display: block; }

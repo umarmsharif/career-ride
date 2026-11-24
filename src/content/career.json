@@ -248,12 +248,13 @@
           "title": "BlockNow",
           "client": "Co-founder, UK healthcare AI venture, 2025 to present",
           "card": "footage",
-          "media": "/media/blocknow.mp4",
+          "media": "/media/blocknow.jpg",
           "facts": [
             "A voice agent, front-end interface and dashboard for GP staff",
             "Handles appointment booking calls for GP practices",
             "Designed to run under UK data-protection rules"
-          ]
+          ],
+          "link": "https://blocknow.co.uk/"
         },
         {
           "title": "Urdu voice agent for restaurant leads",
