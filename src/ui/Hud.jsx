@@ -276,11 +276,12 @@ function Closing({ total }) {
           id="explore"
           className="text-link"
           onClick={() => {
-            useGame.setState({ mode: 'map', autopilot: false })
+            // A phone has no steering keys, so the rider keeps steering itself there.
+            useGame.setState({ mode: 'map', autopilot: g.touch })
             g.jumpTo(0)
           }}
         >
-          Explore every island
+          {g.touch ? 'Pick an island to revisit' : 'Explore every island'}
         </button>
       </div>
     </section>
@@ -343,6 +344,7 @@ export default function Hud({ islands }) {
         )}
       </header>
       {g.phase !== 'closing' && <MiniMap islands={islands} />}
+      {g.touch && g.mode === 'map' && onIsland && g.toasts.length === 0 && <p className="hint map-hint">Tap a number to jump to that island</p>}
       {g.phase !== 'closing' && <Toasts islands={islands} />}
 
       {onIsland && <Splash island={island} />}
