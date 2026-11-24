@@ -29,6 +29,16 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
     fromX = cx + 18
     fromY = sy + 17
     add(fromX, fromY, start.z + 3)
+  } else if (style === 'hills') {
+    // One long rise and one dip, almost straight in plan: easy on the eye.
+    const zEnd = (end.z - start.z) * side + start.z
+    const fx = start.x + 12
+    const tx = tip.x - 24
+    for (let k = 1; k <= 7; k++) {
+      const u = k / 8
+      const e = u * u * (3 - 2 * u)
+      pts.push(new THREE.Vector3(mix(fx, tx, u), mix(sy + 0.8, end.y + 1.6, e) + Math.sin(u * Math.PI * 2) * 4.2 * Math.sin(u * Math.PI), mix(start.z, zEnd, e)))
+    }
   } else if (style === 'dive') {
     add(start.x + 16, sy + 3, start.z)
     add(start.x + 30, sy + 12, start.z - 6)
@@ -41,7 +51,7 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
   }
   // Rolling sweeps the rest of the way.
   const sideEnd = (end.z - start.z) * side + start.z
-  const n = style === 'wave' ? 5 : 3
+  const n = style === 'hills' ? 0 : style === 'wave' ? 5 : 3
   for (let k = 1; k <= n; k++) {
     const u = k / (n + 1)
     const sway = Math.sin(u * Math.PI * (style === 'wave' ? 2.4 : 1.5)) * (style === 'wave' ? 16 : 9) * (1 - u * 0.5)
@@ -82,7 +92,7 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
       c++
     }
     const flat = Math.min(1, i / 40, (N - i) / 70)
-    const bank = THREE.MathUtils.clamp((s / c) * 7.5, -0.6, 0.6) * Math.max(0, flat)
+    const bank = style === 'hills' ? 0 : THREE.MathUtils.clamp((s / c) * 7.5, -0.6, 0.6) * Math.max(0, flat)
     const f = frames[i]
     const left = new THREE.Vector3().crossVectors(up, f.t).normalize()
     const normal = new THREE.Vector3().crossVectors(f.t, left).normalize()

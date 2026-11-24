@@ -17,7 +17,6 @@ const READ_TIME = 4.6
 const X_AXIS = new THREE.Vector3(1, 0, 0)
 const _pitchQ = new THREE.Quaternion()
 // The company-profile pickup, in seconds: brake, get off, walk over, pick up, walk back, load, get on.
-const ACT = [0.45, 0.95, 1.95, 2.5, 3.4, 3.95, 4.5]
 
 export default function Controller({ islands, origins, rides, worldRef }) {
   const { camera, size } = useThree()
@@ -109,96 +108,34 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     return slope
   }
 
-  function startAct(island) {
+  // The company profile: the folder flies from its stand to the rider's outstretched hand and is
+  // stowed in the crate, without leaving the saddle or slowing down.
+  function startAct(island, g) {
     const st = island.profileStand
     const fx = Math.sin(rider.heading)
     const fz = Math.cos(rider.heading)
     const side = (st.x - rider.pos.x) * fz - (st.z - rider.pos.z) * fx >= 0 ? 1 : -1
-    rider.act = { island: island.id, t: 0, side, off: 0, x: rider.pos.x, z: rider.pos.z, face: rider.heading, reach: 0, walk: 0, has: false, loaded: false, set: false }
+    rider.act = { island: island.id, t: 0, side, reach: 0, stow: 0, has: false, loaded: false }
+    useGame.setState({ signRead: { ...g.signRead, [island.id]: true } })
   }
 
-  // The rider gets off, fetches the company profile from its stand and loads it on the bike.
   function stepAct(dt, g, island) {
     const a = rider.act
     a.t += dt
-    rider.speed = damp(rider.speed, 0, 9, dt)
-    rider.pos.x += Math.sin(rider.heading) * rider.speed * dt
-    rider.pos.z += Math.cos(rider.heading) * rider.speed * dt
-    rider.wheel += (rider.speed * dt) / WHEEL_R
-    rider.pedalling = false
-    rider.steer = damp(rider.steer, 0.35 * a.side, 6, dt)
-    rider.lean = damp(rider.lean, 0.1 * a.side * a.off, 6, dt)
-    settle(island, dt)
-    if (a.t < ACT[0]) return
-    const fx = Math.sin(rider.heading)
-    const fz = Math.cos(rider.heading)
-    if (!a.set) {
-      // Fix the walking route once the bike has stopped.
-      a.set = true
-      const st = island.profileStand
-      const lx = fz * a.side
-      const lz = -fx * a.side
-      a.S = [rider.pos.x + lx * 0.85, rider.pos.z + lz * 0.85]
-      a.C = [rider.pos.x + lx * 0.8 - fx * 0.85, rider.pos.z + lz * 0.8 - fz * 0.85]
-      const dx = st.x - a.S[0]
-      const dz = st.z - a.S[1]
-      const d = Math.hypot(dx, dz) || 1
-      const stop = Math.max(0, d - 0.8)
-      a.P = [a.S[0] + (dx / d) * stop, a.S[1] + (dz / d) * stop]
-      a.toStand = Math.atan2(dx, dz)
-      a.toBike = Math.atan2(-lx, -lz)
+    a.reach = a.t < 0.35 ? smooth(a.t / 0.35) : a.t < 0.6 ? 1 : 1 - smooth((a.t - 0.6) / 0.3)
+    a.stow = a.t < 0.6 ? 0 : a.t < 0.95 ? smooth((a.t - 0.6) / 0.35) : a.t < 1.15 ? 1 : 1 - smooth((a.t - 1.15) / 0.3)
+    a.has = a.t >= 0.32 && !a.loaded
+    if (!a.loaded && a.t >= 1.05) {
+      a.loaded = true
+      g.loadProfile(island.id)
+      g.toast('profile', g.island)
+      audio.chime()
     }
-    const seg = (i) => smooth((a.t - ACT[i]) / (ACT[i + 1] - ACT[i]))
-    const go = (from, to, k) => {
-      const px = a.x
-      const pz = a.z
-      a.x = from[0] + (to[0] - from[0]) * k
-      a.z = from[1] + (to[1] - from[1]) * k
-      a.walk += Math.hypot(a.x - px, a.z - pz)
-    }
-    const turnTo = (ang) => (a.face += wrapAngle(ang - a.face) * (1 - Math.exp(-10 * dt)))
-    const here = [rider.pos.x, rider.pos.z]
-    a.reach = 0
-    if (a.t < ACT[1]) {
-      a.off = seg(0)
-      go(here, a.S, a.off)
-    } else if (a.t < ACT[2]) {
-      a.off = 1
-      go(a.S, a.P, seg(1))
-      turnTo(a.toStand)
-    } else if (a.t < ACT[3]) {
-      a.reach = Math.sin(seg(2) * Math.PI)
-      turnTo(a.toStand)
-      if (!a.has && seg(2) > 0.5) a.has = true
-    } else if (a.t < ACT[4]) {
-      go(a.P, a.C, seg(3))
-      turnTo(Math.atan2(a.C[0] - a.P[0], a.C[1] - a.P[1]))
-    } else if (a.t < ACT[5]) {
-      a.reach = Math.sin(seg(4) * Math.PI)
-      turnTo(a.toBike)
-      if (!a.loaded && seg(4) > 0.5) {
-        a.loaded = true
-        a.has = false
-        g.loadProfile(island.id)
-        audio.chime()
-      }
-    } else if (a.t < ACT[6]) {
-      a.off = 1 - seg(5)
-      go(a.C, here, seg(5))
-      turnTo(rider.heading)
-    } else {
-      rider.act = null
-      const patch = { signRead: { ...g.signRead, [island.id]: true } }
-      if (g.autopilot) {
-        patch.waiting = true
-        s.waitUntil = clock.t + READ_TIME + 2.5
-      }
-      useGame.setState(patch)
-    }
+    if (a.t > 1.45) rider.act = null
   }
 
   function stepIsland(dt, g, island) {
-    if (rider.act) return stepAct(dt, g, island)
+    if (rider.act) stepAct(dt, g, island)
     let turn = 0
     let throttle = 0
     if (g.autopilot) {
@@ -254,11 +191,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
 
     // Triggers.
     const st = island.profileStand
-    if (!g.signRead[island.id] && Math.hypot(st.x - rider.pos.x, st.z - rider.pos.z) < 3.8) {
-      startAct(island)
-      useGame.setState({ open: null })
-      return
-    }
+    if (!rider.act && !g.signRead[island.id] && Math.hypot(st.x - rider.pos.x, st.z - rider.pos.z) < 3.6) startAct(island, g)
     const patch = {}
     island.stops.forEach((p, i) => {
       const d2 = (p.x - rider.pos.x) ** 2 + (p.z - rider.pos.z) ** 2
@@ -267,13 +200,9 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       if (!had && d2 < 2.3 ** 2) {
         g.collect(island.id, i)
         audio.chime()
-        if (g.autopilot) {
-          patch.waiting = true
-          s.waitUntil = clock.t + READ_TIME + (p.kind === 'fact' ? 0 : 3)
-        }
       } else if (had && p.kind !== 'fact' && !g.autopilot) {
         // Machines and boards reopen when the rider comes back to them.
-        const isOpen = g.open && g.open.island === g.island && g.open.index === i
+        const isOpen = g.toasts.some((t) => t.type === 'stop' && t.island === g.island && t.index === i)
         if (d2 < 2.3 ** 2 && !isOpen && !s.left?.[key]) g.collect(island.id, i)
         if (d2 > 5 ** 2) (s.left ||= {})[key] = false
         else if (isOpen) (s.left ||= {})[key] = true
@@ -380,8 +309,8 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     }
     const want = tmp.v
     const look = tmp.w
-    let kPos = 3.2
-    const kLook = 6
+    let kPos = 2.4
+    const kLook = 4
     if (phase === 'intro') {
       s.introT += dt
       const a = 2.5 + s.introT * 0.06
@@ -392,15 +321,12 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     } else if (phase === 'ride') {
       const ride = rides[s.idx]
       const u = s.rideS / ride.length
-      const dist = portrait ? 17 : 13
-      const swing = Math.sin(u * Math.PI * 2.2 + 0.6)
-      const settle = smooth((1 - u) / 0.12)
-      want.copy(rider.pos)
-        .addScaledVector(sample.tangent, -dist * (0.75 + 0.25 * Math.cos(u * Math.PI * 2)))
-        .addScaledVector(Y_AXIS, 5 + 3.2 * Math.sin(u * Math.PI))
-        .addScaledVector(sample.left, (-sample.bank * 16 + swing * 6.5) * settle)
-      look.copy(rider.pos).addScaledVector(sample.tangent, 3).addScaledVector(Y_AXIS, 1.4)
-      kPos = 2.2
+      // Steady: straight behind and above, no swinging from side to side.
+      const dist = portrait ? 22 : 17
+      tmp.d.set(sample.tangent.x, 0, sample.tangent.z).normalize()
+      want.copy(rider.pos).addScaledVector(tmp.d, -dist).addScaledVector(Y_AXIS, portrait ? 12 : 9.5)
+      look.copy(rider.pos).addScaledVector(tmp.d, 5).addScaledVector(Y_AXIS, 2.6)
+      kPos = 1.8
     } else if (phase === 'closing') {
       s.closeT += dt
       const a = s.closeT * 0.14 + 4.2
@@ -412,13 +338,18 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       want.copy(s.camPos)
       look.set(rider.pos.x, Math.max(rider.pos.y, -10) + 1, rider.pos.z)
     } else {
-      s.camHeading += wrapAngle(rider.heading - s.camHeading) * (1 - Math.exp(-2.6 * dt))
-      const dist = portrait ? 15 : 10.2
-      const height = portrait ? 10 : 7.2
+      // High and well back, and slow to turn, so the picture stays calm. Hands-free, the camera
+      // keeps facing along the island and barely swings with the road.
+      const g = useGame.getState()
+      const east = Math.PI / 2
+      const aim = g.autopilot ? east + clamp(wrapAngle(rider.heading - east), -1, 1) * 0.3 : rider.heading
+      s.camHeading += wrapAngle(aim - s.camHeading) * (1 - Math.exp(-(g.autopilot ? 1.1 : 1.6) * dt))
+      const dist = portrait ? 21 : 15.5
+      const height = portrait ? 15.5 : 11.5
       want.set(rider.pos.x - Math.sin(s.camHeading) * dist, rider.pos.y + height, rider.pos.z - Math.cos(s.camHeading) * dist)
       // Look far enough ahead that the horizon, the sky and rooftop boards are in the picture.
       const ahead = 7 * s.zoom * s.zoom
-      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, rider.pos.y + 1.0 + 1.5 * s.zoom, rider.pos.z + Math.cos(s.camHeading) * ahead)
+      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, rider.pos.y + 1.0 + 3.4 * s.zoom, rider.pos.z + Math.cos(s.camHeading) * ahead)
     }
     if (phase === 'island') {
       // Pull the camera in when a building or gate would sit between it and the rider.
@@ -444,7 +375,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
           need = Math.min(need, 1 - (t2 + 0.03))
         }
       }
-      need = Math.max(need, 0.5)
+      need = Math.max(need, 0.62)
       s.zoom = damp(s.zoom, need, need < s.zoom ? 9 : 1.6, dt)
       if (s.snap) s.zoom = need
       want.set(bx + (want.x - bx) * s.zoom, by + (want.y - by) * s.zoom, bz + (want.z - bz) * s.zoom)
@@ -488,12 +419,16 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.lastAuto = g.autopilot
     }
     // `__timeScale` is a test hook: it runs the simulation several steps per frame.
-    for (let n = window.__timeScale || 1; n > 0; n--) {
-      if (n < (window.__timeScale || 1)) clock.t += dt
+    // The speed dial runs the ride faster by taking more, equally small, steps per frame.
+    const rate = (window.__timeScale || 1) * (g.phase === 'intro' ? 1 : g.speed)
+    const steps = Math.ceil(rate)
+    const sub = (dt * rate) / steps
+    clock.t += sub * steps - dt
+    for (let n = 0; n < steps; n++) {
       const now = useGame.getState()
-      if (now.phase === 'island') stepIsland(dt, now, islands[s.idx])
-      else if (now.phase === 'falling') stepFall(dt, islands[s.idx])
-      else if (now.phase === 'ride') stepRide(dt, now)
+      if (now.phase === 'island') stepIsland(sub, now, islands[s.idx])
+      else if (now.phase === 'falling') stepFall(sub, islands[s.idx])
+      else if (now.phase === 'ride') stepRide(sub, now)
     }
     // Time of day follows how far through the whole ride the rider is.
     const ph = useGame.getState().phase

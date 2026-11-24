@@ -32,6 +32,8 @@ export const input = { up: false, down: false, left: false, right: false }
 const coarse = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches
 
 // Slow-changing values that the HTML layer shows.
+let toastId = 0
+
 export const useGame = create((set, get) => ({
   phase: 'intro', // intro | island | falling | ride | closing
   mode: 'story', // story | map
@@ -51,6 +53,10 @@ export const useGame = create((set, get) => ({
   splash: 0, // bumps when a new island is entered, to show its name
   resetKey: 0,
   sound: false,
+  speed: 1, // the speed dial
+  cinematic: true,
+  toasts: [], // captures shown on the right: { id, type: 'stop' | 'profile', island, index }
+  rideLate: false,
   view: 'ride', // ride | timeline
 
   start(mode, autopilot) {
@@ -63,12 +69,21 @@ export const useGame = create((set, get) => ({
     const key = `${islandId}:${i}`
     const idx = get().island
     if (get().collected.includes(key)) {
-      set({ open: { island: idx, index: i } })
+      get().toast('stop', idx, i)
       return false
     }
     ;(collectedAt[islandId] ||= [])[i] = clock.t
-    set({ collected: [...get().collected, key], open: { island: idx, index: i } })
+    set({ collected: [...get().collected, key] })
+    get().toast('stop', idx, i)
     return true
+  },
+  toast(type, island, index = -1) {
+    const list = get().toasts
+    if (list.some((t) => t.type === type && t.island === island && t.index === index)) return
+    set({ toasts: [...list, { id: ++toastId, type, island, index }].slice(-4) })
+  },
+  dropToast(id) {
+    set({ toasts: get().toasts.filter((t) => t.id !== id) })
   },
   loadProfile(id) {
     if (!get().profiles.includes(id)) set({ profiles: [...get().profiles, id] })
@@ -97,7 +112,7 @@ export const useGame = create((set, get) => ({
   },
   restart() {
     Object.keys(collectedAt).forEach((k) => delete collectedAt[k])
-    set({ collected: [], signRead: {}, profiles: [], visited: [0], phase: 'intro', island: 0, open: null, waiting: false, autopilot: false, resetKey: get().resetKey + 1 })
+    set({ collected: [], signRead: {}, profiles: [], toasts: [], visited: [0], phase: 'intro', island: 0, open: null, waiting: false, autopilot: false, resetKey: get().resetKey + 1 })
   },
 }))
 

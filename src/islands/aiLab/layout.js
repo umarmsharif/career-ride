@@ -3,29 +3,30 @@ const road = [
   [-47, 0], [-36, 1], [-24, 0], [-16, -1.2], [-8, 0], [0, 1.2], [10, 0], [19, -1.2], [28, 0], [38, 1], [47, 0],
 ]
 
-// Four machines, alternating sides of the road. `rot` turns the machine to face the road.
+// Three machines, one per project, each on its own terrace (a step higher than the last).
+// `rot` turns the machine to face the road.
 const machines = [
-  { x: -24, z: -10, rot: 0 },
-  { x: -8, z: 10, rot: Math.PI },
-  { x: 10, z: -10, rot: 0 },
-  { x: 28, z: 10, rot: Math.PI },
+  { x: -22, z: 10, rot: Math.PI },
+  { x: 2, z: -10, rot: 0 },
+  { x: 26, z: -10, rot: 0 },
 ]
 
 // The token stands on the road side of its machine.
 const stops = machines.map((m) => [m.x, m.z < 0 ? -3.7 : 3.7])
 
-const hut = { x: -8, z: -12.5 }
-const restaurant = { x: 25, z: -12 }
-const turbine = { x: 36, z: -10.5 }
+const hut = { x: -12, z: -12.5 }
+const restaurant = { x: 11, z: -12 }
+const turbine = { x: 38, z: -10.5 }
 const benches = [
-  { x: -22, z: 6, rot: Math.PI },
-  { x: 7, z: 11.5, rot: Math.PI },
+  { x: -12, z: 6.5, rot: Math.PI },
+  { x: 7, z: 6.5, rot: Math.PI },
   { x: -38, z: -11, rot: 0.2 },
+  { x: 33, z: 7, rot: Math.PI },
 ]
 const racks = [
-  { x: -24, z: 13.5, rot: Math.PI },
-  { x: 12, z: 13, rot: Math.PI },
-  { x: -21.5, z: -15, rot: 0 },
+  { x: -24, z: -14.5, rot: 0 },
+  { x: 3, z: 13, rot: Math.PI },
+  { x: 26, z: 13.5, rot: Math.PI },
 ]
 
 const colliders = [
@@ -38,8 +39,8 @@ const colliders = [
 ]
 
 const tour = [
-  [-38, 0], [-35.6, 0.2], [-30, 0.5], [-24, -3.7], [-16, -1.2], [-8, 3.7], [0, 1.2], [10, -3.7],
-  [19, -1.2], [28, 3.7], [38, 1], [45.5, 0],
+  [-38, 0], [-35.6, 0.2], [-30, 0.5], [-22, 3.7], [-13, 0], [-6, -0.6], [2, -3.7],
+  [14, -1], [20, -1.2], [26, -3.7], [38, 1], [45.5, 0],
 ]
 
 export default { road, machines, stops, hut, restaurant, turbine, benches, racks, colliders, tour }

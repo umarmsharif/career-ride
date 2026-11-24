@@ -48,13 +48,8 @@ export default function App() {
     )
   }
 
-  // A tap anywhere on the scene moves a hands-free ride on from a stop.
-  const onTap = () => {
-    const s = useGame.getState()
-    if (s.touch && s.waiting) s.resume()
-  }
   return (
-    <div className="stage" onPointerUp={onTap}>
+    <div className="stage">
       {entries && (
         <Canvas
           flat

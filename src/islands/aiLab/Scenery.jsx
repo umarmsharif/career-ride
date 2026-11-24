@@ -1,4 +1,4 @@
-// The AI Lab scenery: an inventor's yard with four toy machines.
+// The AI Lab scenery: an inventor's yard with three toy machines.
 // Static props go into one merged mesh; each machine's moving parts are separate meshes
 // that wake up when its stop is found.
 import { useMemo, useRef } from 'react'
@@ -17,7 +17,6 @@ const DARK = new THREE.Color(SLATE_OFF)
 const ON_TEAL = new THREE.Color('#37e0c9')
 const ON_GOLD = new THREE.Color('#ffd23f')
 const ON_CORAL = new THREE.Color('#ff7a5c')
-const ON_CREAM = new THREE.Color('#fff6e4')
 const onOf = (i) => {
   const s = since(i)
   return s < 0 ? 0 : smooth(s / 0.8)
@@ -110,26 +109,6 @@ function dialMachine(k) {
   k.cyl(0.05, 0.05, 1.4, NAVY, { p: [0, 7.7, 0] }, 5)
 }
 
-function filmMachine(k) {
-  // Projector table and body.
-  k.box(2.9, 0.2, 1.5, WOOD, { p: [2.4, 1.6, 0] })
-  for (const sx of [1, -1]) for (const sz of [1, -1]) k.box(0.16, 1.2, 0.16, WOOD, { p: [2.4 + sx * 1.2, Y + 0.6, sz * 0.55] })
-  k.box(2.4, 0.95, 1.1, '#2f8f8a', { p: [2.5, 2.2, 0] })
-  k.box(2.5, 0.12, 1.2, CORAL, { p: [2.5, 2.72, 0] })
-  k.cyl(0.32, 0.4, 0.6, NAVY, { p: [1.0, 2.25, 0], r: [0, 0, Math.PI / 2] }, 10)
-  k.cyl(0.2, 0.2, 0.08, '#ffe9a8', { p: [0.68, 2.25, 0], r: [0, 0, Math.PI / 2] }, 10)
-  for (const x of [1.85, 3.15]) k.box(0.16, 0.9, 0.16, NAVY, { p: [x, 3.2, 0] })
-  for (let i = 0; i < 3; i++) k.ball(0.1, [GOLD, CREAM, TEAL][i], { p: [2.0 + i * 0.35, 2.78, 0.62] }, 0)
-  // Screen on a frame, facing +x.
-  k.box(0.2, 3.1, 3.5, NAVY, { p: [-3.3, 2.3, 0] })
-  k.box(0.16, 2.8, 3.2, '#e8e1d0', { p: [-3.2, 2.3, 0] })
-  for (const sz of [1, -1]) k.box(0.2, 0.8, 0.2, NAVY, { p: [-3.3, 0.8, sz * 1.5] })
-  k.box(0.7, 0.14, 4.0, NAVY, { p: [-3.3, Y + 0.07, 0] })
-  // Film cans.
-  k.cyl(0.35, 0.35, 0.3, GOLD, { p: [-1.2, Y + 0.15, 2.4] }, 10)
-  k.cyl(0.35, 0.35, 0.3, CORAL, { p: [-0.6, Y + 0.45, 2.4] }, 10)
-}
-
 function restaurant(k) {
   const r = L.restaurant
   k.at({ p: [r.x, 0, r.z], r: [0, -Math.PI / 2, 0] }, () => {
@@ -220,14 +199,13 @@ function turbineBase(k) {
 
 function buildYard(k, island) {
   const r = rng(808)
-  baseRoad(k, island, { skip: (x) => Math.abs(x + 6) < 1.8 || Math.abs(x - 17) < 1.8 })
+  baseRoad(k, island, { skip: (x) => Math.abs(x + 13) < 1.8 })
 
   // Cables from the power hut to each machine.
   const runs = [
-    [[-10.2, -11], [-14, -13], [-18, -11.5], [-21, -10]],
-    [[-6.5, -10.5], [-5, -5], [-6, 0], [-7, 5], [-7.6, 8]],
-    [[-5.8, -11.5], [0, -10.5], [4, -11], [7.5, -10]],
-    [[-5.8, -11], [3, -9], [13, -7.5], [16.5, -1], [20, 5], [25, 8]],
+    [[-13.5, -10.5], [-12, -5], [-13, 0], [-17, 5], [-19, 7.5]],
+    [[-9.3, -11], [-5, -10.5], [-2.6, -10]],
+    [[-9.3, -12.5], [-6, -16], [6, -16.5], [15, -16], [20, -14], [22.5, -11]],
   ]
   runs.forEach((p) => {
     k.add(ribbonXZ(p, 0.5, 0.075), NAVY)
@@ -237,10 +215,9 @@ function buildYard(k, island) {
   runs.forEach((p) => p.forEach(([x, z]) => k.cyl(0.3, 0.3, 0.1, GOLD, { p: [x, 0.06, z] }, 8)))
 
   L.machines.forEach((m) => platform(k, m))
-  k.at({ p: [L.machines[0].x, 0, L.machines[0].z] }, () => chatMachine(k))
-  k.at({ p: [L.machines[1].x, 0, L.machines[1].z], r: [0, Math.PI, 0] }, () => deskMachine(k))
-  k.at({ p: [L.machines[2].x, 0, L.machines[2].z] }, () => dialMachine(k))
-  k.at({ p: [L.machines[3].x, 0, L.machines[3].z], r: [0, Math.PI, 0] }, () => filmMachine(k))
+  k.at({ p: [L.machines[0].x, 0, L.machines[0].z], r: [0, Math.PI, 0] }, () => deskMachine(k))
+  k.at({ p: [L.machines[1].x, 0, L.machines[1].z] }, () => dialMachine(k))
+  k.at({ p: [L.machines[2].x, 0, L.machines[2].z] }, () => chatMachine(k))
   restaurant(k)
   hut(k)
   turbineBase(k)
@@ -248,7 +225,7 @@ function buildYard(k, island) {
   L.racks.forEach((b) => rack(k, b))
   barrel(k, -29.5, -12.2, CORAL)
   barrel(k, -28.6, -13.0, TEAL)
-  barrel(k, 14, 12.2, GOLD)
+  barrel(k, 11, 12.2, GOLD)
   barrel(k, 33.5, 13.0, CORAL)
   k.box(0.9, 0.7, 0.9, '#d9a066', { p: [-12, 0.35, 12.8], r: [0, 0.3, 0] })
   k.box(0.8, 0.6, 0.8, '#d9a066', { p: [-11.1, 0.3, 13.4], r: [0, 0.8, 0] })
@@ -265,24 +242,23 @@ function buildYard(k, island) {
       { x: L.turbine.x, z: L.turbine.z, r: 3 },
       ...L.benches.map((b) => ({ x: b.x, z: b.z, r: 2.5 })),
       ...L.racks.map((b) => ({ x: b.x, z: b.z, r: 2.5 })),
-      { x: -6, z: 0, r: 6 },
-      { x: 17, z: 0, r: 6 },
+      { x: -13, z: 0, r: 6 },
     ],
   })
 }
 
-// ---------- Machine 0: the chat machine ----------
+// ---------- Machine 2: the chat machine (Sarmaaya) ----------
 
 function ChatMachine() {
-  const m = L.machines[0]
+  const m = L.machines[2]
   const panels = useRef([])
   const lamp = useRef()
   const beads = useRef()
   const heap = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
   useFrame(() => {
-    const s = since(0)
-    const on = onOf(0)
+    const s = since(2)
+    const on = onOf(2)
     const ph = s < 0 ? 0 : (s / 0.9) % 3
     panels.current.forEach((p, i) => {
       const d = Math.abs(ph - i)
@@ -332,10 +308,10 @@ function ChatMachine() {
   )
 }
 
-// ---------- Machine 1: the reception desk ----------
+// ---------- Machine 0: the reception desk (BlockNow) ----------
 
 function DeskMachine() {
-  const m = L.machines[1]
+  const m = L.machines[0]
   const handset = useRef()
   const bell = useRef()
   const arcs = useRef()
@@ -350,8 +326,8 @@ function DeskMachine() {
   })
   const ringGeo = useMemo(() => new THREE.TorusGeometry(0.45, 0.05, 5, 12, Math.PI * 0.7), [])
   useFrame(() => {
-    const s = since(1)
-    const on = onOf(1)
+    const s = since(0)
+    const on = onOf(0)
     // Ring (shaking), then the handset lifts, then it settles back.
     const c = s < 0 ? 0 : s % 3.6
     const ringing = s >= 0 && c < 1.8
@@ -404,10 +380,10 @@ function DeskMachine() {
   )
 }
 
-// ---------- Machine 2: the calling mast ----------
+// ---------- Machine 1: the calling mast (voice agent) ----------
 
 function DialMachine() {
-  const m = L.machines[2]
+  const m = L.machines[1]
   const dial = useRef()
   const lamp = useRef()
   const rings = useRef([])
@@ -426,8 +402,8 @@ function DialMachine() {
   const to = useMemo(() => new THREE.Vector3(L.restaurant.x - 1.9, 2.0, L.restaurant.z + 0.5), [])
   const quat = useMemo(() => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), to.clone().sub(from).normalize()), [from, to])
   useFrame(() => {
-    const s = since(2)
-    const on = onOf(2)
+    const s = since(1)
+    const on = onOf(1)
     const c = s < 0 ? 0 : s % 2.4
     const u = c / 2.4
     dial.current.rotation.z = s < 0 ? 0 : u < 0.7 ? -(u / 0.7) * 2.0 : -2.0 * (1 - smooth((u - 0.7) / 0.3))
@@ -476,108 +452,6 @@ function DialMachine() {
   )
 }
 
-// ---------- Machine 3: the film projector ----------
-
-function shapeMesh(k, pts, color, z) {
-  const sh = new THREE.Shape()
-  pts.forEach(([x, y], i) => (i ? sh.lineTo(x, y) : sh.moveTo(x, y)))
-  sh.closePath()
-  k.add(new THREE.ShapeGeometry(sh), color, { p: [0, 0, z] })
-}
-
-function FilmMachine() {
-  const m = L.machines[3]
-  const reelA = useRef()
-  const reelB = useRef()
-  const cone = useRef()
-  const screen = useRef()
-  const lamp = useRef()
-  const toons = useRef([])
-  const reelGeo = useGeo((k) => {
-    k.add(new THREE.TorusGeometry(0.62, 0.09, 5, 14), GOLD)
-    k.cyl(0.14, 0.14, 0.22, NAVY, { r: [Math.PI / 2, 0, 0] }, 8)
-    for (let i = 0; i < 3; i++) k.box(1.15, 0.13, 0.1, CORAL, { r: [0, 0, (i / 3) * Math.PI] })
-  })
-  const boat = useGeo((k) => {
-    shapeMesh(k, [[-1.1, -0.1], [1.1, -0.1], [0.75, -0.55], [-0.75, -0.55]], CORAL, 0)
-    shapeMesh(k, [[-0.05, 0.0], [-0.05, 1.3], [0.9, 0.0]], GOLD, 0.01)
-    shapeMesh(k, [[-0.09, 0.0], [-0.09, 1.5], [-0.01, 1.5], [-0.01, 0.0]], NAVY, 0.02)
-    for (let i = 0; i < 3; i++) shapeMesh(k, [[-1.3 + i * 0.9, -0.9], [-0.6 + i * 0.9, -0.9], [-0.95 + i * 0.9, -0.6]], TEAL, 0.01)
-  })
-  const wave = useGeo((k) => {
-    for (let row = 0; row < 3; row++) {
-      const pts = [[-1.4, -0.9 + row * 0.1]]
-      for (let i = 0; i <= 14; i++) pts.push([-1.4 + (i / 14) * 2.8, 0.5 - row * 0.55 + Math.sin(i * 0.9 + row * 1.5) * 0.28])
-      pts.push([1.4, -0.9 + row * 0.1])
-      shapeMesh(k, pts, ['#37b8c9', '#1f9d8f', '#7fe3d4'][row], row * 0.01)
-    }
-  })
-  const flame = useGeo((k) => {
-    const out = new THREE.Shape()
-    out.moveTo(0, -1)
-    out.bezierCurveTo(0.95, -0.9, 1.0, -0.1, 0.15, 1.1)
-    out.bezierCurveTo(0.15, 0.4, -0.15, 0.3, -0.35, 0.05)
-    out.bezierCurveTo(-1.05, -0.3, -0.8, -0.9, 0, -1)
-    k.add(new THREE.ShapeGeometry(out), CORAL, { p: [0, 0, 0] })
-    const inn = new THREE.Shape()
-    inn.moveTo(0, -0.95)
-    inn.bezierCurveTo(0.5, -0.85, 0.5, -0.4, 0.05, 0.1)
-    inn.bezierCurveTo(-0.5, -0.3, -0.45, -0.85, 0, -0.95)
-    k.add(new THREE.ShapeGeometry(inn), GOLD, { p: [0, 0, 0.01] })
-  })
-  const geos = [boat, wave, flame]
-  useFrame(() => {
-    const s = since(3)
-    const on = onOf(3)
-    const sp = s < 0 ? 0 : Math.min(1, s / 1.2)
-    reelA.current.rotation.z = -clock.t * 2.2 * sp
-    reelB.current.rotation.z = -clock.t * 1.6 * sp
-    cone.current.visible = s >= 0
-    cone.current.material.opacity = 0.26 * on * (0.85 + 0.15 * Math.sin(clock.t * 24))
-    screen.current.material.color.set('#4a5568').lerp(ON_CREAM, on)
-    paint(lamp.current, on * (0.6 + 0.4 * Math.sin(clock.t * 5)), ON_TEAL)
-    const idx = s < 0 ? -1 : Math.floor(s / 2.4) % 3
-    toons.current.forEach((t, i) => {
-      t.visible = i === idx
-      if (i === idx) {
-        const ph = (s % 2.4) / 2.4
-        t.scale.setScalar(0.92 * smooth(ph * 5) * (1 - 0.1 * smooth((ph - 0.85) * 6)))
-        t.position.y = 2.3 + (i === 0 ? Math.sin(clock.t * 3) * 0.08 : i === 2 ? Math.sin(clock.t * 9) * 0.04 : 0)
-        t.rotation.z = i === 1 ? Math.sin(clock.t * 2.5) * 0.05 : 0
-      }
-    })
-  })
-  return (
-    <group position={[m.x, 0, m.z]} rotation={[0, Math.PI, 0]}>
-      <group ref={reelA} position={[1.85, 3.65, 0.3]}>
-        <mesh geometry={reelGeo} material={toyMaterial} castShadow />
-      </group>
-      <group ref={reelB} position={[3.15, 3.65, 0.3]}>
-        <mesh geometry={reelGeo} material={toyMaterial} castShadow />
-      </group>
-      <mesh ref={cone} position={[-1.15, 2.25, 0]} rotation={[0, 0, -Math.PI / 2]} visible={false}>
-        <coneGeometry args={[1.5, 4.2, 14, 1, true]} />
-        <meshBasicMaterial color="#ffe9a8" transparent opacity={0.25} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
-      </mesh>
-      <mesh ref={screen} position={[-3.1, 2.3, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[3.1, 2.7]} />
-        <meshBasicMaterial color="#4a5568" toneMapped={false} />
-      </mesh>
-      {geos.map((g, i) => (
-        <group key={i} ref={(e) => (toons.current[i] = e)} position={[-3.05, 2.3, 0]} rotation={[0, Math.PI / 2, 0]} visible={false}>
-          <mesh geometry={g}>
-            <meshBasicMaterial vertexColors side={THREE.DoubleSide} toneMapped={false} />
-          </mesh>
-        </group>
-      ))}
-      <mesh ref={lamp} position={[-3.3, 4.25, 0]}>
-        <icosahedronGeometry args={[0.3, 1]} />
-        <meshBasicMaterial color={SLATE_OFF} toneMapped={false} />
-      </mesh>
-    </group>
-  )
-}
-
 // ---------- Power hut lamp and the wind turbine ----------
 
 function PowerAndWind() {
@@ -596,7 +470,7 @@ function PowerAndWind() {
   })
   useFrame((_, dt) => {
     let n = 0
-    for (let i = 0; i < 4; i++) if (since(i) >= 0) n++
+    for (let i = 0; i < 3; i++) if (since(i) >= 0) n++
     speed.current += (0.5 + n * 0.55 - speed.current) * Math.min(1, dt * 1.5)
     rotor.current.rotation.z -= dt * speed.current
     paint(hutLamp.current, n ? 0.5 + 0.5 * Math.sin(clock.t * 4) : 0.1, ON_GOLD)
@@ -621,7 +495,6 @@ export default function AiLabScenery({ island }) {
       <ChatMachine />
       <DeskMachine />
       <DialMachine />
-      <FilmMachine />
       <PowerAndWind />
     </>
   )

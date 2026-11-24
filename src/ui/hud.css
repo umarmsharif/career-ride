@@ -676,3 +676,73 @@ a.btn {
 .swatch { display: inline-block; width: 0.8em; height: 0.8em; border-radius: 3px; margin-right: 0.45em; vertical-align: -0.05em; }
 .card.sign .about { font-style: italic; opacity: 0.85; margin: 0.2em 0 0.5em; }
 .card.sign .role { margin: 0 0 0.35em; }
+
+/* Captures: each find slides in on the right, stacks, then fades away. */
+.toasts {
+  position: absolute;
+  top: 118px;
+  right: max(14px, env(safe-area-inset-right, 0px));
+  width: min(330px, 60vw);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.card.toast {
+  padding: 12px 16px;
+  border-width: 2px;
+  border-radius: 16px;
+  box-shadow: 0 4px 0 var(--card-edge), 0 12px 22px var(--shadow);
+  background: rgba(255, 246, 228, 0.95);
+  max-width: none;
+  font-size: 0.86rem;
+  animation: toast-in 0.45s ease-out both;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.card.toast.leaving { opacity: 0; transform: translateX(24px); }
+.card.toast h2 { font-size: 1.05rem; margin: 0.1em 0 0.25em; }
+.card.toast p { margin: 0.2em 0; }
+.card.toast .fact-text { font-size: 0.98rem; line-height: 1.3; }
+.card.toast .facts { margin: 0.3em 0 0; padding-left: 1.1em; }
+.card.toast .diagram { font-size: 0.78rem; }
+.card.toast .clip, .card.toast .clip-missing { max-height: 110px; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@media (max-width: 560px) {
+  .toasts { top: 176px; width: min(250px, 66vw); gap: 8px; }
+  .card.toast { font-size: 0.78rem; padding: 9px 12px; }
+  .toasts .toast:nth-last-child(n + 3) { display: none; }
+  .card.toast .facts, .card.toast .diagram, .card.toast .clip, .card.toast .clip-missing { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .card.toast { animation: none; transition: none; } }
+
+.dial {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 246, 228, 0.9);
+  border: 2px solid var(--card-edge);
+  border-radius: 999px;
+  padding: 3px 6px 3px 12px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.dial-label { margin-right: 4px; }
+.dial-step {
+  font: inherit;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  min-width: 40px;
+  min-height: 32px;
+  cursor: pointer;
+}
+.dial-step.on { background: var(--coral); color: var(--coral-ink); }
+.dial-step:focus-visible { outline: 3px solid var(--teal); outline-offset: 1px; }
+.closing-line { font-weight: 800; margin-top: 0.6em; }
+.finale-logo { display: block; max-width: 220px; max-height: 70px; margin: 0 0 10px; }

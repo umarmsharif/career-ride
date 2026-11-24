@@ -48,8 +48,7 @@ export function defineIsland(spec) {
   const signView = spec.signView ?? [spawn.x + 3, 0.2]
   // The company profile waits on a small stand between the road and the signboard.
   const sd = Math.hypot(sign.x - signView[0], sign.z - signView[1]) || 1
-  const profileStand = spec.profileStand ?? { x: signView[0] + ((sign.x - signView[0]) / sd) * 3.0, z: signView[1] + ((sign.z - signView[1]) / sd) * 3.0 }
-  colliders.push({ x: profileStand.x, z: profileStand.z, r: 0.45, h: 1.5 })
+  const profileStand = spec.profileStand ?? { x: signView[0] + ((sign.x - signView[0]) / sd) * 2.7, z: signView[1] + ((sign.z - signView[1]) / sd) * 2.7 }
   const ground = makeGround(spec.terrain, len, Math.max(wid, ...outline.map(([, z]) => Math.abs(z))) + 3)
   const tour = spec.tour ?? [
     [spawn.x + 0.6, 0],

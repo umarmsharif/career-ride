@@ -208,7 +208,7 @@ export function Banner({ x, y = 0, z, face, text }) {
 export function Signboard({ id, x, y = 0, z, face, brand }) {
   const marker = useRef()
   // The company name, in its colour, across the top of the board.
-  const tex = useMemo(() => (brand ? textTexture(brand.label, { w: 768, h: 230, size: brand.label.length > 12 ? 78 : 120, bg: brand.primary, fg: brand.ink }) : null), [brand])
+  const tex = useMemo(() => (brand ? textTexture(brand.signLabel ?? brand.label, { w: 768, h: 230, size: (brand.signLabel ?? brand.label).length > 12 ? 78 : 120, bg: brand.primary, fg: brand.ink }) : null), [brand])
   const read = useGame((s) => !!s.signRead[id])
   useFrame(() => {
     marker.current.position.y = 5.5 + Math.sin(clock.t * 2.6) * 0.22
@@ -310,25 +310,38 @@ export function ProfileStand({ id, x, y, z, face, color }) {
   const folder = useRef()
   const taken = useGame((s) => s.profiles.includes(id))
   useFrame(() => {
-    if (!folder.current) return
-    folder.current.visible = !taken && !(rider.act && rider.act.island === id && rider.act.has)
-    folder.current.position.y = 1.5 + Math.sin(clock.t * 2.4) * 0.07
-    folder.current.rotation.y = Math.sin(clock.t * 1.2) * 0.35
+    const f = folder.current
+    if (!f) return
+    const act = rider.act && rider.act.island === id ? rider.act : null
+    f.visible = !taken && !(act && (act.has || act.loaded))
+    f.position.set(x, y + 1.5 + Math.sin(clock.t * 2.4) * 0.07, z)
+    f.rotation.y = face + Math.sin(clock.t * 1.2) * 0.35
+    if (act && f.visible) {
+      // The folder flies across to the rider's outstretched hand.
+      const k = Math.min(1, act.t / 0.32)
+      const e = k * k
+      f.position.x += (rider.pos.x - x) * e
+      f.position.z += (rider.pos.z - z) * e
+      f.position.y += (rider.pos.y + 1.7 - (y + 1.5)) * e + Math.sin(k * Math.PI) * 0.8
+      f.rotation.y += k * 5
+    }
   })
   return (
-    <group position={[x, y, z]} rotation={[0, face, 0]}>
-      <Static
-        build={(k) => {
-          k.cyl(0.42, 0.5, 0.16, '#c98a5e', { p: [0, 0.08, 0] }, 8)
-          k.cyl(0.09, 0.11, 1.0, '#8b5e3c', { p: [0, 0.6, 0] }, 6)
-          k.box(0.8, 0.07, 0.6, '#fff1dc', { p: [0, 1.12, 0], r: [0.35, 0, 0] })
-        }}
-      />
-      <mesh ref={folder} position={[0, 1.5, 0]} castShadow>
+    <>
+      <group position={[x, y, z]} rotation={[0, face, 0]}>
+        <Static
+          build={(k) => {
+            k.cyl(0.42, 0.5, 0.16, '#c98a5e', { p: [0, 0.08, 0] }, 8)
+            k.cyl(0.09, 0.11, 1.0, '#8b5e3c', { p: [0, 0.6, 0] }, 6)
+            k.box(0.8, 0.07, 0.6, '#fff1dc', { p: [0, 1.12, 0], r: [0.35, 0, 0] })
+          }}
+        />
+      </group>
+      <mesh ref={folder} position={[x, y + 1.5, z]} castShadow>
         <boxGeometry args={[0.56, 0.72, 0.09]} />
         <meshStandardMaterial color={color} roughness={0.6} emissive={color} emissiveIntensity={0.2} flatShading />
       </mesh>
-    </group>
+    </>
   )
 }
 

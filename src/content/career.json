@@ -245,17 +245,6 @@
       "theme": "A workshop yard of four machines; riding up to one switches it on and opens its project card",
       "machines": [
         {
-          "title": "Multilingual GenAI agent",
-          "client": "Sarmaaya Financials (Fractional Head of AI and Transformation, 2026)",
-          "card": "diagram",
-          "facts": [
-            "A production agent in Urdu, Roman Urdu and English, built on Gemini and FastAPI",
-            "2,000 to 3,000 active user interactions per day",
-            "Qualified leads routed to CRM after a five-interaction threshold",
-            "Part of an enterprise AI roadmap designed as a three-layer Revenue Funnelling System"
-          ]
-        },
-        {
           "title": "BlockNow",
           "client": "Co-founder, UK healthcare AI venture, 2025 to present",
           "card": "footage",
@@ -276,13 +265,14 @@
           ]
         },
         {
-          "title": "A ten-minute animated film for kids",
-          "client": "Personal project, 2026",
-          "card": "footage",
-          "media": "/media/kids-film.mp4",
+          "title": "Multilingual GenAI agent",
+          "client": "Sarmaaya Financials (Fractional Head of AI and Transformation, 2026)",
+          "card": "diagram",
           "facts": [
-            "70 scenes drawn in Python, with no design tool",
-            "97 lines of narration voiced through ElevenLabs and timed to each scene"
+            "A production agent in Urdu, Roman Urdu and English, built on Gemini and FastAPI",
+            "2,000 to 3,000 active user interactions per day",
+            "Qualified leads routed to CRM after a five-interaction threshold",
+            "Part of an enterprise AI roadmap designed as a three-layer Revenue Funnelling System"
           ]
         }
       ],
@@ -325,11 +315,12 @@
       ],
       "closing": "Eighteen years of building things that work. Now teaching others to do the same with AI.",
       "brand": {
-        "label": "The Classroom",
+        "label": "Top Search Agency",
         "primary": "#22304f",
         "secondary": "#f0553f",
         "ink": "#fff6e4",
-        "logo": null
+        "logo": null,
+        "signLabel": "The Classroom"
       }
     }
   ]

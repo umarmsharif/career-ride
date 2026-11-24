@@ -9,6 +9,7 @@ import { Land, Stops, Gate, Banner, Signboard, Sky, Lights, Static, Grounded, Br
 import { buildRide, rideRibbon } from './engine/rideCurve.js'
 import { rng } from './engine/kit.js'
 import { useGame } from './engine/state.js'
+import Cinematic, { sceneCost } from './engine/Cinematic.jsx'
 
 const GAP = 118
 
@@ -99,15 +100,16 @@ export default function World({ entries }) {
     for (let i = 0; i < islands.length - 1; i++) {
       const a = islands[i]
       const b = islands[i + 1]
-      const d = new THREE.Vector3(a.len + b.len + GAP, a.ride.dy, a.ride.dz)
+      // Islands sit nearly in line, so the road between them goes up and down rather than side to side.
+      const d = new THREE.Vector3(a.len + b.len + GAP, a.ride.dy, a.ride.dz * 0.3)
       origins.push(origins[i].clone().add(d))
       rides.push(
         buildRide({
           start: { x: a.exitGate.x + 0.8, y: a.h(a.exitGate.x + 0.8, a.exitGate.z), z: a.exitGate.z },
           end: { x: d.x + b.spawn.x, y: d.y + b.h(b.spawn.x, b.spawn.z), z: d.z + b.spawn.z },
           tip: { x: d.x - b.len },
-          style: a.ride.style,
-          side: a.ride.dz <= 0 ? 1 : -1,
+          style: 'hills',
+          side: 1,
         })
       )
     }
@@ -116,7 +118,7 @@ export default function World({ entries }) {
 
   useEffect(() => {
     scene.fog = new THREE.Fog('#d9eef6', 150, 430)
-    window.__ride = { ...(window.__ride || {}), info: () => ({ ...gl.info.render }) }
+    window.__ride = { ...(window.__ride || {}), info: () => (gl.info.autoReset ? { ...gl.info.render } : { ...sceneCost }) }
   }, [scene, gl])
 
   // The next island is only drawn once the rider is heading for it, to stay inside the budget.
@@ -124,6 +126,7 @@ export default function World({ entries }) {
   // the ride, the one being approached for the rest. The other is bare land.
   const leaving = useGame((s) => s.phase === 'ride' || s.nearExit)
   const late = useGame((s) => s.phase === 'ride' && s.rideLate)
+  const cinematic = useGame((s) => s.cinematic && !s.touch)
   const mounted = (leaving ? [current, current + 1] : [current]).filter((i) => i < islands.length)
   return (
     <>
@@ -138,6 +141,7 @@ export default function World({ entries }) {
           </group>
         ))}
       </group>
+      {cinematic && <Cinematic />}
       <Rider ids={islands.map((i) => i.id)} />
       <Controller islands={islands} origins={origins} rides={rides} worldRef={worldRef} />
     </>

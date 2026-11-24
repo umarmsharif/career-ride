@@ -46,7 +46,7 @@ function StartScreen() {
           )}
         </div>
         <p className="fine">
-          {touch ? 'The rider steers for you. Tap to move on from each stop.' : 'Steer with the arrow keys or W A S D. Story plays the years in order; Open map lets you start anywhere.'}
+          {touch ? 'The rider steers for you. Sit back and watch.' : 'Steer with the arrow keys or W A S D. Story plays the years in order; Open map lets you start anywhere.'}
         </p>
         <CvLink className="text-link" />
       </div>
@@ -110,17 +110,17 @@ function Footage({ src, title }) {
 function StopCard({ stop, district }) {
   if (stop.kind === 'fact') {
     return (
-      <section className="card fact" aria-live="polite">
+      <>
         <p className="eyebrow">
           <Gem /> {district}
         </p>
         <p className="fact-text">{stop.fact}</p>
-      </section>
+      </>
     )
   }
   if (stop.kind === 'machine') {
     return (
-      <section className="card project" aria-live="polite">
+      <>
         <p className="eyebrow">{stop.client}</p>
         <h2>{stop.title}</h2>
         {stop.card === 'footage' ? <Footage src={stop.media} title={stop.title} /> : stop.diagram && <Diagram steps={stop.diagram} />}
@@ -129,15 +129,83 @@ function StopCard({ stop, district }) {
             <li key={f}>{f}</li>
           ))}
         </ul>
-      </section>
+      </>
     )
   }
   return (
-    <section className="card board" aria-live="polite">
+    <>
       <p className="eyebrow">{stop.kind === 'board' ? 'On the board' : 'Now'}</p>
       <h2>{stop.title}</h2>
       <p>{stop.body}</p>
+    </>
+  )
+}
+
+function ProfileCard({ island, count, total }) {
+  const data = island.data
+  return (
+    <>
+      <p className="eyebrow">
+        <span className="swatch" style={{ background: data.brand.primary }} />
+        Company profile · {count} of {total} loaded
+      </p>
+      <h2>{data.company}</h2>
+      {data.about && <p className="about">{data.about}</p>}
+      <p className="role">
+        <strong>{data.years}</strong> · {data.role}
+      </p>
+      <p>{data.summary}</p>
+    </>
+  )
+}
+
+// How long each kind of capture stays on screen, in seconds.
+const LIFE = { fact: 5, board: 7, card: 7, machine: 9, profile: 7 }
+
+// One capture in the stack on the right. It fades in, waits, fades out and removes itself.
+function Toast({ toast, islands }) {
+  const [leaving, setLeaving] = useState(false)
+  const island = islands[toast.island]
+  const stop = toast.type === 'stop' ? island.stops[toast.index] : null
+  const kind = stop ? stop.kind : 'profile'
+  useEffect(() => {
+    const life = LIFE[kind] * 1000
+    const a = setTimeout(() => setLeaving(true), life)
+    const b = setTimeout(() => useGame.getState().dropToast(toast.id), life + 600)
+    return () => {
+      clearTimeout(a)
+      clearTimeout(b)
+    }
+  }, [toast.id, kind])
+  return (
+    <section className={`card toast ${kind}${leaving ? ' leaving' : ''}`}>
+      {stop ? <StopCard stop={stop} district={island.districts[stop.district] ?? island.name} /> : <ProfileCard island={island} count={useGame.getState().profiles.length} total={islands.length} />}
     </section>
+  )
+}
+
+function Toasts({ islands }) {
+  const toasts = useGame((s) => s.toasts)
+  return (
+    <div className="toasts" aria-live="polite">
+      {toasts.map((t) => (
+        <Toast key={t.id} toast={t} islands={islands} />
+      ))}
+    </div>
+  )
+}
+
+function SpeedDial() {
+  const speed = useGame((s) => s.speed)
+  return (
+    <div className="dial" role="group" aria-label="Bike speed">
+      <span className="dial-label">Speed</span>
+      {[1, 1.5, 2, 3].map((v) => (
+        <button key={v} id={`speed-${v}`} className={`dial-step${v === speed ? ' on' : ''}`} aria-pressed={v === speed} onClick={() => useGame.setState({ speed: v })}>
+          {v}x
+        </button>
+      ))}
+    </div>
   )
 }
 
@@ -162,13 +230,17 @@ function Splash({ island }) {
 function Closing({ total }) {
   const g = useGame()
   const last = career.islands[career.islands.length - 1]
+  const finale = last.cards[0]
   const links = career.person.links
   return (
     <section className="card closing">
-      <p className="eyebrow">The end of the road, for now</p>
-      <h2>{last.closing}</h2>
-      <p>
-        You found {g.collected.length} of {total} tokens.
+      {last.brand.logo && <img className="finale-logo" src={last.brand.logo} alt={finale.title} />}
+      <p className="eyebrow">Now</p>
+      <h2>{finale.title}</h2>
+      <p>{finale.body}</p>
+      <p className="closing-line">{last.closing}</p>
+      <p className="fine">
+        You found {g.collected.length} of {total} tokens and loaded {g.profiles.length} company profiles.
       </p>
       <div className="row">
         <a id="link-linkedin" className="btn primary" href={links.linkedin} target="_blank" rel="noopener">
@@ -203,31 +275,9 @@ export default function Hud({ islands }) {
   const island = islands[g.island]
   const total = islands.reduce((n, i) => n + i.stops.length, 0)
 
-  // Space or Enter moves a hands-free ride on from a stop, or closes a card.
-  useEffect(() => {
-    const onKey = (e) => {
-      if ((e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape') && !e.target?.closest?.('button, a, video')) {
-        const s = useGame.getState()
-        if (s.waiting) s.resume()
-        else if (s.open) s.dismiss()
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
-  // In free steering a fact card clears itself after a while; project cards stay until closed.
-  const open = g.open && g.open.island === g.island ? island.stops[g.open.index] : null
-  useEffect(() => {
-    if (!open || g.autopilot || open.kind !== 'fact') return
-    const id = setTimeout(() => useGame.getState().dismiss(), 7000)
-    return () => clearTimeout(id)
-  }, [open, g.autopilot])
-
   if (g.phase === 'intro') return <StartScreen />
 
   const onIsland = g.phase === 'island' || g.phase === 'falling'
-  const showSign = onIsland && !open && g.signRead[island.id] && (g.autopilot ? g.waiting : g.nearSign)
   const data = island.data
 
   return (
@@ -246,6 +296,11 @@ export default function Hud({ islands }) {
         {onIsland && !g.touch && (
           <button id="toggle-auto" className="btn small" onClick={() => g.setAutopilot(!g.autopilot)}>
             {g.autopilot ? 'Take the handlebars' : 'Ride for me'}
+          </button>
+        )}
+        {!g.touch && (
+          <button id="toggle-cine" className="btn small" aria-pressed={g.cinematic} onClick={() => useGame.setState({ cinematic: !g.cinematic })}>
+            {g.cinematic ? 'Cinematic on' : 'Cinematic off'}
           </button>
         )}
         <button
@@ -271,6 +326,7 @@ export default function Hud({ islands }) {
         )}
       </header>
       {g.phase !== 'closing' && <MiniMap islands={islands} />}
+      {g.phase !== 'closing' && <Toasts islands={islands} />}
 
       {onIsland && <Splash island={island} />}
       {g.phase === 'ride' && g.year && (
@@ -283,38 +339,12 @@ export default function Hud({ islands }) {
       )}
 
       <div className="bottom">
-        {showSign && (
-          <section className="card sign" aria-live="polite">
-            <p className="eyebrow">
-              <span className="swatch" style={{ background: data.brand.primary }} />
-              Company profile · {g.profiles.length} of {islands.length} loaded
-            </p>
-            <h2>{data.company}</h2>
-            {data.about && <p className="about">{data.about}</p>}
-            <p className="role">
-              <strong>{data.years}</strong> · {data.role}
-            </p>
-            <p>{data.summary}</p>
-          </section>
-        )}
-        {open && onIsland && <StopCard key={`${g.island}-${g.open.index}`} stop={open} district={island.districts[open.district] ?? island.name} />}
-        {onIsland && g.autopilot && g.waiting && (
-          <button id="ride-on" className="btn primary" onClick={() => g.resume()}>
-            {g.touch ? 'Tap to ride on' : 'Ride on'}
-          </button>
-        )}
-        {onIsland && !g.autopilot && open && open.kind !== 'fact' && (
-          <button id="close-card" className="btn small" onClick={() => g.dismiss()}>
-            Close
-          </button>
-        )}
-        {onIsland && !g.autopilot && !open && !showSign && (
+        {onIsland && !g.autopilot && g.toasts.length === 0 && (
           <p className="hint">
             {g.nearExit ? (
               <>Ride through the glowing gate to leave for {islands[g.island + 1]?.startYear}</>
             ) : (
               <>
-                {!g.signRead[island.id] && <>Ride to the folder by the signboard · </>}
                 <kbd>↑</kbd> pedal <kbd>←</kbd> <kbd>→</kbd> steer <kbd>↓</kbd> brake
               </>
             )}
@@ -322,6 +352,7 @@ export default function Hud({ islands }) {
         )}
         {g.phase === 'closing' && <Closing total={total} />}
       </div>
+      {g.phase !== 'closing' && <SpeedDial />}
       {g.phase !== 'closing' && <CvLink />}
     </div>
   )

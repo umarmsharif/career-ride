@@ -15,7 +15,8 @@ export const island = defineIsland({
   sign: { x: -38.5, z: 6.2, face: -2.2 },
   colliders: L.colliders,
   terrain: (x) => climb(x),
-  brandSign: { x: -26, z: -6.6, y: 7.2, face: -Math.PI / 2, scale: 1 },
+  // Top Search Agency is the finale: its board stands over the open door at the summit.
+  brandSign: { x: L.door.x + 0.4, z: L.door.z, y: 9.6, face: -Math.PI / 2, scale: 1.15 },
   last: true,
   finish: L.finish,
   grass: '#b7d66a',

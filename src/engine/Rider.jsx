@@ -170,26 +170,10 @@ export default function Rider({ ids }) {
     mats.helmet.color.lerp(_c.set(brand.secondary), k)
     mats.flag.color.lerp(_c.set(brand.secondary), k)
 
-    // On foot: where the rider stands relative to the bike, and how far off the saddle.
+    // Reaching for the company profile and stowing it, without leaving the saddle.
     const act = rider.act
-    const off = act ? act.off : 0
-    const reach = act ? act.reach : 0
-    if (act) {
-      const vx = act.x - rider.pos.x
-      const vz = act.z - rider.pos.z
-      const ch = Math.cos(rider.heading)
-      const sh = Math.sin(rider.heading)
-      walker.current.position.set((vx * ch - vz * sh) / 1.18, 0, (vx * sh + vz * ch) / 1.18 + HIP.z)
-      walker.current.rotation.y = wrapAngle(act.face - rider.heading)
-      mats.held.color.set(brandOf(act.island).primary)
-    } else {
-      walker.current.position.set(0, 0, HIP.z)
-      walker.current.rotation.y = 0
-    }
-    const tilt = UPRIGHT * off + 0.45 * reach
-    upper.current.rotation.x = tilt
+    if (act) mats.held.color.set(brandOf(act.island).primary)
     held.current.visible = !!act && act.has
-    const stride = act ? Math.sin(act.walk * 4.2) : 0
     root.current.position.copy(rider.pos)
     root.current.quaternion.copy(rider.quat)
     leanRef.current.rotation.z = rider.lean
@@ -213,7 +197,7 @@ export default function Rider({ ids }) {
       // Two-bone leg from hip to the foot on the pedal.
       const hipX = side * 0.13
       // The foot is on the pedal when riding and on the ground, striding, when walking.
-      _f.set(px, _b.y + 0.08, _b.z).lerp(_s.set(hipX, 0.15 + Math.max(0, stride * side) * 0.1, HIP.z + stride * side * 0.34), off)
+      _f.set(px, _b.y + 0.08, _b.z)
       const footX = _f.x
       const fy = _f.y
       const fz = _f.z
@@ -232,15 +216,15 @@ export default function Rider({ ids }) {
       p['shoe' + s].position.set(footX, fy - 0.03, fz + 0.07)
 
       // Arms follow the handlebar as it turns.
-      _a.set(side * SHOULDER.x, SHOULDER.y, SHOULDER.z).sub(HIP).applyAxisAngle(_xAxis, tilt).add(HIP)
+      _a.set(side * SHOULDER.x, SHOULDER.y, SHOULDER.z)
       _b.set(side * 0.27, 1.19, -0.02).applyAxisAngle(_yAxis, rider.steer)
       _b.z += STEER_Z
-      if (off > 0) {
-        // Arms swing at the sides, reach out for the folder, or carry it in front.
-        const carry = act.has ? 1 : reach
-        _h.set(side * (0.3 - 0.14 * carry), _a.y - 0.5 + 0.2 * carry - 0.12 * reach, _a.z - stride * side * 0.2 * (1 - carry) + 0.4 * carry + 0.1 * reach)
-        _b.lerp(_h, off)
-        if (side === 1) held.current.position.set(0, _h.y + 0.02, _h.z + 0.08)
+      if (act && side === act.side) {
+        // Out to the side to catch the folder, then back over the shoulder to the crate.
+        _b.lerp(_h.set(side * 0.85, 1.42, 0.12), act.reach)
+        _b.lerp(_h.set(side * 0.2, 1.42, -0.78), act.stow)
+        held.current.position.copy(_b)
+        held.current.position.y += 0.12
       }
       placeLimb(p['arm' + s], _a, _b)
       p['hand' + s].position.copy(_b)
@@ -318,7 +302,7 @@ export default function Rider({ ids }) {
         {/* Rider */}
         <group ref={walker} position={[0, 0, HIP.z]}>
         <group ref={body} position={[0, 0, -HIP.z]}>
-          <mesh ref={held} visible={false} castShadow rotation={[-0.5, 0, 0]}>
+          <mesh ref={held} visible={false} castShadow rotation={[0, Math.PI / 2, 0]}>
             <boxGeometry args={[0.36, 0.44, 0.05]} />
             <primitive object={mats.held} attach="material" />
           </mesh>
@@ -345,19 +329,9 @@ export default function Rider({ ids }) {
             <primitive object={mats.helmet} attach="material" />
           </mesh>
           <mesh position={[0, 2.085, 0.075]} rotation={[-0.12, 0, 0]}>
-            <boxGeometry args={[0.09, 0.46, 0.5]} />
+            <boxGeometry args={[0.08, 0.5, 0.4]} />
             {std(C.stripe, 0.45)}
           </mesh>
-          <mesh position={[0, 2.0, 0.36]} rotation={[0.25, 0, 0]}>
-            <boxGeometry args={[0.36, 0.04, 0.14]} />
-            <primitive object={mats.helmet} attach="material" />
-          </mesh>
-          {[1, -1].map((s) => (
-            <mesh key={s} position={[s * 0.1, 1.95, 0.33]}>
-              <sphereGeometry args={[0.032, 6, 6]} />
-              <meshBasicMaterial color="#2c2f3a" />
-            </mesh>
-          ))}
           </group>
           </group>
           {/* Limbs, placed every frame */}
