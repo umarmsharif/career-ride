@@ -752,8 +752,8 @@ a.btn {
 .card.closing { position: relative; }
 .closing .avatar {
   position: absolute;
-  top: 18px;
-  right: 20px;
+  top: 14px;
+  right: 16px;
   width: 96px;
   height: 96px;
   border-radius: 50%;
@@ -762,5 +762,6 @@ a.btn {
   object-fit: cover;
   background: var(--card);
 }
-.closing .eyebrow, .closing h2 { padding-right: 116px; }
-@media (max-width: 560px) { .closing .avatar { width: 72px; height: 72px; } .closing .eyebrow, .closing h2 { padding-right: 88px; } }
+.card.closing { max-width: 40rem; padding: 22px 26px; }
+.closing .eyebrow, .closing h2, .closing h2 + p { padding-right: 128px; }
+@media (max-width: 560px) { .closing .avatar { width: 72px; height: 72px; } .card.closing { padding: 16px 18px; } .closing .eyebrow, .closing h2, .closing h2 + p { padding-right: 92px; } }
