@@ -227,7 +227,7 @@ export default function Hud({ islands }) {
   if (g.phase === 'intro') return <StartScreen />
 
   const onIsland = g.phase === 'island' || g.phase === 'falling'
-  const showSign = onIsland && !open && (g.autopilot ? g.waiting && g.signRead[island.id] : g.nearSign)
+  const showSign = onIsland && !open && g.signRead[island.id] && (g.autopilot ? g.waiting : g.nearSign)
   const data = island.data
 
   return (
@@ -286,9 +286,14 @@ export default function Hud({ islands }) {
         {showSign && (
           <section className="card sign" aria-live="polite">
             <p className="eyebrow">
-              {data.company} · {data.years}
+              <span className="swatch" style={{ background: data.brand.primary }} />
+              Company profile · {g.profiles.length} of {islands.length} loaded
             </p>
-            <h2>{data.role}</h2>
+            <h2>{data.company}</h2>
+            {data.about && <p className="about">{data.about}</p>}
+            <p className="role">
+              <strong>{data.years}</strong> · {data.role}
+            </p>
             <p>{data.summary}</p>
           </section>
         )}
@@ -309,6 +314,7 @@ export default function Hud({ islands }) {
               <>Ride through the glowing gate to leave for {islands[g.island + 1]?.startYear}</>
             ) : (
               <>
+                {!g.signRead[island.id] && <>Ride to the folder by the signboard · </>}
                 <kbd>↑</kbd> pedal <kbd>←</kbd> <kbd>→</kbd> steer <kbd>↓</kbd> brake
               </>
             )}

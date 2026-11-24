@@ -9,31 +9,32 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
   const add = (x, y, z) => pts.push(new THREE.Vector3(x, y, start.z + (z - start.z) * side + 0))
   const mix = (a, b, k) => a + (b - a) * k
 
-  add(start.x, 0.06, start.z)
-  add(start.x + 6, 0.06, start.z)
+  const sy = start.y ?? 0
+  add(start.x, sy + 0.06, start.z)
+  add(start.x + 6, sy + 0.06, start.z)
   // Where the last straight begins, lined up with the next island's gate.
   const ax = tip.x - 24
   let fromX = start.x + 14
-  let fromY = 1.2
+  let fromY = sy + 1.2
   if (style === 'spiral') {
-    add(start.x + 14, 1.2, start.z)
-    add(start.x + 21, 3.4, start.z)
+    add(start.x + 14, sy + 1.2, start.z)
+    add(start.x + 21, sy + 3.4, start.z)
     const R = 14
     const cx = start.x + 27
     const cz = start.z - R
     for (let i = 0; i <= 14; i++) {
       const th = Math.PI / 2 + (i / 14) * Math.PI * 2
-      add(cx - R * Math.cos(th), 5 + (i / 14) * 12, cz + R * Math.sin(th))
+      add(cx - R * Math.cos(th), sy + 5 + (i / 14) * 12, cz + R * Math.sin(th))
     }
     fromX = cx + 18
-    fromY = 17
+    fromY = sy + 17
     add(fromX, fromY, start.z + 3)
   } else if (style === 'dive') {
-    add(start.x + 16, 3, start.z)
-    add(start.x + 30, 12, start.z - 6)
-    add(start.x + 44, 20, start.z - 2)
+    add(start.x + 16, sy + 3, start.z)
+    add(start.x + 30, sy + 12, start.z - 6)
+    add(start.x + 44, sy + 20, start.z - 2)
     fromX = start.x + 56
-    fromY = 18
+    fromY = sy + 18
     add(fromX, fromY, start.z + 6)
   } else {
     add(fromX, fromY, start.z)

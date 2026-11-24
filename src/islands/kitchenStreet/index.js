@@ -1,6 +1,9 @@
 import { defineIsland } from '../../engine/defineIsland.js'
 import L from './layout.js'
 import Scenery from './Scenery.jsx'
+import { profile } from '../../engine/terrain.js'
+
+const rise = profile([[-47, 0], [-26, 0], [-12, 3], [2, 3], [14, 6], [47, 6]])
 
 export const island = defineIsland({
   id: 6,
@@ -19,6 +22,7 @@ export const island = defineIsland({
     [-38, 0], [-35.6, 0.2], [-29.5, -2.6], [-25, 0.6], [-22, 3.4], [-17.5, 0], [-11.5, -3],
     [-4, -0.8], [3, 0.6], [11.5, 3.4], [17, 4.4], [22, 4.6], [31.5, 3.2], [38, 0.8], [45.5, 0],
   ],
+  terrain: (x) => rise(x),
   ride: { dy: 10, dz: -44, style: 'spiral' },
 })
 export { Scenery }

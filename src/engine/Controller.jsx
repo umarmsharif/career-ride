@@ -7,12 +7,17 @@ import * as THREE from 'three'
 import { rider, clock, input, useGame, damp, clamp, wrapAngle, smooth } from './state.js'
 import { insideOutline } from './kit.js'
 import { audio } from './sound.js'
+import { day } from './day.js'
 
 const MAX_SPEED = 10.5
 const REVERSE_SPEED = -3
 const WHEEL_R = 0.42 * 1.18
 const Y_AXIS = new THREE.Vector3(0, 1, 0)
 const READ_TIME = 4.6
+const X_AXIS = new THREE.Vector3(1, 0, 0)
+const _pitchQ = new THREE.Quaternion()
+// The company-profile pickup, in seconds: brake, get off, walk over, pick up, walk back, load, get on.
+const ACT = [0.45, 0.95, 1.95, 2.5, 3.4, 3.95, 4.5]
 
 export default function Controller({ islands, origins, rides, worldRef }) {
   const { camera, size } = useThree()
@@ -67,8 +72,10 @@ export default function Controller({ islands, origins, rides, worldRef }) {
   }, [])
 
   function placeAtSpawn(island) {
-    rider.pos.set(island.spawn.x, 0, island.spawn.z)
+    rider.pos.set(island.spawn.x, island.h(island.spawn.x, island.spawn.z), island.spawn.z)
     rider.heading = island.spawn.heading
+    rider.act = null
+    rider.pitch = 0
     rider.speed = 0
     rider.lean = 0
     rider.steer = 0
@@ -91,7 +98,107 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     return Math.min(island.tour.length - 1, best + 1)
   }
 
+  // Sets the rider's height and tilt from the ground under the wheels.
+  function settle(island, dt) {
+    const fx = Math.sin(rider.heading)
+    const fz = Math.cos(rider.heading)
+    rider.pos.y = island.h(rider.pos.x, rider.pos.z)
+    const slope = (island.h(rider.pos.x + fx * 0.7, rider.pos.z + fz * 0.7) - island.h(rider.pos.x - fx * 0.7, rider.pos.z - fz * 0.7)) / 1.4
+    rider.pitch = damp(rider.pitch, Math.atan(slope), 9, dt)
+    rider.quat.setFromAxisAngle(Y_AXIS, rider.heading).multiply(_pitchQ.setFromAxisAngle(X_AXIS, -rider.pitch))
+    return slope
+  }
+
+  function startAct(island) {
+    const st = island.profileStand
+    const fx = Math.sin(rider.heading)
+    const fz = Math.cos(rider.heading)
+    const side = (st.x - rider.pos.x) * fz - (st.z - rider.pos.z) * fx >= 0 ? 1 : -1
+    rider.act = { island: island.id, t: 0, side, off: 0, x: rider.pos.x, z: rider.pos.z, face: rider.heading, reach: 0, walk: 0, has: false, loaded: false, set: false }
+  }
+
+  // The rider gets off, fetches the company profile from its stand and loads it on the bike.
+  function stepAct(dt, g, island) {
+    const a = rider.act
+    a.t += dt
+    rider.speed = damp(rider.speed, 0, 9, dt)
+    rider.pos.x += Math.sin(rider.heading) * rider.speed * dt
+    rider.pos.z += Math.cos(rider.heading) * rider.speed * dt
+    rider.wheel += (rider.speed * dt) / WHEEL_R
+    rider.pedalling = false
+    rider.steer = damp(rider.steer, 0.35 * a.side, 6, dt)
+    rider.lean = damp(rider.lean, 0.1 * a.side * a.off, 6, dt)
+    settle(island, dt)
+    if (a.t < ACT[0]) return
+    const fx = Math.sin(rider.heading)
+    const fz = Math.cos(rider.heading)
+    if (!a.set) {
+      // Fix the walking route once the bike has stopped.
+      a.set = true
+      const st = island.profileStand
+      const lx = fz * a.side
+      const lz = -fx * a.side
+      a.S = [rider.pos.x + lx * 0.85, rider.pos.z + lz * 0.85]
+      a.C = [rider.pos.x + lx * 0.8 - fx * 0.85, rider.pos.z + lz * 0.8 - fz * 0.85]
+      const dx = st.x - a.S[0]
+      const dz = st.z - a.S[1]
+      const d = Math.hypot(dx, dz) || 1
+      const stop = Math.max(0, d - 0.8)
+      a.P = [a.S[0] + (dx / d) * stop, a.S[1] + (dz / d) * stop]
+      a.toStand = Math.atan2(dx, dz)
+      a.toBike = Math.atan2(-lx, -lz)
+    }
+    const seg = (i) => smooth((a.t - ACT[i]) / (ACT[i + 1] - ACT[i]))
+    const go = (from, to, k) => {
+      const px = a.x
+      const pz = a.z
+      a.x = from[0] + (to[0] - from[0]) * k
+      a.z = from[1] + (to[1] - from[1]) * k
+      a.walk += Math.hypot(a.x - px, a.z - pz)
+    }
+    const turnTo = (ang) => (a.face += wrapAngle(ang - a.face) * (1 - Math.exp(-10 * dt)))
+    const here = [rider.pos.x, rider.pos.z]
+    a.reach = 0
+    if (a.t < ACT[1]) {
+      a.off = seg(0)
+      go(here, a.S, a.off)
+    } else if (a.t < ACT[2]) {
+      a.off = 1
+      go(a.S, a.P, seg(1))
+      turnTo(a.toStand)
+    } else if (a.t < ACT[3]) {
+      a.reach = Math.sin(seg(2) * Math.PI)
+      turnTo(a.toStand)
+      if (!a.has && seg(2) > 0.5) a.has = true
+    } else if (a.t < ACT[4]) {
+      go(a.P, a.C, seg(3))
+      turnTo(Math.atan2(a.C[0] - a.P[0], a.C[1] - a.P[1]))
+    } else if (a.t < ACT[5]) {
+      a.reach = Math.sin(seg(4) * Math.PI)
+      turnTo(a.toBike)
+      if (!a.loaded && seg(4) > 0.5) {
+        a.loaded = true
+        a.has = false
+        g.loadProfile(island.id)
+        audio.chime()
+      }
+    } else if (a.t < ACT[6]) {
+      a.off = 1 - seg(5)
+      go(a.C, here, seg(5))
+      turnTo(rider.heading)
+    } else {
+      rider.act = null
+      const patch = { signRead: { ...g.signRead, [island.id]: true } }
+      if (g.autopilot) {
+        patch.waiting = true
+        s.waitUntil = clock.t + READ_TIME + 2.5
+      }
+      useGame.setState(patch)
+    }
+  }
+
   function stepIsland(dt, g, island) {
+    if (rider.act) return stepAct(dt, g, island)
     let turn = 0
     let throttle = 0
     if (g.autopilot) {
@@ -105,13 +212,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
         const diff = wrapAngle(Math.atan2(dx, dz) - rider.heading)
         turn = clamp(diff * 2.6, -1, 1)
         throttle = Math.abs(diff) > 0.9 ? 0.4 : 0.82
-        if (dist < 1.5) {
-          if (s.tourIdx === island.signStop && !g.signRead[island.id]) {
-            useGame.setState({ waiting: true, signRead: { ...g.signRead, [island.id]: true } })
-            s.waitUntil = clock.t + READ_TIME + 1.5
-          }
-          if (s.tourIdx < island.tour.length - 1) s.tourIdx++
-        }
+        if (dist < 1.5 && s.tourIdx < island.tour.length - 1) s.tourIdx++
       }
     } else {
       turn = (input.left ? 1 : 0) - (input.right ? 1 : 0)
@@ -147,9 +248,17 @@ export default function Controller({ islands, origins, rides, worldRef }) {
         rider.speed *= 1 - 2.5 * dt
       }
     }
-    rider.quat.setFromAxisAngle(Y_AXIS, rider.heading)
+    // Hills: slower on the way up, a little faster on the way down.
+    const slope = settle(island, dt)
+    if (!braking && Math.abs(rider.speed) > 0.4) rider.speed = clamp(rider.speed - clamp(slope, -0.5, 0.5) * 7 * dt * Math.sign(rider.speed), REVERSE_SPEED, MAX_SPEED * 1.2)
 
     // Triggers.
+    const st = island.profileStand
+    if (!g.signRead[island.id] && Math.hypot(st.x - rider.pos.x, st.z - rider.pos.z) < 3.8) {
+      startAct(island)
+      useGame.setState({ open: null })
+      return
+    }
     const patch = {}
     island.stops.forEach((p, i) => {
       const d2 = (p.x - rider.pos.x) ** 2 + (p.z - rider.pos.z) ** 2
@@ -172,7 +281,6 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     })
     const nearSign = Math.hypot(island.sign.x - rider.pos.x, island.sign.z - rider.pos.z) < island.sign.radius
     if (nearSign !== g.nearSign) patch.nearSign = nearSign
-    if (nearSign && !g.signRead[island.id] && !g.autopilot) patch.signRead = { ...g.signRead, [island.id]: true }
     const district = island.districtAt(rider.pos.x, rider.pos.z)
     if (district !== g.district) patch.district = district
     const ex = island.exitGate
@@ -246,7 +354,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       // Arrive: slide the world so the new island sits at the origin.
       tmp.d.copy(origins[s.idx + 1]).sub(origins[s.idx])
       rider.pos.sub(tmp.d)
-      rider.pos.y = 0
+      rider.pos.y = next.h(rider.pos.x, rider.pos.z)
       s.camPos.sub(tmp.d)
       s.look.sub(tmp.d)
       s.idx += 1
@@ -296,8 +404,8 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.closeT += dt
       const a = s.closeT * 0.14 + 4.2
       const r = portrait ? 34 : 26
-      want.set(rider.pos.x + Math.sin(a) * r, 11, rider.pos.z + Math.cos(a) * r)
-      look.set(rider.pos.x, portrait ? -1 : 0.5, rider.pos.z)
+      want.set(rider.pos.x + Math.sin(a) * r, rider.pos.y + 11, rider.pos.z + Math.cos(a) * r)
+      look.set(rider.pos.x, rider.pos.y + (portrait ? -1 : 0.5), rider.pos.z)
       kPos = 1.2
     } else if (phase === 'falling') {
       want.copy(s.camPos)
@@ -306,15 +414,15 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.camHeading += wrapAngle(rider.heading - s.camHeading) * (1 - Math.exp(-2.6 * dt))
       const dist = portrait ? 15 : 10.2
       const height = portrait ? 10 : 7.2
-      want.set(rider.pos.x - Math.sin(s.camHeading) * dist, height, rider.pos.z - Math.cos(s.camHeading) * dist)
+      want.set(rider.pos.x - Math.sin(s.camHeading) * dist, rider.pos.y + height, rider.pos.z - Math.cos(s.camHeading) * dist)
       const ahead = 4.5 * s.zoom * s.zoom
-      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, 1.0, rider.pos.z + Math.cos(s.camHeading) * ahead)
+      look.set(rider.pos.x + Math.sin(s.camHeading) * ahead, rider.pos.y + 1.0, rider.pos.z + Math.cos(s.camHeading) * ahead)
     }
     if (phase === 'island') {
       // Pull the camera in when a building or gate would sit between it and the rider.
       const bx = rider.pos.x
       const bz = rider.pos.z
-      const by = 1.5
+      const by = rider.pos.y + 1.5
       const dx = bx - want.x
       const dz = bz - want.z
       const a = dx * dx + dz * dz
@@ -330,7 +438,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
           const t1 = (-b - root) / (2 * a)
           const t2 = (-b + root) / (2 * a)
           if (t2 <= 0 || t1 >= 1 || t2 >= 0.97) continue
-          if (want.y + (by - want.y) * t2 > (c.h ?? 7)) continue
+          if (want.y + (by - want.y) * t2 > (c.h ?? 7) + island.h(c.x, c.z)) continue
           need = Math.min(need, 1 - (t2 + 0.03))
         }
       }
@@ -338,6 +446,8 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.zoom = damp(s.zoom, need, need < s.zoom ? 9 : 1.6, dt)
       if (s.snap) s.zoom = need
       want.set(bx + (want.x - bx) * s.zoom, by + (want.y - by) * s.zoom, bz + (want.z - bz) * s.zoom)
+      // Never let a hill come between the camera and the rider.
+      want.y = Math.max(want.y, island.h(want.x, want.z) + 2.4, island.h((want.x + bx) / 2, (want.z + bz) / 2) + 2.6)
     }
     if (s.snap) {
       s.camPos.copy(want)
@@ -362,6 +472,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       placeAtSpawn(islands[s.idx])
       s.camHeading = rider.heading
       s.snap = true
+      s.snapDay = true
       s.left = {}
     }
     const island = islands[s.idx]
@@ -382,6 +493,15 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       else if (now.phase === 'falling') stepFall(dt, islands[s.idx])
       else if (now.phase === 'ride') stepRide(dt, now)
     }
+    // Time of day follows how far through the whole ride the rider is.
+    const ph = useGame.getState().phase
+    const cur = islands[s.idx]
+    let inner = 0
+    if (ph === 'ride') inner = 0.8 + 0.2 * (s.rideS / rides[s.idx].length)
+    else if (ph !== 'intro') inner = 0.8 * clamp((rider.pos.x + cur.len) / (2 * cur.len), 0, 1)
+    day.target = ph === 'intro' ? 0 : ph === 'closing' ? 1 + Math.min(0.1, s.closeT * 0.007) : (cur.id - 1 + inner) / 9
+    day.t = s.snapDay ? day.target : damp(day.t, day.target, 1.4, dt)
+    s.snapDay = false
     audio.update(g, rider, island)
     updateCamera(dt, useGame.getState().phase, islands[s.idx])
   })
@@ -394,7 +514,8 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       game: useGame,
       islands,
       teleport(x, z, heading) {
-        rider.pos.set(x, 0, z)
+        rider.pos.set(x, islands[s.idx].h(x, z), z)
+        rider.act = null
         if (heading !== undefined) rider.heading = heading
         s.camHeading = rider.heading
         s.snap = true

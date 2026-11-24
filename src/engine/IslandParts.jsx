@@ -2,8 +2,10 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { Kit, islandBody, islandTop, textTexture, rng } from './kit.js'
+import { Kit, islandBody, textTexture, rng } from './kit.js'
 import { clock, collectedAt, useGame, rider } from './state.js'
+import { groundGeometry, outlineMask, groundScenery } from './terrain.js'
+import { look, updateDay } from './day.js'
 
 export const toyMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.82 })
 export const toyMaterialDouble = new THREE.MeshStandardMaterial({
@@ -13,18 +15,28 @@ export const toyMaterialDouble = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 })
 
-export function Land({ outline, grass = '#a5d86e', colors, seed = 7, y = 0 }) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const body = useMemo(() => islandBody(outline, colors, seed), [outline, colors, seed])
-  const top = useMemo(() => islandTop(outline), [outline])
+export function Land({ island, seed = 7 }) {
+  const { outline, land: colors, grass, ground } = island
+  const body = useMemo(() => islandBody(outline, colors, seed, ground.h), [outline, colors, seed, ground])
+  const top = useMemo(() => groundGeometry(ground, grass), [ground, grass])
+  const mask = useMemo(() => outlineMask(ground, outline), [ground, outline])
   return (
-    <group position={[0, y, 0]}>
+    <group>
       <mesh geometry={top} receiveShadow>
-        <meshStandardMaterial color={grass} roughness={0.95} />
+        <meshStandardMaterial vertexColors flatShading roughness={0.95} alphaMap={mask} alphaTest={0.5} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={2} />
       </mesh>
       <mesh geometry={body} material={toyMaterial} />
     </group>
   )
+}
+
+// Wraps an island's scenery so every prop in it stands on the terrain. See terrain.js.
+export function Grounded({ island, children }) {
+  const ref = useRef()
+  useFrame(() => {
+    if (!island.ground.isFlat) groundScenery(ref.current, ref.current, island.h)
+  })
+  return <group ref={ref}>{children}</group>
 }
 
 export function Static({ build, deps = [], double = false }) {
@@ -36,7 +48,7 @@ export function Static({ build, deps = [], double = false }) {
   return <mesh geometry={geo} material={double ? toyMaterialDouble : toyMaterial} castShadow receiveShadow />
 }
 
-function Stop({ id, index, x, z, kind }) {
+function Stop({ id, index, x, y, z, kind }) {
   const group = useRef()
   const gem = useRef()
   const ring = useRef()
@@ -87,7 +99,7 @@ function Stop({ id, index, x, z, kind }) {
   })
 
   return (
-    <group position={[x, 0, z]}>
+    <group position={[x, y, z]}>
       <group ref={group}>
         <mesh ref={gem} castShadow>
           <octahedronGeometry args={[0.62, 0]} />
@@ -120,7 +132,7 @@ function Stop({ id, index, x, z, kind }) {
 
 // The tokens (and machine, board and card markers) of one island.
 export function Stops({ island }) {
-  return island.stops.map((p, i) => <Stop key={i} id={island.id} index={i} x={p.x} z={p.z} kind={p.kind} />)
+  return island.stops.map((p, i) => <Stop key={i} id={island.id} index={i} x={p.x} y={island.h(p.x, p.z)} z={p.z} kind={p.kind} />)
 }
 
 // An archway with a year plaque. The exit gate glows.
@@ -172,10 +184,10 @@ export function Gate({ x, z, y = 0, year, glow = false, face = Math.PI / 2 }) {
 }
 
 // A roadside banner naming a district.
-export function Banner({ x, z, face, text }) {
+export function Banner({ x, y = 0, z, face, text }) {
   const tex = useMemo(() => textTexture(text, { w: 640, h: 150, size: 84, bg: '#fff6e4', fg: '#22304f' }), [text])
   return (
-    <group position={[x, 0, z]} rotation={[0, face, 0]}>
+    <group position={[x, y, z]} rotation={[0, face, 0]}>
       <Static
         build={(k) => {
           for (const s of [1, -1]) k.cyl(0.13, 0.16, 3.6, '#8b5e3c', { p: [s * 2.7, 1.8, 0] })
@@ -193,7 +205,7 @@ export function Banner({ x, z, face, text }) {
 }
 
 // The signboard: riding near it opens the role summary in the HUD.
-export function Signboard({ id, x, z, face }) {
+export function Signboard({ id, x, y = 0, z, face }) {
   const marker = useRef()
   const read = useGame((s) => !!s.signRead[id])
   useFrame(() => {
@@ -201,7 +213,7 @@ export function Signboard({ id, x, z, face }) {
     marker.current.rotation.y = clock.t * 1.4
   })
   return (
-    <group position={[x, 0, z]} rotation={[0, face, 0]}>
+    <group position={[x, y, z]} rotation={[0, face, 0]}>
       <Static
         build={(k) => {
           for (const s of [1, -1]) k.cyl(0.16, 0.2, 4.2, '#8b5e3c', { p: [s * 1.9, 2.1, 0] })
@@ -220,9 +232,117 @@ export function Signboard({ id, x, z, face }) {
   )
 }
 
+// The company name on a rooftop board, in the company's colour. If career.json names a logo
+// file for the island, the logo is shown instead.
+export function BrandSign({ brand, x, y, z, face = 0, scale = 1 }) {
+  const w = Math.min(13, Math.max(5, brand.label.length * 0.62 + 2)) * scale
+  const hgt = 2.3 * scale
+  const tex = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 1024
+    canvas.height = Math.round((1024 * hgt) / w)
+    const t = new THREE.CanvasTexture(canvas)
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 4
+    const ctx = canvas.getContext('2d')
+    const W = canvas.width
+    const H = canvas.height
+    const drawName = () => {
+      ctx.fillStyle = brand.primary
+      ctx.fillRect(0, 0, W, H)
+      ctx.fillStyle = brand.secondary
+      ctx.fillRect(0, H * 0.86, W, H * 0.14)
+      ctx.fillStyle = brand.ink
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      let size = H * 0.52
+      ctx.font = `700 ${size}px Fredoka, "Trebuchet MS", sans-serif`
+      const tw = ctx.measureText(brand.label).width
+      if (tw > W * 0.88) size *= (W * 0.88) / tw
+      ctx.font = `700 ${size}px Fredoka, "Trebuchet MS", sans-serif`
+      ctx.fillText(brand.label, W / 2, H * 0.45)
+      t.needsUpdate = true
+    }
+    drawName()
+    if (document.fonts?.load) document.fonts.load('700 80px Fredoka').then(drawName).catch(() => {})
+    if (brand.logo) {
+      const img = new Image()
+      img.onload = () => {
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, W, H)
+        const k = Math.min((W * 0.86) / img.width, (H * 0.8) / img.height)
+        ctx.drawImage(img, (W - img.width * k) / 2, (H - img.height * k) / 2, img.width * k, img.height * k)
+        t.needsUpdate = true
+      }
+      img.src = brand.logo
+    }
+    return t
+  }, [brand, w, hgt])
+  return (
+    <group position={[x, y, z]} rotation={[0, face, 0]}>
+      <Static
+        deps={[w, hgt]}
+        build={(k) => {
+          for (const s of [1, -1]) k.cyl(0.11, 0.13, hgt * 0.5 + 0.9, '#8b5e3c', { p: [s * w * 0.36, -(hgt * 0.5 + 0.9) / 2, 0] }, 6)
+          k.box(w + 0.36, hgt + 0.36, 0.22, '#fff6e4', { p: [0, 0, 0] })
+        }}
+      />
+      {[0.12, -0.12].map((o) => (
+        <mesh key={o} position={[0, 0, o]} rotation={[0, o > 0 ? 0 : Math.PI, 0]}>
+          <planeGeometry args={[w, hgt]} />
+          <meshBasicMaterial map={tex} toneMapped={false} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// The stand by the signboard where the company profile waits to be picked up.
+export function ProfileStand({ id, x, y, z, face, color }) {
+  const folder = useRef()
+  const taken = useGame((s) => s.profiles.includes(id))
+  useFrame(() => {
+    if (!folder.current) return
+    folder.current.visible = !taken && !(rider.act && rider.act.island === id && rider.act.has)
+    folder.current.position.y = 1.5 + Math.sin(clock.t * 2.4) * 0.07
+    folder.current.rotation.y = Math.sin(clock.t * 1.2) * 0.35
+  })
+  return (
+    <group position={[x, y, z]} rotation={[0, face, 0]}>
+      <Static
+        build={(k) => {
+          k.cyl(0.42, 0.5, 0.16, '#c98a5e', { p: [0, 0.08, 0] }, 8)
+          k.cyl(0.09, 0.11, 1.0, '#8b5e3c', { p: [0, 0.6, 0] }, 6)
+          k.box(0.8, 0.07, 0.6, '#fff1dc', { p: [0, 1.12, 0], r: [0.35, 0, 0] })
+        }}
+      />
+      <group ref={folder} position={[0, 1.5, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.56, 0.72, 0.09]} />
+          <meshStandardMaterial color="#f6dfa6" roughness={0.7} flatShading />
+        </mesh>
+        <mesh position={[0, 0.2, 0]}>
+          <boxGeometry args={[0.58, 0.2, 0.1]} />
+          <meshStandardMaterial color={color} roughness={0.6} emissive={color} emissiveIntensity={0.25} />
+        </mesh>
+        <mesh position={[0.16, 0.41, 0]}>
+          <boxGeometry args={[0.2, 0.12, 0.08]} />
+          <meshStandardMaterial color={color} roughness={0.6} />
+        </mesh>
+      </group>
+    </group>
+  )
+}
+
 const skyVert = `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`
-const skyFrag = `varying vec3 vDir; uniform vec3 top; uniform vec3 mid; uniform vec3 low;
-void main(){ float h = vDir.y; vec3 c = h > 0.0 ? mix(mid, top, pow(h, 0.55)) : mix(mid, low, pow(-h, 0.5));
+const skyFrag = `varying vec3 vDir; uniform vec3 top; uniform vec3 mid; uniform vec3 low; uniform vec3 sunDir; uniform vec3 sunCol; uniform float night;
+float hash(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+void main(){ vec3 d = normalize(vDir); float h = d.y;
+vec3 c = h > 0.0 ? mix(mid, top, pow(h, 0.55)) : mix(mid, low, pow(-h, 0.5));
+float s = max(dot(d, sunDir), 0.0);
+c += sunCol * (pow(s, 6.0) * 0.22 + pow(s, 60.0) * 0.35);
+c = mix(c, vec3(1.0, 0.97, 0.86), smoothstep(0.99905, 0.9993, s));
+if (night > 0.0 && h > 0.02) { vec3 g = floor(d * 90.0); float st = step(0.9965, hash(g)); c += vec3(st) * night * smoothstep(0.02, 0.3, h) * 0.9; }
 gl_FragColor = vec4(c, 1.0); }`
 
 export function Sky() {
@@ -250,17 +370,29 @@ export function Sky() {
       top: { value: new THREE.Color('#4fb3ea') },
       mid: { value: new THREE.Color('#d6f1fb') },
       low: { value: new THREE.Color('#fff0d6') },
+      sunDir: { value: new THREE.Vector3(0, 1, 0) },
+      sunCol: { value: new THREE.Color('#fff0d2') },
+      night: { value: 0 },
     }),
     []
   )
-  useFrame(({ camera }) => {
+  useFrame(({ camera, scene }) => {
+    updateDay()
+    uniforms.top.value.copy(look.top)
+    uniforms.mid.value.copy(look.mid)
+    uniforms.low.value.copy(look.low)
+    uniforms.sunDir.value.copy(look.dir)
+    uniforms.sunCol.value.copy(look.sun)
+    uniforms.night.value = look.night
+    if (scene.fog) scene.fog.color.copy(look.fog)
     ref.current.position.copy(camera.position)
     clouds.current.position.x = Math.sin(clock.t * 0.02) * 14
+    clouds.current.material.emissive.copy(look.cloud)
   })
   return (
     <>
       <mesh ref={ref} renderOrder={-1} frustumCulled={false}>
-        <sphereGeometry args={[400, 24, 16]} />
+        <sphereGeometry args={[400, 32, 20]} />
         <shaderMaterial vertexShader={skyVert} fragmentShader={skyFrag} uniforms={uniforms} side={THREE.BackSide} depthWrite={false} fog={false} />
       </mesh>
       <mesh ref={clouds} geometry={cloudGeo}>
@@ -273,16 +405,33 @@ export function Sky() {
 // Sun and soft fill. The shadow follows the rider so its map stays sharp.
 export function Lights() {
   const sun = useRef()
+  const hemi = useRef()
+  const lamp = useRef()
   const target = useMemo(() => new THREE.Object3D(), [])
+  const dir = useMemo(() => new THREE.Vector3(), [])
   useFrame(() => {
     const p = rider.pos
-    target.position.set(p.x, Math.max(p.y, 0), p.z)
+    const base = Math.max(p.y, -12)
+    target.position.set(p.x, base, p.z)
     target.updateMatrixWorld()
-    sun.current.position.set(p.x + 34, Math.max(p.y, 0) + 58, p.z + 26)
+    // Keep the shadow light a little above the horizon so shadows stay sane at dawn and dusk.
+    dir.copy(look.dir)
+    dir.y = Math.max(dir.y, 0.26)
+    dir.normalize()
+    sun.current.position.set(p.x + dir.x * 80, base + dir.y * 80, p.z + dir.z * 80)
+    sun.current.color.copy(look.sun)
+    sun.current.intensity = look.sI
+    hemi.current.color.copy(look.hs)
+    hemi.current.groundColor.copy(look.hg)
+    hemi.current.intensity = look.hI
+    // The bicycle lamp comes on as the light goes.
+    lamp.current.position.set(p.x, p.y + 1.6, p.z)
+    lamp.current.intensity = look.night * 26
   })
   return (
     <>
-      <hemisphereLight args={['#eef8ff', '#f6d7b4', 1.5]} />
+      <hemisphereLight ref={hemi} args={['#eef8ff', '#f6d7b4', 1.5]} />
+      <pointLight ref={lamp} color="#ffd9a0" intensity={0} distance={16} decay={1.6} />
       <primitive object={target} />
       <directionalLight
         ref={sun}
@@ -296,7 +445,7 @@ export function Lights() {
         shadow-camera-top={48}
         shadow-camera-bottom={-48}
         shadow-camera-near={1}
-        shadow-camera-far={160}
+        shadow-camera-far={190}
         shadow-bias={-0.0006}
         shadow-normalBias={0.04}
       />

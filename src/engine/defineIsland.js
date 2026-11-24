@@ -1,6 +1,7 @@
 // Turns a short island spec into everything the engine needs.
 // Facts always come from career.json; a spec only says where things are.
 import career from '../content/career.json'
+import { makeGround } from './terrain.js'
 
 function makeOutline({ len, wid, neck, seed }) {
   const pts = []
@@ -45,6 +46,11 @@ export function defineIsland(spec) {
   const colliders = [...(spec.colliders ?? []), { x: sign.x, z: sign.z, r: 1.5, h: 5 }, ...gatePillars]
   const blockers = [entranceGate, exitGate].filter(Boolean).flatMap((g) => [-3.2, 0, 3.2].map((z) => ({ x: g.x, z, r: 2.1, h: 12 })))
   const signView = spec.signView ?? [spawn.x + 3, 0.2]
+  // The company profile waits on a small stand between the road and the signboard.
+  const sd = Math.hypot(sign.x - signView[0], sign.z - signView[1]) || 1
+  const profileStand = spec.profileStand ?? { x: signView[0] + ((sign.x - signView[0]) / sd) * 3.0, z: signView[1] + ((sign.z - signView[1]) / sd) * 3.0 }
+  colliders.push({ x: profileStand.x, z: profileStand.z, r: 0.45, h: 1.5 })
+  const ground = makeGround(spec.terrain, len, Math.max(wid, ...outline.map(([, z]) => Math.abs(z))) + 3)
   const tour = spec.tour ?? [
     [spawn.x + 0.6, 0],
     signView,
@@ -66,6 +72,10 @@ export function defineIsland(spec) {
     exitGate,
     finish: spec.finish ?? null,
     sign,
+    profileStand,
+    ground,
+    h: ground.h,
+    brandSign: spec.brandSign ?? null,
     stops,
     colliders,
     blockers,

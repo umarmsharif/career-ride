@@ -59,6 +59,27 @@ export class Kit {
       colors[i * 3 + 2] = _col.b
     }
     g.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+    // Where this part meets the ground. Low, thin parts (roads, paths, markings) follow the
+    // surface point by point; everything else stands on the ground under its group's origin.
+    g.computeBoundingBox()
+    const bb = g.boundingBox
+    const anchor = new Float32Array(n * 2)
+    const pos = g.attributes.position
+    const drape = geometry.userData.drape || (bb.max.y - bb.min.y < 0.3 && bb.max.y < 0.7 && bb.min.y > -0.5)
+    let ax = (bb.min.x + bb.max.x) / 2
+    let az = (bb.min.z + bb.max.z) / 2
+    if (this.stack.length > 1) {
+      const e = this.stack[1].elements
+      if (Math.abs(e[12]) + Math.abs(e[14]) > 1e-6) {
+        ax = e[12]
+        az = e[14]
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      anchor[i * 2] = drape ? pos.getX(i) : ax
+      anchor[i * 2 + 1] = drape ? pos.getZ(i) : az
+    }
+    g.setAttribute('anchor', new THREE.BufferAttribute(anchor, 2))
     this.parts.push(g)
     geometry.dispose()
     return this
@@ -105,37 +126,42 @@ export class Kit {
 }
 
 // Ribbon lying on a path of [x, z] points at height y. Returns a geometry.
+// It is cut into strips so it can follow sloping ground.
 export function ribbonXZ(points, width, y = 0.04) {
   const curve = new THREE.CatmullRomCurve3(
     points.map(([x, z]) => new THREE.Vector3(x, y, z)),
     false,
     'centripetal'
   )
-  const n = points.length * 10
+  const n = Math.max(points.length * 10, Math.ceil(curve.getLength() / 1.6))
+  const strips = Math.max(1, Math.min(4, Math.round(width / 1.4)))
   const verts = []
-  let prevL, prevR
+  let prev
   for (let i = 0; i <= n; i++) {
     const u = i / n
     const p = curve.getPointAt(u)
     const t = curve.getTangentAt(u)
     const side = new THREE.Vector3(t.z, 0, -t.x).normalize().multiplyScalar(width / 2)
-    const L = p.clone().add(side)
-    const R = p.clone().sub(side)
-    if (prevL) {
-      verts.push(prevL.x, y, prevL.z, prevR.x, y, prevR.z, L.x, y, L.z)
-      verts.push(prevR.x, y, prevR.z, R.x, y, R.z, L.x, y, L.z)
+    const row = []
+    for (let k = 0; k <= strips; k++) row.push(p.clone().addScaledVector(side, 1 - (2 * k) / strips))
+    if (prev) {
+      for (let k = 0; k < strips; k++) {
+        const pL = prev[k], pR = prev[k + 1], L = row[k], R = row[k + 1]
+        verts.push(pL.x, y, pL.z, pR.x, y, pR.z, L.x, y, L.z)
+        verts.push(pR.x, y, pR.z, R.x, y, R.z, L.x, y, L.z)
+      }
     }
-    prevL = L
-    prevR = R
+    prev = row
   }
   const g = new THREE.BufferGeometry()
   g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3))
   g.computeVertexNormals()
+  g.userData.drape = true
   return g
 }
 
 // The floating landmass under an outline: a grassy lip, dirt, then tapering rock.
-export function islandBody(outline, colors, seed = 7) {
+export function islandBody(outline, colors, seed = 7, h = null) {
   const rand = rng(seed)
   let cx = 0
   let cz = 0
@@ -158,7 +184,8 @@ export function islandBody(outline, colors, seed = 7) {
     outline.map(([x, z]) => {
       const j = ri < 2 ? 0 : (rand() - 0.5) * 0.12
       const s = ring.s + j
-      return [cx + (x - cx) * s, ring.y + (ri < 2 ? 0 : (rand() - 0.5) * 1.6), cz + (z - cz) * s]
+      const lift = h ? h(x, z) * [1, 1, 0.75, 0.4, 0.1, 0][ri] : 0
+      return [cx + (x - cx) * s, ring.y + lift + (ri < 2 ? 0 : (rand() - 0.5) * 1.6), cz + (z - cz) * s]
     })
   )
   const verts = []

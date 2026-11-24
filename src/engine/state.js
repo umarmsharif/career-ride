@@ -13,6 +13,9 @@ export const rider = {
   wheel: 0,
   pedalling: false,
   tumble: 0,
+  pitch: 0,
+  // The company-profile pickup: null, or what the rider on foot is doing right now.
+  act: null,
 }
 
 export const clock = { t: 0 }
@@ -41,6 +44,7 @@ export const useGame = create((set, get) => ({
   open: null, // the stop whose card is on screen: { island, index }
   nearSign: false,
   signRead: {},
+  profiles: [], // island ids whose company profile is loaded on the bike
   nearExit: false,
   district: 0,
   year: null,
@@ -66,6 +70,9 @@ export const useGame = create((set, get) => ({
     set({ collected: [...get().collected, key], open: { island: idx, index: i } })
     return true
   },
+  loadProfile(id) {
+    if (!get().profiles.includes(id)) set({ profiles: [...get().profiles, id] })
+  },
   dismiss() {
     set({ open: null })
   },
@@ -90,7 +97,7 @@ export const useGame = create((set, get) => ({
   },
   restart() {
     Object.keys(collectedAt).forEach((k) => delete collectedAt[k])
-    set({ collected: [], signRead: {}, visited: [0], phase: 'intro', island: 0, open: null, waiting: false, autopilot: false, resetKey: get().resetKey + 1 })
+    set({ collected: [], signRead: {}, profiles: [], visited: [0], phase: 'intro', island: 0, open: null, waiting: false, autopilot: false, resetKey: get().resetKey + 1 })
   },
 }))
 

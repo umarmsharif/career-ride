@@ -5,7 +5,7 @@ import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import Rider from './engine/Rider.jsx'
 import Controller from './engine/Controller.jsx'
-import { Land, Stops, Gate, Banner, Signboard, Sky, Lights, Static, toyMaterialDouble } from './engine/IslandParts.jsx'
+import { Land, Stops, Gate, Banner, Signboard, Sky, Lights, Static, Grounded, BrandSign, ProfileStand, toyMaterialDouble } from './engine/IslandParts.jsx'
 import { buildRide, rideRibbon } from './engine/rideCurve.js'
 import { rng } from './engine/kit.js'
 import { useGame } from './engine/state.js'
@@ -37,16 +37,24 @@ function RideRoad({ ride, tipX, endY }) {
 
 function Island({ entry, exitYear }) {
   const { island, Scenery } = entry
+  const h = island.h
+  const brand = island.data.brand
+  const bs = island.brandSign ?? { x: island.sign.x, z: island.sign.z, y: 7.4, face: island.sign.face }
+  const st = island.profileStand
   return (
     <>
-      <Land outline={island.outline} colors={island.land} grass={island.grass} seed={island.id * 3 + 1} />
-      <Scenery island={island} />
+      <Land island={island} seed={island.id * 3 + 1} />
+      <Grounded island={island}>
+        <Scenery island={island} />
+      </Grounded>
       <Stops island={island} />
-      <Signboard id={island.id} {...island.sign} />
-      <Gate {...island.entranceGate} year={island.startYear} />
-      {island.exitGate && <Gate {...island.exitGate} year={exitYear} glow />}
+      <Signboard id={island.id} {...island.sign} y={h(island.sign.x, island.sign.z)} />
+      <ProfileStand id={island.id} x={st.x} z={st.z} y={h(st.x, st.z)} face={island.sign.face} color={brand.primary} />
+      <BrandSign brand={brand} {...bs} y={h(bs.x, bs.z) + bs.y} />
+      <Gate {...island.entranceGate} y={h(island.entranceGate.x, 0)} year={island.startYear} />
+      {island.exitGate && <Gate {...island.exitGate} y={h(island.exitGate.x, 0)} year={exitYear} glow />}
       {island.banners.map((b, i) => (
-        <Banner key={i} {...b} text={b.text ?? island.districts[b.district ?? 0]} />
+        <Banner key={i} {...b} y={h(b.x, b.z)} text={b.text ?? island.districts[b.district ?? 0]} />
       ))}
     </>
   )
@@ -88,8 +96,8 @@ export default function World({ entries }) {
       origins.push(origins[i].clone().add(d))
       rides.push(
         buildRide({
-          start: { x: a.exitGate.x + 0.8, z: a.exitGate.z },
-          end: { x: d.x + b.spawn.x, y: d.y, z: d.z + b.spawn.z },
+          start: { x: a.exitGate.x + 0.8, y: a.h(a.exitGate.x + 0.8, a.exitGate.z), z: a.exitGate.z },
+          end: { x: d.x + b.spawn.x, y: d.y + b.h(b.spawn.x, b.spawn.z), z: d.z + b.spawn.z },
           tip: { x: d.x - b.len },
           style: a.ride.style,
           side: a.ride.dz <= 0 ? 1 : -1,
@@ -116,11 +124,11 @@ export default function World({ entries }) {
         {mounted.map((i) => (
           <group key={islands[i].id} position={origins[i]}>
             <Island entry={entries[i]} exitYear={islands[i + 1]?.startYear} />
-            {rides[i] && i === current && <RideRoad ride={rides[i]} tipX={origins[i + 1].x - origins[i].x - islands[i + 1].len} endY={islands[i].ride.dy} />}
+            {rides[i] && i === current && <RideRoad ride={rides[i]} tipX={origins[i + 1].x - origins[i].x - islands[i + 1].len} endY={islands[i].ride.dy + islands[i + 1].h(islands[i + 1].spawn.x, 0)} />}
           </group>
         ))}
       </group>
-      <Rider />
+      <Rider ids={islands.map((i) => i.id)} />
       <Controller islands={islands} origins={origins} rides={rides} worldRef={worldRef} />
     </>
   )

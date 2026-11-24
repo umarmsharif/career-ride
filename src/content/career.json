@@ -27,7 +27,15 @@
         {
           "fact": "Worked in Islamabad, Brussels and Madrid"
         }
-      ]
+      ],
+      "brand": {
+        "label": "Ultimus · Teradata",
+        "primary": "#f37440",
+        "secondary": "#1c3d6e",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "Ultimus builds business process automation software. Teradata, then part of NCR, makes enterprise data warehouses."
     },
     {
       "id": 2,
@@ -41,7 +49,15 @@
         {
           "fact": "MBA in Marketing and Strategy"
         }
-      ]
+      ],
+      "brand": {
+        "label": "LUMS",
+        "primary": "#1f3a6e",
+        "secondary": "#c9a227",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "LUMS is a private research university in Lahore, home to the Suleman Dawood School of Business."
     },
     {
       "id": 3,
@@ -55,7 +71,15 @@
         {
           "fact": "Business analysis and growth strategy for a national mobile operator"
         }
-      ]
+      ],
+      "brand": {
+        "label": "Jazz",
+        "primary": "#d6001c",
+        "secondary": "#ffc20e",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "Jazz, known as Mobilink in these years, is Pakistan's largest mobile operator and part of VEON."
     },
     {
       "id": 4,
@@ -96,7 +120,15 @@
             }
           ]
         }
-      ]
+      ],
+      "brand": {
+        "label": "Telenor",
+        "primary": "#00ace7",
+        "secondary": "#19336a",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "In these years Telenor Pakistan was a nationwide mobile operator, part of Norway's Telenor Group."
     },
     {
       "id": 5,
@@ -116,7 +148,15 @@
         {
           "fact": "Payment risk model raised transaction success by 3% and cut shipping costs by 4%"
         }
-      ]
+      ],
+      "brand": {
+        "label": "Daraz",
+        "primary": "#f85606",
+        "secondary": "#1a0f5c",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "Daraz is an online marketplace across South Asia, part of Alibaba Group."
     },
     {
       "id": 6,
@@ -157,7 +197,15 @@
             }
           ]
         }
-      ]
+      ],
+      "brand": {
+        "label": "foodpanda",
+        "primary": "#d70f64",
+        "secondary": "#ffd1e3",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "Foodpanda delivers restaurant food and groceries, and is part of Delivery Hero."
     },
     {
       "id": 7,
@@ -177,7 +225,15 @@
         {
           "fact": "Relaunched the partner health score and set OKR cycles across Product, Finance and Operations"
         }
-      ]
+      ],
+      "brand": {
+        "label": "Delivery Hero",
+        "primary": "#d61f26",
+        "secondary": "#2b2b2b",
+        "ink": "#ffffff",
+        "logo": null
+      },
+      "about": "Delivery Hero is a Berlin-based delivery company whose brands include Foodpanda, Yemeksepeti and Foodora."
     },
     {
       "id": 8,
@@ -229,7 +285,14 @@
             "97 lines of narration voiced through ElevenLabs and timed to each scene"
           ]
         }
-      ]
+      ],
+      "brand": {
+        "label": "AI Lab",
+        "primary": "#1f9d8f",
+        "secondary": "#f2a541",
+        "ink": "#ffffff",
+        "logo": null
+      }
     },
     {
       "id": 9,
@@ -260,7 +323,14 @@
           "removable": true
         }
       ],
-      "closing": "Eighteen years of building things that work. Now teaching others to do the same with AI."
+      "closing": "Eighteen years of building things that work. Now teaching others to do the same with AI.",
+      "brand": {
+        "label": "The Classroom",
+        "primary": "#22304f",
+        "secondary": "#f0553f",
+        "ink": "#fff6e4",
+        "logo": null
+      }
     }
   ]
 }
