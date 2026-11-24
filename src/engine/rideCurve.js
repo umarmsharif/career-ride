@@ -1,6 +1,7 @@
 // The passenger ride between two islands: a climbing straight, one full
 // spiral, then a banked sweep down to the next island's landing strip.
 import * as THREE from 'three'
+import { DECK } from './world.js'
 
 // `start` is the exit gate of this island. `end` is the next island's spawn point and
 // `tip` the western tip of its land, both measured from this island's centre.
@@ -29,6 +30,22 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
     fromX = cx + 18
     fromY = sy + 17
     add(fromX, fromY, start.z + 3)
+  } else if (style === 'voyage') {
+    // Down a pier to the water, across the open sea on the boat, and up the next pier.
+    const zEnd = (end.z - start.z) * side + start.z
+    const l1 = Math.max(14, (sy - DECK) * 2.6)
+    const l2 = Math.max(14, (end.y - DECK) * 2.6)
+    const a = start.x + 6 + l1
+    const b = tip.x - 3 - l2
+    pts.push(new THREE.Vector3(start.x + 6 + l1 * 0.5, (sy + DECK) / 2, start.z))
+    pts.push(new THREE.Vector3(a, DECK, start.z))
+    for (let k = 1; k <= 5; k++) {
+      const u = k / 6
+      const e = u * u * (3 - 2 * u)
+      pts.push(new THREE.Vector3(mix(a, b, u), DECK, mix(start.z, zEnd, e)))
+    }
+    pts.push(new THREE.Vector3(b, DECK, zEnd))
+    pts.push(new THREE.Vector3(b + l2 * 0.5, (end.y + DECK) / 2, zEnd))
   } else if (style === 'hills') {
     // One long rise and one dip, almost straight in plan: easy on the eye.
     const zEnd = (end.z - start.z) * side + start.z
@@ -51,15 +68,17 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
   }
   // Rolling sweeps the rest of the way.
   const sideEnd = (end.z - start.z) * side + start.z
-  const n = style === 'hills' ? 0 : style === 'wave' ? 5 : 3
+  const n = style === 'hills' || style === 'voyage' ? 0 : style === 'wave' ? 5 : 3
   for (let k = 1; k <= n; k++) {
     const u = k / (n + 1)
     const sway = Math.sin(u * Math.PI * (style === 'wave' ? 2.4 : 1.5)) * (style === 'wave' ? 16 : 9) * (1 - u * 0.5)
     const hill = Math.sin(u * Math.PI * (style === 'wave' ? 3 : 1)) * (style === 'wave' ? 5 : 2)
     add(mix(fromX, ax, u), mix(fromY, end.y + 2.2, u) + hill, mix(start.z, sideEnd, u) + sway)
   }
-  add(ax, end.y + 1.6, sideEnd)
-  add(tip.x - 10, end.y + 0.4, sideEnd)
+  if (style !== 'voyage') {
+    add(ax, end.y + 1.6, sideEnd)
+    add(tip.x - 10, end.y + 0.4, sideEnd)
+  } else add(tip.x - 3, end.y + 0.06, sideEnd)
   add(tip.x - 1, end.y + 0.06, sideEnd)
   add(mix(tip.x, end.x, 0.5), end.y + 0.06, sideEnd)
   add(end.x, end.y + 0.06, sideEnd)
@@ -92,7 +111,7 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
       c++
     }
     const flat = Math.min(1, i / 40, (N - i) / 70)
-    const bank = style === 'hills' ? 0 : THREE.MathUtils.clamp((s / c) * 7.5, -0.6, 0.6) * Math.max(0, flat)
+    const bank = style === 'hills' || style === 'voyage' ? 0 : THREE.MathUtils.clamp((s / c) * 7.5, -0.6, 0.6) * Math.max(0, flat)
     const f = frames[i]
     const left = new THREE.Vector3().crossVectors(up, f.t).normalize()
     const normal = new THREE.Vector3().crossVectors(f.t, left).normalize()
@@ -118,15 +137,24 @@ export function buildRide({ start, end, tip, style = 'spiral', side = 1 }) {
     return out
   }
 
-  return { curve, length, frames, sample }
+  // The stretch spent on the water, as frame numbers.
+  let seaFrom = -1
+  let seaTo = -1
+  frames.forEach((f, i) => {
+    if (f.p.y < DECK + 0.25) {
+      if (seaFrom < 0) seaFrom = i
+      seaTo = i
+    }
+  })
+  return { curve, length, frames, sample, seaFrom, seaTo, N }
 }
 
 // The road itself: a toy track with striped kerbs and a thin slab underneath.
-export function rideRibbon(ride, { width = 4.8, from = 2, until = null } = {}) {
-  const road = new THREE.Color('#f3dcab')
-  const kerbA = new THREE.Color('#f0553f')
-  const kerbB = new THREE.Color('#fff6e4')
-  const under = new THREE.Color('#c98a5e')
+export function rideRibbon(ride, { width = 4.8, from = 2, to = Infinity, until = null, colors = ['#f3dcab', '#f0553f', '#fff6e4', '#c98a5e'] } = {}) {
+  const road = new THREE.Color(colors[0])
+  const kerbA = new THREE.Color(colors[1])
+  const kerbB = new THREE.Color(colors[2])
+  const under = new THREE.Color(colors[3])
   const verts = []
   const cols = []
   const quad = (a, b, c, d, col) => {
@@ -141,7 +169,7 @@ export function rideRibbon(ride, { width = 4.8, from = 2, until = null } = {}) {
     return { l0: o(w), l1: o(w - 0.55), r1: o(-w + 0.55), r0: o(-w), bl: o(w, 0.5), br: o(-w, 0.5) }
   }
   let prev = null
-  for (let i = from; i < ride.frames.length; i++) {
+  for (let i = from; i < Math.min(ride.frames.length, to); i++) {
     if (until && i > ride.frames.length / 2 && until(ride.frames[i].p)) break
     const cur = row(ride.frames[i])
     if (prev) {

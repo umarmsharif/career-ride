@@ -161,7 +161,7 @@ export function ribbonXZ(points, width, y = 0.04) {
 }
 
 // The floating landmass under an outline: a grassy lip, dirt, then tapering rock.
-export function islandBody(outline, colors, seed = 7, h = null) {
+export function islandBody(outline, colors, seed = 7, h = null, sea = false) {
   const rand = rng(seed)
   let cx = 0
   let cz = 0
@@ -174,8 +174,9 @@ export function islandBody(outline, colors, seed = 7, h = null) {
   const rings = [
     { s: 1.0, y: 0, c: colors.lip },
     { s: 1.025, y: -1.1, c: colors.lip },
-    { s: 0.95, y: -3.6, c: colors.dirt },
-    { s: 0.76, y: -9, c: colors.rock },
+    // In the sea the land spreads out below the waterline; in the sky it tapers to a point.
+    { s: sea ? 1.03 : 0.95, y: -3.6, c: colors.dirt },
+    { s: sea ? 1.12 : 0.76, y: -9, c: colors.rock },
     { s: 0.5, y: -15.5, c: colors.rock2 },
     { s: 0.2, y: -22, c: colors.rock2 },
   ]

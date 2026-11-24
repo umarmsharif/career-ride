@@ -6,6 +6,7 @@ import { Kit, islandBody, textTexture, rng } from './kit.js'
 import { clock, collectedAt, useGame, rider } from './state.js'
 import { groundGeometry, outlineMask, groundScenery } from './terrain.js'
 import { look, updateDay } from './day.js'
+import { VOYAGE } from './world.js'
 
 export const toyMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.82 })
 export const toyMaterialDouble = new THREE.MeshStandardMaterial({
@@ -17,7 +18,7 @@ export const toyMaterialDouble = new THREE.MeshStandardMaterial({
 
 export function Land({ island, seed = 7 }) {
   const { outline, land: colors, grass, ground } = island
-  const body = useMemo(() => islandBody(outline, colors, seed, ground.h), [outline, colors, seed, ground])
+  const body = useMemo(() => islandBody(outline, colors, seed, ground.h, VOYAGE), [outline, colors, seed, ground])
   const top = useMemo(() => groundGeometry(ground, grass), [ground, grass])
   const mask = useMemo(() => outlineMask(ground, outline), [ground, outline])
   return (
@@ -417,6 +418,8 @@ export function Sky() {
     if (scene.fog) scene.fog.color.copy(look.fog)
     ref.current.position.copy(camera.position)
     clouds.current.position.x = Math.sin(clock.t * 0.02) * 14
+    // Over the sea the clouds ride higher, clear of the water and the boat.
+    clouds.current.position.y = VOYAGE ? 52 : 0
     clouds.current.material.emissive.copy(look.cloud)
   })
   return (

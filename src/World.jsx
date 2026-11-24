@@ -10,6 +10,8 @@ import { buildRide, rideRibbon } from './engine/rideCurve.js'
 import { rng } from './engine/kit.js'
 import { useGame } from './engine/state.js'
 import Cinematic, { sceneCost } from './engine/Cinematic.jsx'
+import { VOYAGE } from './engine/world.js'
+import { Sea, MirrorSea, Foam, Piers, Boat, Lighthouse, Gulls } from './engine/Voyage.jsx'
 
 const GAP = 118
 
@@ -45,6 +47,7 @@ function Island({ entry, exitYear, lite }) {
   return (
     <>
       <Land island={island} seed={island.id * 3 + 1} />
+      {VOYAGE && <Foam outline={island.outline} />}
       {!lite && (
         <Grounded island={island}>
           <Scenery island={island} />
@@ -59,6 +62,7 @@ function Island({ entry, exitYear, lite }) {
         </>
       )}
       <Gate {...island.entranceGate} y={h(island.entranceGate.x, 0)} year={island.startYear} />
+      {VOYAGE && !lite && <Lighthouse {...(island.exitGate ? { x: island.exitGate.x - 1.5, z: 8.2, scale: 0.8 } : { x: island.finish.x + 4.6, z: -8.6, scale: 1.35 })} y={h(island.exitGate ? island.exitGate.x - 1.5 : island.finish.x + 4.6, island.exitGate ? 8.2 : -8.6)} />}
       {island.exitGate && <Gate {...island.exitGate} y={h(island.exitGate.x, 0)} year={exitYear} glow />}
       {!lite &&
         island.banners.map((b, i) => (
@@ -101,14 +105,14 @@ export default function World({ entries }) {
       const a = islands[i]
       const b = islands[i + 1]
       // Islands sit nearly in line, so the road between them goes up and down rather than side to side.
-      const d = new THREE.Vector3(a.len + b.len + GAP, a.ride.dy, a.ride.dz * 0.3)
+      const d = new THREE.Vector3(a.len + b.len + GAP, VOYAGE ? 0 : a.ride.dy, a.ride.dz * 0.3)
       origins.push(origins[i].clone().add(d))
       rides.push(
         buildRide({
           start: { x: a.exitGate.x + 0.8, y: a.h(a.exitGate.x + 0.8, a.exitGate.z), z: a.exitGate.z },
           end: { x: d.x + b.spawn.x, y: d.y + b.h(b.spawn.x, b.spawn.z), z: d.z + b.spawn.z },
           tip: { x: d.x - b.len },
-          style: 'hills',
+          style: VOYAGE ? 'voyage' : 'hills',
           side: 1,
         })
       )
@@ -118,8 +122,8 @@ export default function World({ entries }) {
 
   useEffect(() => {
     scene.fog = new THREE.Fog('#d9eef6', 150, 430)
-    window.__ride = { ...(window.__ride || {}), info: () => (gl.info.autoReset ? { ...gl.info.render } : { ...sceneCost }) }
-  }, [scene, gl])
+    window.__ride = { ...(window.__ride || {}), info: () => (gl.info.autoReset ? { ...gl.info.render } : { ...sceneCost }), rides }
+  }, [scene, gl, rides])
 
   // The next island is only drawn once the rider is heading for it, to stay inside the budget.
   // While both are in view only one has its scenery: the one being left for the first part of
@@ -132,12 +136,25 @@ export default function World({ entries }) {
     <>
       <Sky />
       <Lights />
-      <Backdrop />
+      {VOYAGE ? (
+        <>
+          {cinematic ? <MirrorSea offset={origins[current]} /> : <Sea offset={origins[current]} />}
+          <Gulls />
+        </>
+      ) : (
+        <Backdrop />
+      )}
       <group ref={worldRef}>
         {mounted.map((i) => (
           <group key={islands[i].id} position={origins[i]}>
             <Island entry={entries[i]} exitYear={islands[i + 1]?.startYear} lite={leaving && (i === current) === late} />
-            {rides[i] && i === current && <RideRoad ride={rides[i]} tipX={origins[i + 1].x - origins[i].x - islands[i + 1].len} endY={islands[i].ride.dy + islands[i + 1].h(islands[i + 1].spawn.x, 0)} />}
+            {rides[i] && i === current && !VOYAGE && <RideRoad ride={rides[i]} tipX={origins[i + 1].x - origins[i].x - islands[i + 1].len} endY={islands[i].ride.dy + islands[i + 1].h(islands[i + 1].spawn.x, 0)} />}
+            {rides[i] && i === current && VOYAGE && (
+              <>
+                <Piers ride={rides[i]} tipX={origins[i + 1].x - origins[i].x - islands[i + 1].len} endY={islands[i + 1].h(islands[i + 1].spawn.x, 0)} />
+                <Boat ride={rides[i]} sail={islands[i + 1].data.brand.primary} />
+              </>
+            )}
           </group>
         ))}
       </group>

@@ -8,6 +8,7 @@ import { rider, clock, input, useGame, damp, clamp, wrapAngle, smooth } from './
 import { insideOutline } from './kit.js'
 import { audio } from './sound.js'
 import { day } from './day.js'
+import { VOYAGE } from './world.js'
 
 const MAX_SPEED = 10.5
 const REVERSE_SPEED = -3
@@ -222,6 +223,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.rideT = 0
       s.rideFrom.copy(rider.pos)
       s.rideFromQ.copy(rider.quat)
+      rider.rideU = 0
       useGame.setState({ phase: 'ride', rideLate: false, open: null, waiting: false, nearSign: false, nearExit: false, year: island.endYear })
       return
     }
@@ -262,14 +264,19 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     rider.speed = damp(rider.speed, target, 1.6, dt)
     s.rideS = Math.min(ride.length, s.rideS + rider.speed * dt)
     ride.sample(s.rideS / ride.length, sample)
+    rider.rideU = s.rideS / ride.length
+    // On the water the boat, and the rider on it, rise and fall with the swell.
+    const f = rider.rideU * ride.N
+    rider.afloat = VOYAGE && f >= ride.seaFrom && f <= ride.seaTo
+    if (rider.afloat) sample.pos.y += Math.sin(clock.t * 1.7) * 0.1
     const blend = smooth(s.rideT / 0.9)
     rider.pos.lerpVectors(s.rideFrom, sample.pos, blend)
     rider.quat.slerpQuaternions(s.rideFromQ, sample.quat, blend)
     rider.lean = damp(rider.lean, 0, 5, dt)
     rider.steer = damp(rider.steer, -sample.bank * 0.35, 5, dt)
-    rider.wheel += (rider.speed * dt) / WHEEL_R
-    rider.pedalling = true
-    rider.pedal += rider.speed * dt * 0.55
+    if (!rider.afloat) rider.wheel += (rider.speed * dt) / WHEEL_R
+    rider.pedalling = !rider.afloat
+    if (!rider.afloat) rider.pedal += rider.speed * dt * 0.55
     // The year counter ticks from the year being left to the year being entered.
     const u = s.rideS / ride.length
     const a = islands[s.idx].endYear
@@ -289,6 +296,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       s.look.sub(tmp.d)
       s.idx += 1
       rider.heading = Math.PI / 2
+      rider.afloat = false
       rider.quat.setFromAxisAngle(Y_AXIS, rider.heading)
       rider.speed = 5
       s.camHeading = rider.heading
@@ -324,7 +332,9 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       // Steady: straight behind and above, no swinging from side to side.
       const dist = portrait ? 22 : 17
       tmp.d.set(sample.tangent.x, 0, sample.tangent.z).normalize()
-      want.copy(rider.pos).addScaledVector(tmp.d, -dist).addScaledVector(Y_AXIS, portrait ? 12 : 9.5)
+      // Stay high while leaving, so the camera clears the gate before settling behind the rider.
+      const lift = 6 * (1 - smooth(u / 0.22))
+      want.copy(rider.pos).addScaledVector(tmp.d, -dist).addScaledVector(Y_AXIS, (portrait ? 12 : 9.5) + lift)
       look.copy(rider.pos).addScaledVector(tmp.d, 5).addScaledVector(Y_AXIS, 2.6)
       kPos = 1.8
     } else if (phase === 'closing') {

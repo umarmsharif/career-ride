@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useGame } from '../engine/state.js'
 import { audio } from '../engine/sound.js'
 import career from '../content/career.json'
+import { VOYAGE } from '../engine/world.js'
 
 function Gem() {
   return (
@@ -28,8 +29,12 @@ function StartScreen() {
     <div className="start">
       <div className="card start-card">
         <p className="eyebrow">{career.person.name}</p>
-        <h1>Career Ride</h1>
-        <p className="lede">Nine islands, one bicycle. Ride from a software workshop in 2004 to an AI classroom today.</p>
+        <h1>{VOYAGE ? 'Career Voyage' : 'Career Ride'}</h1>
+        <p className="lede">
+          {VOYAGE
+            ? 'Nine islands, one bicycle and a small boat. Sail from a software workshop in 2004 to an AI classroom today.'
+            : 'Nine islands, one bicycle. Ride from a software workshop in 2004 to an AI classroom today.'}
+        </p>
         <div className="row">
           <button id="start-story" className="btn primary" onClick={() => start('story', false)}>
             {touch ? 'Start the story' : 'Play the story'}
@@ -350,7 +355,7 @@ export default function Hud({ islands }) {
       {onIsland && <Splash island={island} />}
       {g.phase === 'ride' && g.year && (
         <div className="year" aria-live="polite">
-          <span className="year-label">Riding into</span>
+          <span className="year-label">{VOYAGE ? 'Sailing into' : 'Riding into'}</span>
           <span className="year-digits" key={g.year}>
             {g.year}
           </span>
@@ -361,7 +366,7 @@ export default function Hud({ islands }) {
         {onIsland && !g.autopilot && g.toasts.length === 0 && (
           <p className="hint">
             {g.nearExit ? (
-              <>Ride through the glowing gate to leave for {islands[g.island + 1]?.startYear}</>
+              <>{VOYAGE ? 'Ride through the glowing gate to the pier and sail for' : 'Ride through the glowing gate to leave for'} {islands[g.island + 1]?.startYear}</>
             ) : (
               <>
                 <kbd>↑</kbd> pedal <kbd>←</kbd> <kbd>→</kbd> steer <kbd>↓</kbd> brake
