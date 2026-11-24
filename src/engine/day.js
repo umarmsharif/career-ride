@@ -1,10 +1,11 @@
 // Time of day. The ride starts at dawn on the first island and ends at sunset on the last,
 // so the light itself shows how far through the career the rider is.
 import * as THREE from 'three'
+import { DRIVE } from './world.js'
 
 export const day = { t: 0, target: 0 }
 
-const KEYS = [
+const RIDE_KEYS = [
   { t: 0.0, top: '#5f86d0', mid: '#f6c7ae', low: '#ffd7a6', sun: '#ffc995', sI: 1.3, hI: 1.3, hs: '#ffe9e0', hg: '#e9c9a8', fog: '#f1d3c6', cloud: '#f3b9a0' },
   { t: 0.14, top: '#4fb3ea', mid: '#d6f1fb', low: '#fff0d6', sun: '#fff0d2', sI: 1.75, hI: 1.5, hs: '#eef8ff', hg: '#f6d7b4', fog: '#d9eef6', cloud: '#bcd9ea' },
   { t: 0.5, top: '#3c9fe6', mid: '#cfeefc', low: '#fff3dc', sun: '#fffaf0', sI: 1.9, hI: 1.5, hs: '#eef8ff', hg: '#f6d7b4', fog: '#d9eef6', cloud: '#bcd9ea' },
@@ -12,8 +13,21 @@ const KEYS = [
   { t: 0.92, top: '#5670bd', mid: '#ffa671', low: '#ffcf8c', sun: '#ff9c5c', sI: 1.5, hI: 1.25, hs: '#ffd9c4', hg: '#d9a98c', fog: '#f3b795', cloud: '#ff9d7a' },
   { t: 1.0, top: '#34428a', mid: '#f0806a', low: '#f7b47c', sun: '#ff7d4f', sI: 1.15, hI: 1.1, hs: '#e9c0c8', hg: '#b98a80', fog: '#d98e80', cloud: '#e0707a' },
   { t: 1.1, top: '#161d48', mid: '#6a4f93', low: '#d9805f', sun: '#c0603f', sI: 0.35, hI: 1.0, hs: '#b9b0e0', hg: '#806a80', fog: '#6a5590', cloud: '#7a5a96' },
-].map((k) => {
-  const o = { t: k.t, sI: k.sI, hI: k.hI }
+]
+
+// The drive: it sets off at sunset, runs through the night and arrives at sunrise.
+const DRIVE_KEYS = [
+  { t: 0.0, top: '#3b4a9a', mid: '#ff9a6a', low: '#ffc98a', sun: '#ff9c5c', sI: 1.35, hI: 1.25, hs: '#ffd9c4', hg: '#b98a80', fog: '#d98e80', cloud: '#e0707a', night: 0.15 },
+  { t: 0.1, top: '#1b2452', mid: '#6a4f93', low: '#d9805f', sun: '#b9a6ff', sI: 1.0, hI: 1.2, hs: '#9aa6e8', hg: '#3a3558', fog: '#4a3f7a', cloud: '#6a5a96', night: 0.7 },
+  { t: 0.2, top: '#060a20', mid: '#131b46', low: '#1d2654', sun: '#a9bcff', sI: 1.2, hI: 1.3, hs: '#7388dc', hg: '#1b2040', fog: '#11183c', cloud: '#2a3364', night: 1 },
+  { t: 0.84, top: '#060a20', mid: '#131b46', low: '#1d2654', sun: '#a9bcff', sI: 1.2, hI: 1.3, hs: '#7388dc', hg: '#1b2040', fog: '#11183c', cloud: '#2a3364', night: 1 },
+  { t: 0.95, top: '#1e2a66', mid: '#7a5a9a', low: '#f0a070', sun: '#ffb080', sI: 1.05, hI: 1.25, hs: '#b9b0e0', hg: '#5a4a70', fog: '#6a5590', cloud: '#a0709a', night: 0.55 },
+  { t: 1.0, top: '#5f86d0', mid: '#f6c7ae', low: '#ffd7a6', sun: '#ffc995', sI: 1.35, hI: 1.35, hs: '#ffe9e0', hg: '#e9c9a8', fog: '#f1d3c6', cloud: '#f3b9a0', night: 0.15 },
+  { t: 1.1, top: '#4fb3ea', mid: '#ffe6c8', low: '#fff0d6', sun: '#fff0d2', sI: 1.7, hI: 1.5, hs: '#eef8ff', hg: '#f6d7b4', fog: '#e6eef2', cloud: '#ffd9c0', night: 0 },
+]
+
+const KEYS = (DRIVE ? DRIVE_KEYS : RIDE_KEYS).map((k) => {
+  const o = { t: k.t, sI: k.sI, hI: k.hI, night: k.night }
   for (const n of ['top', 'mid', 'low', 'sun', 'hs', 'hg', 'fog', 'cloud']) o[n] = new THREE.Color(k[n])
   return o
 })
@@ -41,5 +55,12 @@ export function updateDay() {
   look.dir.set(-Math.cos(az) * Math.cos(el), Math.sin(el), (0.35 + 0.5 * Math.sin(az)) * Math.cos(el)).normalize()
   const n = (t - 0.98) / 0.12
   look.night = Math.min(1, Math.max(0, n))
+  if (DRIVE) {
+    // Moonlight from high on one side through the night; the sun comes up ahead at the end.
+    look.night = a.night + (b.night - a.night) * k
+    const rise = Math.min(1, Math.max(0, (t - 0.9) / 0.14))
+    const e = rise * rise * (3 - 2 * rise)
+    look.dir.set(-0.38 + 1.3 * e, 0.82 - 0.66 * e, 0.42 - 0.1 * e).normalize()
+  }
   return look
 }

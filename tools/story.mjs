@@ -12,10 +12,13 @@ const errors = []
 page.on('pageerror', (e) => errors.push(e.message))
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
 await page.goto(process.env.URL || 'http://127.0.0.1:5173/')
-await page.waitForSelector('#start-story', { timeout: 30000 })
+await page.waitForSelector('#start-story, .drive-title', { timeout: 30000 })
+const selfStart = await page.$('.drive-title')
 await page.waitForTimeout(1500)
 if (shots) await page.screenshot({ path: `docs/shots/s2-${phone ? 'phone-' : ''}start.png` })
-if (phone) await page.tap('#start-story'); else await page.click('#start-auto')
+// The night drive sets off by itself; the bicycle ride needs its start button.
+if (selfStart) await page.waitForFunction(() => window.__ride?.game?.getState().phase === 'island', null, { timeout: 60000 })
+else if (phone) await page.tap('#start-story'); else await page.click('#start-auto')
 await page.evaluate(() => { window.__timeScale = 5 })
 const seen = {}
 let maxCalls = 0, maxTris = 0, lastIsland = -1, stuckAt = null, lastPos = '', same = 0

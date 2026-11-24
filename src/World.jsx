@@ -5,10 +5,12 @@ import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import Rider from './engine/Rider.jsx'
 import Controller from './engine/Controller.jsx'
-import { Land, Stops, Gate, Banner, Signboard, Sky, Lights, Static, Grounded, BrandSign, ProfileStand, toyMaterialDouble } from './engine/IslandParts.jsx'
+import { Land, Stops, Gate, Banner, Signboard, Sky, Lights, Static, Grounded, BrandSign, ProfileStand, RoadLamps, toyMaterialDouble } from './engine/IslandParts.jsx'
 import { buildRide, rideRibbon } from './engine/rideCurve.js'
 import { rng } from './engine/kit.js'
 import { useGame } from './engine/state.js'
+import { DRIVE } from './engine/world.js'
+import Car from './engine/Car.jsx'
 import Cinematic, { sceneCost } from './engine/Cinematic.jsx'
 
 const GAP = 118
@@ -51,6 +53,7 @@ function Island({ entry, exitYear, lite }) {
         </Grounded>
       )}
       {!lite && <Stops island={island} />}
+      {!lite && DRIVE && <RoadLamps island={island} />}
       {!lite && (
         <>
       <Signboard id={island.id} {...island.sign} y={h(island.sign.x, island.sign.z)} brand={brand} />
@@ -142,7 +145,7 @@ export default function World({ entries }) {
         ))}
       </group>
       {cinematic && <Cinematic />}
-      <Rider ids={islands.map((i) => i.id)} />
+      {DRIVE ? <Car ids={islands.map((i) => i.id)} /> : <Rider ids={islands.map((i) => i.id)} />}
       <Controller islands={islands} origins={origins} rides={rides} worldRef={worldRef} />
     </>
   )

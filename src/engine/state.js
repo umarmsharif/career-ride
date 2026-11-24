@@ -13,6 +13,11 @@ export const rider = {
   wheel: 0,
   pedalling: false,
   tumble: 0,
+  // The car: how far the tail is out, whether the tyres are smoking, and the ending.
+  slip: 0,
+  drift: false,
+  door: 0,
+  out: 0,
   pitch: 0,
   // The company-profile pickup: null, or what the rider on foot is doing right now.
   act: null,

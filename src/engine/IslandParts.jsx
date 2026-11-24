@@ -6,6 +6,9 @@ import { Kit, islandBody, textTexture, rng } from './kit.js'
 import { clock, collectedAt, useGame, rider } from './state.js'
 import { groundGeometry, outlineMask, groundScenery } from './terrain.js'
 import { look, updateDay } from './day.js'
+import { DRIVE } from './world.js'
+import { roadCurve } from './props.js'
+import { insideOutline } from './kit.js'
 
 export const toyMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.82 })
 export const toyMaterialDouble = new THREE.MeshStandardMaterial({
@@ -432,6 +435,83 @@ export function Sky() {
   )
 }
 
+// Street lamps along an island's road, for the night drive: a post, a bulb and a pool of light.
+export function RoadLamps({ island }) {
+  const posts = useRef()
+  const bulbs = useRef()
+  const pools = useRef()
+  const spots = useMemo(() => {
+    const curve = roadCurve(island)
+    const n = Math.floor(curve.getLength() / 11)
+    const out = []
+    for (let i = 1; i < n; i++) {
+      const u = i / n
+      const p = curve.getPointAt(u)
+      const t = curve.getTangentAt(u)
+      const side = i % 2 ? 1 : -1
+      const x = p.x + t.z * side * 3.7
+      const z = p.z - t.x * side * 3.7
+      if (!insideOutline(island.outline, x * 1.04, z * 1.04)) continue
+      if (island.stops.some((s) => Math.hypot(s.x - x, s.z - z) < 3)) continue
+      if (island.colliders.some((c) => Math.hypot(c.x - x, c.z - z) < c.r + 0.6)) continue
+      if (Math.abs(x - island.entranceGate.x) < 6 || (island.exitGate && Math.abs(x - island.exitGate.x) < 6)) continue
+      out.push({ x, y: island.h(x, z), z })
+    }
+    return out
+  }, [island])
+  const glow = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 128
+    const g = c.getContext('2d')
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64)
+    grad.addColorStop(0, 'rgba(255,255,255,1)')
+    grad.addColorStop(0.4, 'rgba(255,255,255,0.4)')
+    grad.addColorStop(1, 'rgba(255,255,255,0)')
+    g.fillStyle = grad
+    g.fillRect(0, 0, 128, 128)
+    return new THREE.CanvasTexture(c)
+  }, [])
+  useMemo(() => 0, [])
+  useFrame(() => {
+    if (!posts.current || posts.current.userData.placed === spots) return
+    posts.current.userData.placed = spots
+    const m = new THREE.Matrix4()
+    const q = new THREE.Quaternion()
+    const flat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)
+    const p = new THREE.Vector3()
+    const s = new THREE.Vector3()
+    spots.forEach((l, i) => {
+      posts.current.setMatrixAt(i, m.compose(p.set(l.x, l.y + 1.9, l.z), q, s.set(1, 1, 1)))
+      bulbs.current.setMatrixAt(i, m.compose(p.set(l.x, l.y + 3.95, l.z), q, s.set(1, 1, 1)))
+      pools.current.setMatrixAt(i, m.compose(p.set(l.x, l.y + 0.1, l.z), flat, s.set(9.5, 9.5, 1)))
+    })
+    for (const mesh of [posts, bulbs, pools]) mesh.current.instanceMatrix.needsUpdate = true
+  })
+  useFrame(() => {
+    if (!pools.current) return
+    const on = Math.min(1, look.night * 1.4)
+    pools.current.material.opacity = 0.34 * on
+    bulbs.current.material.color.setRGB(0.3 + 2.1 * on, 0.3 + 1.4 * on, 0.3 + 0.6 * on)
+  })
+  if (!spots.length) return null
+  return (
+    <>
+      <instancedMesh ref={posts} args={[null, null, spots.length]} frustumCulled={false} castShadow>
+        <cylinderGeometry args={[0.07, 0.1, 3.8, 5]} />
+        <meshStandardMaterial color="#2b3156" roughness={0.8} flatShading />
+      </instancedMesh>
+      <instancedMesh ref={bulbs} args={[null, null, spots.length]} frustumCulled={false}>
+        <sphereGeometry args={[0.24, 8, 6]} />
+        <meshBasicMaterial toneMapped={false} />
+      </instancedMesh>
+      <instancedMesh ref={pools} args={[null, null, spots.length]} frustumCulled={false}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial map={glow} color="#ffcf8f" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </instancedMesh>
+    </>
+  )
+}
+
 // Sun and soft fill. The shadow follows the rider so its map stays sharp.
 export function Lights() {
   const sun = useRef()
@@ -456,7 +536,7 @@ export function Lights() {
     hemi.current.intensity = look.hI
     // The bicycle lamp comes on as the light goes.
     lamp.current.position.set(p.x, p.y + 1.6, p.z)
-    lamp.current.intensity = look.night * 26
+    lamp.current.intensity = DRIVE ? 0 : look.night * 26
   })
   return (
     <>

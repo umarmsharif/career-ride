@@ -8,6 +8,7 @@ import { rider, clock, input, useGame, damp, clamp, wrapAngle, smooth } from './
 import { insideOutline } from './kit.js'
 import { audio } from './sound.js'
 import { day } from './day.js'
+import { DRIVE } from './world.js'
 
 const MAX_SPEED = 10.5
 const REVERSE_SPEED = -3
@@ -79,6 +80,10 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     rider.lean = 0
     rider.steer = 0
     rider.tumble = 0
+    rider.slip = 0
+    rider.drift = false
+    rider.door = 0
+    rider.out = 0
     rider.quat.setFromAxisAngle(Y_AXIS, rider.heading)
     s.tourIdx = 0
     s.waitUntil = 0
@@ -166,6 +171,12 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     rider.heading += turn * turnRate * dt * (rider.speed < -0.2 ? -1 : 1)
     rider.steer = damp(rider.steer, turn * 0.5, 10, dt)
     rider.lean = damp(rider.lean, -turn * 0.3 * clamp(rider.speed / MAX_SPEED, 0, 1), 6, dt)
+    if (DRIVE) {
+      // On a hard corner at speed the tail steps out: the nose points further into the turn.
+      const hard = smooth((Math.abs(turn) - 0.55) / 0.4) * clamp((rider.speed - 3) / 5, 0, 1)
+      rider.slip = damp(rider.slip, Math.sign(turn) * hard * 0.62, hard > 0.1 ? 5 : 3, dt)
+      rider.drift = Math.abs(rider.slip) > 0.24 && rider.speed > 3
+    }
 
     const step = rider.speed * dt
     rider.pos.x += Math.sin(rider.heading) * step
@@ -228,6 +239,8 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     const fin = island.finish
     if (fin && Math.hypot(fin.x - rider.pos.x, fin.z - rider.pos.z) < fin.radius) {
       s.closeT = 0
+      s.endT = 0
+      s.endSpeed = DRIVE ? clamp(rider.speed, 4, 7) : 0
       rider.speed = 0
       rider.pedalling = false
       useGame.setState({ phase: 'closing', open: null, waiting: false, nearSign: false })
@@ -238,6 +251,20 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       audio.whoosh()
       useGame.setState({ phase: 'falling', open: null, nearSign: false })
     }
+  }
+
+  // The ending: the car slides side-on to a stop, the door opens and the driver gets out.
+  function stepEnding(dt, island) {
+    s.endT += dt
+    const v = s.endSpeed * (1 - smooth(s.endT / 1.0))
+    rider.pos.x += Math.sin(rider.heading) * v * dt
+    rider.pos.z += Math.cos(rider.heading) * v * dt
+    rider.pos.y = island.h(rider.pos.x, rider.pos.z)
+    rider.wheel += (v * dt) / WHEEL_R
+    rider.slip = 1.2 * smooth(s.endT / 0.75)
+    rider.drift = s.endT < 1.0
+    rider.door = smooth((s.endT - 1.5) / 0.6)
+    rider.out = smooth((s.endT - 2.0) / 0.9)
   }
 
   function stepFall(dt, island) {
@@ -266,6 +293,8 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     rider.pos.lerpVectors(s.rideFrom, sample.pos, blend)
     rider.quat.slerpQuaternions(s.rideFromQ, sample.quat, blend)
     rider.lean = damp(rider.lean, 0, 5, dt)
+    rider.slip = damp(rider.slip, 0, 4, dt)
+    rider.drift = false
     rider.steer = damp(rider.steer, -sample.bank * 0.35, 5, dt)
     rider.wheel += (rider.speed * dt) / WHEEL_R
     rider.pedalling = true
@@ -429,6 +458,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       if (now.phase === 'island') stepIsland(sub, now, islands[s.idx])
       else if (now.phase === 'falling') stepFall(sub, islands[s.idx])
       else if (now.phase === 'ride') stepRide(sub, now)
+      else if (now.phase === 'closing' && DRIVE) stepEnding(sub, islands[s.idx])
     }
     // Time of day follows how far through the whole ride the rider is.
     const ph = useGame.getState().phase

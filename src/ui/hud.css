@@ -776,3 +776,47 @@ a.btn {
   .dial-step { min-width: 44px; min-height: 40px; }
 }
 .map-hint { align-self: center; margin-top: 6px; }
+
+/* --- The night drive: the same interface in the colours of umarmsharif.com --- */
+.world-drive {
+  --sky: #05070f;
+  --card: rgba(13, 17, 30, 0.88);
+  --card-edge: #2b3350;
+  --ink: #f2f4f7;
+  --ink-soft: #aab3c5;
+  --coral: #c8ff3d;
+  --coral-ink: #0b0d10;
+  --teal: #c8ff3d;
+  --gold: #c8ff3d;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --font-display: 'Instrument Sans', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', system-ui, sans-serif;
+  color-scheme: dark;
+}
+.world-drive .card { border-width: 1px; box-shadow: 0 14px 34px var(--shadow); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.world-drive .card.toast { background: rgba(13, 17, 30, 0.86); border-width: 1px; box-shadow: 0 10px 26px var(--shadow); }
+.world-drive .pill, .world-drive .minimap, .world-drive .cv-link, .world-drive .dial, .world-drive .hint, .world-drive .btn { background: rgba(13, 17, 30, 0.78); border-width: 1px; box-shadow: none; color: var(--ink); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.world-drive .btn { font-weight: 600; }
+.world-drive .btn.primary { background: #c8ff3d; color: #0b0d10; border-color: #c8ff3d; }
+.world-drive .btn:hover { border-color: #c8ff3d; transform: none; }
+.world-drive .eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.12em; font-size: 0.7rem; }
+.world-drive .map-dot { background: transparent; color: var(--ink-soft); border-color: #3a4366; }
+.world-drive .map-dot.seen { background: rgba(200, 255, 61, 0.16); color: var(--ink); border-color: #c8ff3d; }
+.world-drive .map-dot.here { background: #c8ff3d; color: #0b0d10; border-color: #c8ff3d; }
+.world-drive .dial-step { color: var(--ink); }
+.world-drive .dial-step.on { background: #c8ff3d; color: #0b0d10; }
+.world-drive .text-link { color: var(--ink-soft); }
+.world-drive kbd { background: rgba(255, 255, 255, 0.08); border-color: #3a4366; color: var(--ink); }
+.world-drive .splash-name, .world-drive .splash-years, .world-drive .year-digits, .world-drive .year-label { color: #f2f4f7; -webkit-text-stroke: 0; text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8); }
+.world-drive .gem { fill: #c8ff3d; stroke: #0b0d10; }
+.world-drive .diagram li { background: rgba(200, 255, 61, 0.1); border-color: #3a4366; color: var(--ink); }
+.world-drive .closing .avatar { border-color: #c8ff3d; box-shadow: none; }
+.drive-title { background: none; text-align: center; color: #f2f4f7; animation: drive-title 2.8s ease both; }
+.drive-title h1 { font-family: 'Instrument Sans', system-ui, sans-serif; font-size: clamp(3rem, 11vw, 7rem); font-weight: 700; letter-spacing: -0.045em; line-height: 0.95; margin: 10px 0 14px; color: #f2f4f7; text-shadow: 0 6px 40px rgba(0, 0, 0, 0.75); }
+.drive-title .lede { max-width: 34rem; margin: 0 auto; color: #e3e7ee; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8); }
+.drive-title .eyebrow { color: #c8ff3d; }
+@keyframes drive-title { 0% { opacity: 0; } 16% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
+.clip-over { position: fixed; inset: 0; z-index: 20; background: #05070f; display: grid; place-items: center; pointer-events: auto; }
+.clip-over video { width: 100%; height: 100%; object-fit: cover; }
+.clip-over .btn { position: absolute; right: 18px; bottom: 18px; }
+@media (prefers-reduced-motion: reduce) { .drive-title { animation: none; } }

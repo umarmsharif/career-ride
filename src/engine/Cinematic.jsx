@@ -5,6 +5,7 @@ import { useEffect, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useGame } from './state.js'
+import { DRIVE } from './world.js'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
@@ -65,7 +66,7 @@ export default function Cinematic() {
     const composer = new EffectComposer(gl, target)
     composer.addPass(new RenderPass(scene, camera))
     composer.addPass(new CountPass(sceneCost))
-    const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.14, 0.5, 0.95)
+    const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), DRIVE ? 0.42 : 0.14, DRIVE ? 0.6 : 0.5, DRIVE ? 0.88 : 0.95)
     composer.addPass(bloom)
     const h = new ShaderPass(TiltShift)
     const v = new ShaderPass(TiltShift)

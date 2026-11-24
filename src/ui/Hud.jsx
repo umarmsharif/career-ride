@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useGame } from '../engine/state.js'
 import { audio } from '../engine/sound.js'
 import career from '../content/career.json'
+import { DRIVE, T } from '../engine/world.js'
 
 function Gem() {
   return (
@@ -28,8 +29,8 @@ function StartScreen() {
     <div className="start">
       <div className="card start-card">
         <p className="eyebrow">{career.person.name}</p>
-        <h1>Career Ride</h1>
-        <p className="lede">Nine islands, one bicycle. Ride from a software workshop in 2004 to an AI classroom today.</p>
+        <h1>{T.title}</h1>
+        <p className="lede">{T.lede}</p>
         <div className="row">
           <button id="start-story" className="btn primary" onClick={() => start('story', false)}>
             {touch ? 'Start the story' : 'Play the story'}
@@ -41,7 +42,7 @@ function StartScreen() {
           )}
           {!touch && (
             <button id="start-auto" className="btn" onClick={() => start('story', true)}>
-              Ride for me
+              {T.auto}
             </button>
           )}
         </div>
@@ -56,6 +57,50 @@ function StartScreen() {
             </a>
           )}
         </div>
+      </div>
+    </div>
+  )
+}
+
+// A filmed clip shown over the scene: the driver getting in before the drive and getting out at
+// the end. The file paths are set in career.json under "clips". A clip that is missing, or will
+// not start within a few seconds, is skipped so nobody is left waiting.
+function Clip({ src, onDone }) {
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    if (playing) return
+    const id = setTimeout(onDone, 3500)
+    return () => clearTimeout(id)
+  }, [playing])
+  return (
+    <div className="clip-over">
+      <video src={src.replace(/^\//, '')} autoPlay muted playsInline onPlaying={() => setPlaying(true)} onEnded={onDone} onError={onDone} />
+      <button className="btn small" onClick={onDone}>
+        Skip
+      </button>
+    </div>
+  )
+}
+
+// The drive opens on its title and sets off by itself; nobody has to press anything.
+function DriveTitle() {
+  const start = useGame((s) => s.start)
+  const clip = career.clips?.intro
+  const [intro, setIntro] = useState(!!clip)
+  useEffect(() => {
+    if (intro) return
+    const id = setTimeout(() => start('story', true), 2800)
+    return () => clearTimeout(id)
+  }, [intro])
+  if (intro) return <Clip src={clip} onDone={() => setIntro(false)} />
+  return (
+    <div className="start drive-title">
+      <div>
+        <p className="eyebrow">
+          {career.person.name} · {career.islands[career.islands.length - 1].role}
+        </p>
+        <h1>{T.title}</h1>
+        <p className="lede">{T.lede}</p>
       </div>
     </div>
   )
@@ -238,6 +283,14 @@ function Splash({ island }) {
 
 function Closing({ total }) {
   const g = useGame()
+  // The filmed ending plays once, a moment after the car has stopped.
+  const [outro, setOutro] = useState(false)
+  useEffect(() => {
+    if (!career.clips?.outro) return
+    const id = setTimeout(() => setOutro(true), 2600)
+    return () => clearTimeout(id)
+  }, [])
+  if (outro === true) return <Clip src={career.clips.outro} onDone={() => setOutro('seen')} />
   const last = career.islands[career.islands.length - 1]
   const finale = last.cards[0]
   const links = career.person.links
@@ -255,8 +308,13 @@ function Closing({ total }) {
         You found {g.collected.length} of {total} tokens and loaded {g.profiles.length} company profiles.
       </p>
       <div className="row">
+        {DRIVE && links.book && (
+          <a id="link-book" className="btn primary" href={links.book} target="_blank" rel="noopener">
+            Book a 30-min intro call
+          </a>
+        )}
         {links.site && (
-          <a id="link-site" className="btn primary" href={links.site}>
+          <a id="link-site" className={DRIVE ? 'btn' : 'btn primary'} href={links.site}>
             Back to umarmsharif.com
           </a>
         )}
@@ -270,7 +328,7 @@ function Closing({ total }) {
       </div>
       <div className="row">
         <button id="again" className="text-link" onClick={() => g.restart()}>
-          Ride again
+          {T.again}
         </button>
         <button
           id="explore"
@@ -293,7 +351,7 @@ export default function Hud({ islands }) {
   const island = islands[g.island]
   const total = islands.reduce((n, i) => n + i.stops.length, 0)
 
-  if (g.phase === 'intro') return <StartScreen />
+  if (g.phase === 'intro') return DRIVE ? <DriveTitle /> : <StartScreen />
 
   const onIsland = g.phase === 'island' || g.phase === 'falling'
   const data = island.data
@@ -313,7 +371,7 @@ export default function Hud({ islands }) {
         <div className="spacer" />
         {onIsland && !g.touch && (
           <button id="toggle-auto" className="btn small" onClick={() => g.setAutopilot(!g.autopilot)}>
-            {g.autopilot ? 'Take the handlebars' : 'Ride for me'}
+            {g.autopilot ? T.manual : T.auto}
           </button>
         )}
         {!g.touch && (
@@ -350,7 +408,7 @@ export default function Hud({ islands }) {
       {onIsland && <Splash island={island} />}
       {g.phase === 'ride' && g.year && (
         <div className="year" aria-live="polite">
-          <span className="year-label">Riding into</span>
+          <span className="year-label">{T.into}</span>
           <span className="year-digits" key={g.year}>
             {g.year}
           </span>
@@ -361,10 +419,12 @@ export default function Hud({ islands }) {
         {onIsland && !g.autopilot && g.toasts.length === 0 && (
           <p className="hint">
             {g.nearExit ? (
-              <>Ride through the glowing gate to leave for {islands[g.island + 1]?.startYear}</>
+              <>
+                {T.exit} {islands[g.island + 1]?.startYear}
+              </>
             ) : (
               <>
-                <kbd>↑</kbd> pedal <kbd>←</kbd> <kbd>→</kbd> steer <kbd>↓</kbd> brake
+                <kbd>↑</kbd> {T.keys} <kbd>←</kbd> <kbd>→</kbd> steer <kbd>↓</kbd> brake
               </>
             )}
           </p>

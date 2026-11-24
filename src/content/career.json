@@ -1,4 +1,9 @@
 {
+  "world": "drive",
+  "clips": {
+    "intro": null,
+    "outro": null
+  },
   "person": {
     "name": "Umar Muhammad Sharif",
     "tagline": "AI transformation and training, after two decades in telecom, fintech and digital platforms",
@@ -6,7 +11,8 @@
       "linkedin": "https://www.linkedin.com/in/umarmsharif",
       "github": "https://github.com/umarmsharif",
       "cv": "/cv",
-      "site": "https://umarmsharif.com/"
+      "site": "https://umarmsharif.com/",
+      "book": "https://calendly.com/umarjamilsharif/30min"
     },
     "photo": "/media/umar-sharif.jpg"
   },
