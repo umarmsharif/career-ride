@@ -58,27 +58,31 @@ class CountPass extends Pass {
 
 export const sceneCost = { calls: 0, triangles: 0 }
 
-export default function Cinematic() {
+// `bloom` is [strength, radius, threshold]; `tilt` is the strength of the miniature blur (0 turns it off).
+export default function Cinematic({ bloom = [0.14, 0.5, 0.95], tilt = 2.4, ratio = 1.5, band = 0.16 }) {
   const { gl, scene, camera, size } = useThree()
   const rig = useMemo(() => {
     const target = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 })
     const composer = new EffectComposer(gl, target)
     composer.addPass(new RenderPass(scene, camera))
     composer.addPass(new CountPass(sceneCost))
-    const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.14, 0.5, 0.95)
-    composer.addPass(bloom)
+    const glowPass = new UnrealBloomPass(new THREE.Vector2(4, 4), bloom[0], bloom[1], bloom[2])
+    composer.addPass(glowPass)
     const h = new ShaderPass(TiltShift)
     const v = new ShaderPass(TiltShift)
-    composer.addPass(h)
-    composer.addPass(v)
+    h.uniforms.amount.value = tilt
+    v.uniforms.amount.value = tilt
+    if (tilt > 0) {
+      composer.addPass(h)
+      composer.addPass(v)
+    }
     composer.addPass(new ShaderPass(Grade))
     composer.addPass(new OutputPass())
     return { composer, h, v }
-  }, [gl, scene, camera])
+  }, [gl, scene, camera, bloom[0], bloom[1], bloom[2], tilt])
 
   useEffect(() => {
-    const ratio = Math.min(gl.getPixelRatio(), 1.5)
-    rig.composer.setPixelRatio(ratio)
+    rig.composer.setPixelRatio(Math.min(gl.getPixelRatio(), ratio))
     rig.composer.setSize(size.width, size.height)
     rig.h.uniforms.dir.value.set(1 / size.width, 0)
     rig.v.uniforms.dir.value.set(0, 1 / size.height)
@@ -99,7 +103,7 @@ export default function Cinematic() {
     for (const pass of [rig.h, rig.v]) {
       const u = pass.uniforms
       u.focus.value += ((closing ? 0.74 : 0.44) - u.focus.value) * 0.04
-      u.band.value += ((closing ? 0.3 : 0.16) - u.band.value) * 0.04
+      u.band.value += ((closing ? 0.3 : band) - u.band.value) * 0.04
     }
     gl.info.reset()
     rig.composer.render()

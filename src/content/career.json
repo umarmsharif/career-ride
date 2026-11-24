@@ -1,4 +1,5 @@
 {
+  "world": "night",
   "person": {
     "name": "Umar Muhammad Sharif",
     "tagline": "AI transformation and training, after two decades in telecom, fintech and digital platforms",
@@ -6,7 +7,8 @@
       "linkedin": "https://www.linkedin.com/in/umarmsharif",
       "github": "https://github.com/umarmsharif",
       "cv": "/cv",
-      "site": "https://umarmsharif.com/"
+      "site": "https://umarmsharif.com/",
+      "book": "https://calendly.com/umarjamilsharif/30min"
     },
     "photo": "/media/umar-sharif.jpg"
   },
@@ -97,13 +99,22 @@
           "theme": "Rooftops and antennas, with offers flying to individual houses",
           "pickups": [
             {
-              "fact": "+5% incremental ARPU against control through one-to-one personalisation"
+              "fact": "+5% incremental ARPU against control through one-to-one personalisation",
+              "headline": "+5% ARPU",
+              "matrix": "+5%",
+              "caption": "ARPU · PERSONALISATION"
             },
             {
-              "fact": "Loyalty programme for high-value customers reached 8% engagement, built with a 10-member cross-functional team"
+              "fact": "Loyalty programme for high-value customers reached 8% engagement, built with a 10-member cross-functional team",
+              "headline": "8% ENGAGED",
+              "matrix": "8%",
+              "caption": "LOYALTY ENGAGEMENT"
             },
             {
-              "fact": "Secured PKR 50M investment from JS Bank for a co-branded proposition"
+              "fact": "Secured PKR 50M investment from JS Bank for a co-branded proposition",
+              "headline": "PKR 50M",
+              "matrix": "50M",
+              "caption": "PKR · JS BANK INVESTMENT"
             }
           ]
         },
@@ -112,13 +123,22 @@
           "theme": "A market street where shopkeepers pay by phone",
           "pickups": [
             {
-              "fact": "Managed a PKR 1B per month fintech portfolio on the EasyPaisa mobile wallet"
+              "fact": "Managed a PKR 1B per month fintech portfolio on the EasyPaisa mobile wallet",
+              "headline": "PKR 1B / MONTH",
+              "matrix": "1B",
+              "caption": "PKR A MONTH · EASYPAISA"
             },
             {
-              "fact": "Grew telco bundle penetration from 17% to 25%"
+              "fact": "Grew telco bundle penetration from 17% to 25%",
+              "headline": "17% → 25%",
+              "matrix": "25%",
+              "caption": "BUNDLE PENETRATION · FROM 17%"
             },
             {
-              "fact": "Go Getter Award 2018 and 2019; Employee of the Quarter 2018"
+              "fact": "Go Getter Award 2018 and 2019; Employee of the Quarter 2018",
+              "headline": "GO GETTER ×2",
+              "matrix": "3",
+              "caption": "AWARDS · 2018 AND 2019"
             }
           ]
         }
@@ -326,5 +346,9 @@
         "signLabel": "The Classroom"
       }
     }
-  ]
+  ],
+  "night": {
+    "introClip": null,
+    "outroClip": null
+  }
 }

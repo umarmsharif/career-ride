@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import career from './content/career.json'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import World from './World.jsx'
@@ -16,7 +17,22 @@ function canRender3D() {
   }
 }
 
+const NightApp = lazy(() => import('./night/NightApp.jsx'))
+// Which journey to show: set by career.json, or by ?world=ride / ?world=night in the address.
+const WORLD = new URLSearchParams(location.search).get('world') ?? career.world
+
 export default function App() {
+  if (WORLD === 'night' && location.hash !== '#cv') {
+    return (
+      <Suspense fallback={null}>
+        <NightApp />
+      </Suspense>
+    )
+  }
+  return <RideApp />
+}
+
+function RideApp() {
   const [entries, setEntries] = useState(null)
   const webgl = useMemo(canRender3D, [])
   const reduced = useMemo(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, [])

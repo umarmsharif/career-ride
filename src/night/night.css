@@ -1,0 +1,67 @@
+.n-stage { position: fixed; inset: 0; background: #05070f; color: #f2f4f7; font-family: 'Instrument Sans', system-ui, sans-serif; overflow: hidden; }
+.n-stage canvas { display: block; width: 100%; height: 100%; }
+.n-hud { position: absolute; inset: 0; pointer-events: none; padding: max(14px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; }
+.n-hud > * { pointer-events: auto; }
+.n-label { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 0.7rem; letter-spacing: 0.13em; text-transform: uppercase; color: #c8ff3d; margin: 0; }
+.n-top { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; pointer-events: none; }
+.n-top > * { pointer-events: auto; }
+.n-spacer { flex: 1; }
+.n-place, .n-meter, .n-card, .n-dial, .n-btn, .n-back, .n-hint { background: rgba(13, 17, 30, 0.72); border: 1px solid #262d45; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.n-place { display: flex; flex-direction: column; gap: 3px; padding: 10px 14px; border-radius: 14px; }
+.n-name { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.n-sub { font-size: 0.8rem; color: #aab3c5; max-width: 22rem; line-height: 1.3; }
+.n-meter { display: grid; grid-template-columns: auto auto; align-items: baseline; column-gap: 10px; row-gap: 6px; padding: 10px 14px; border-radius: 14px; min-width: 150px; }
+.n-pct { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 1.1rem; font-weight: 600; justify-self: end; font-variant-numeric: tabular-nums; }
+.n-bar { grid-column: 1 / -1; height: 4px; border-radius: 4px; background: #232a42; overflow: hidden; }
+.n-bar i { display: block; height: 100%; background: #c8ff3d; box-shadow: 0 0 12px #c8ff3d; transition: width 0.5s ease; }
+.n-btn { font: inherit; font-weight: 600; font-size: 0.9rem; color: #f2f4f7; padding: 10px 16px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; min-height: 42px; }
+.n-btn:hover { border-color: #c8ff3d; }
+.n-btn.primary { background: #c8ff3d; color: #0b0d10; border-color: #c8ff3d; }
+.n-btn:focus-visible, .n-dial button:focus-visible, .n-back:focus-visible { outline: 2px solid #c8ff3d; outline-offset: 3px; }
+.n-toasts { position: absolute; top: 92px; right: max(16px, env(safe-area-inset-right, 0px)); width: min(330px, 62vw); display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.n-card { border-radius: 16px; padding: 14px 16px; }
+.n-toast { animation: n-in 0.45s ease-out both; transition: opacity 0.6s ease, transform 0.6s ease; }
+.n-toast.leaving { opacity: 0; transform: translateX(24px); }
+.n-figure { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 1.55rem; font-weight: 600; letter-spacing: -0.01em; margin: 6px 0 4px; color: #fff; text-shadow: 0 0 18px rgba(200, 255, 61, 0.35); }
+.n-figure.small { font-family: inherit; font-size: 1.2rem; font-weight: 700; text-shadow: none; }
+.n-text { margin: 4px 0 0; font-size: 0.92rem; line-height: 1.45; color: #c2c9d6; }
+.n-text.dim { color: #8d96a8; font-size: 0.84rem; }
+.n-dot { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 2px; margin-right: 0.5em; }
+.n-title { margin: auto; text-align: center; animation: n-fade 2.6s ease both; padding-bottom: 8vh; }
+.n-title h1 { font-size: clamp(3rem, 11vw, 7.5rem); font-weight: 700; letter-spacing: -0.045em; line-height: 0.95; margin: 10px 0 12px; text-shadow: 0 6px 40px rgba(0, 0, 0, 0.7); }
+.n-title h1 em { font-style: normal; color: #c8ff3d; text-shadow: 0 0 40px rgba(200, 255, 61, 0.45); }
+.n-title .n-text { font-size: 1.1rem; color: #e3e7ee; }
+.n-end { margin: auto auto 5vh 0; max-width: 25rem; border-top: 3px solid #c8ff3d; animation: n-in 0.7s 4.2s ease-out both; }
+.n-end h2 { font-size: clamp(1.4rem, 3.4vw, 1.9rem); letter-spacing: -0.03em; margin: 12px 0 4px; }
+.n-who { display: flex; align-items: center; gap: 12px; }
+.n-who img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid #c8ff3d; }
+.n-owner { margin: 0 0 3px; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
+.n-who .n-label { font-family: inherit; font-size: 0.82rem; letter-spacing: 0; text-transform: none; color: #c2c9d6; line-height: 1.35; }
+.n-link { font: inherit; font-size: 0.86rem; font-weight: 600; color: #c2c9d6; background: none; border: 0; padding: 8px 4px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.n-link:hover { color: #fff; }
+.n-link:focus-visible { outline: 2px solid #c8ff3d; outline-offset: 3px; }
+.n-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 14px; }
+.n-dial { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: 14px; display: flex; align-items: center; gap: 4px; padding: 4px 6px 4px 14px; border-radius: 999px; }
+.n-dial .n-label { color: #9aa3b5; margin-right: 6px; }
+.n-dial button { font: inherit; font-weight: 600; font-size: 0.85rem; color: #f2f4f7; background: none; border: 0; border-radius: 999px; min-width: 44px; min-height: 38px; cursor: pointer; }
+.n-dial button.on { background: #c8ff3d; color: #0b0d10; }
+.n-back { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 14px; font-size: 0.8rem; color: #aab3c5; padding: 10px 16px; border-radius: 999px; text-decoration: none; max-width: 60vw; }
+.n-back b { color: #f2f4f7; font-weight: 700; }
+.n-hint { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); margin: 0; padding: 8px 14px; border-radius: 999px; font-size: 0.82rem; color: #c2c9d6; }
+@keyframes n-in { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+@keyframes n-fade { 0% { opacity: 0; } 18% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+@media (max-width: 560px) {
+  .n-end { margin: auto 0 9vh; }
+  .n-name { font-size: 1.05rem; }
+  .n-toasts { top: 136px; width: min(260px, 70vw); }
+  .n-toast:nth-last-child(n + 3) { display: none; }
+  .n-figure { font-size: 1.25rem; }
+  .n-text { font-size: 0.82rem; }
+  .n-back { display: none; }
+  .n-sub { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .n-toast, .n-end, .n-title { animation: none; transition: none; } }
+
+.n-clip { position: fixed; inset: 0; z-index: 5; background: #05070f; display: grid; place-items: center; }
+.n-clip video { width: 100%; height: 100%; object-fit: cover; }
+.n-clip .n-btn { position: absolute; right: 18px; bottom: 18px; }
