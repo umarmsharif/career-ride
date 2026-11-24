@@ -8,5 +8,5 @@ export const DRIVE = WORLD === 'drive'
 
 // The words that change with the vehicle.
 export const T = DRIVE
-  ? { title: 'Night Drive', lede: 'Nine stations, one car, one night. Drive from a software workshop in 2004 to an AI classroom at sunrise.', auto: 'Drive for me', manual: 'Take the wheel', into: 'Driving into', again: 'Drive again', keys: 'drive', exit: 'Drive through the glowing gate to leave for' }
+  ? { title: 'Night Drive', lede: 'Nine stations, one car, one night. Drive from a software workshop in 2004 to an AI classroom before sunrise.', auto: 'Drive for me', manual: 'Take the wheel', into: 'Driving into', again: 'Drive again', keys: 'drive', exit: 'Drive through the glowing gate to leave for' }
   : { title: 'Career Ride', lede: 'Nine islands, one bicycle. Ride from a software workshop in 2004 to an AI classroom today.', auto: 'Ride for me', manual: 'Take the handlebars', into: 'Riding into', again: 'Ride again', keys: 'pedal', exit: 'Ride through the glowing gate to leave for' }
