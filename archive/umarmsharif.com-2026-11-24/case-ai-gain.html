@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where the AI gain lands | Umar Jamil Sharif</title>
+<meta name="description" content="Measured AI effects, role exposure and pricing for a headcount-priced services firm.">
+<meta property="og:title" content="Where the AI gain lands | Umar Jamil Sharif">
+<meta property="og:description" content="Measured AI effects, role exposure and pricing for a headcount-priced services firm.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="case-ai-gain.html">
+<meta property="og:url" content="https://umarmsharif.com/case-ai-gain">
+<meta property="og:site_name" content="Umar Jamil Sharif">
+<meta property="og:image" content="https://umarmsharif.com/og.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Umar Jamil Sharif. AI training, AI agents and AI for growth.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Where the AI gain lands | Umar Jamil Sharif">
+<meta name="twitter:description" content="Measured AI effects, role exposure and pricing for a headcount-priced services firm.">
+<meta name="twitter:image" content="https://umarmsharif.com/og.png?v=2">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></noscript>
+<style>
+h1,h2,h3:not([style*="Plex Mono"]){font-family:'Newsreader',Georgia,serif!important}h1,h2{font-weight:500!important;letter-spacing:-.02em!important}h3:not([style*="Plex Mono"]){font-weight:600!important;letter-spacing:-.01em!important}
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:#C8FF3D;color:#0B0D10!important;padding:10px 16px;border-radius:999px;font-family:'IBM Plex Mono',monospace;font-size:14px;text-decoration:none}
+.skip:focus{top:12px}
+a:focus-visible,button:focus-visible,[tabindex="0"]:focus-visible{outline:3px solid #C8FF3D;outline-offset:3px}
+body{margin:0;background:#0B0D10}
+a{color:#C8FF3D}a:hover{color:#E4FF94}
+@keyframes rise{from{transform:translateY(8px)}to{transform:none}}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes growy{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.rise{opacity:0;animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+.d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}.d5{animation-delay:.7s}
+.rv{opacity:1}
+@supports (animation-timeline:view()){.rv{opacity:0;animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 45%}}
+.gx{transform-origin:left;animation:growx 1.1s cubic-bezier(.2,.7,.2,1) both}
+.gxr{transform-origin:right;animation:growx 1.1s cubic-bezier(.2,.7,.2,1) both}
+.gy{transform-origin:bottom;animation:growy 1.1s cubic-bezier(.2,.7,.2,1) both}
+.fu{animation:fu .8s cubic-bezier(.2,.7,.2,1) both}
+@supports (animation-timeline:view()){.gx,.gxr,.gy,.fu{animation-timeline:view();animation-range:entry 5% cover 30%;animation-delay:0s}}
+.sec{max-width:1240px;margin:0 auto;padding:clamp(40px,6vw,72px) clamp(20px,4vw,32px) 0;display:flex;flex-direction:column;gap:28px;box-sizing:border-box}
+.lbl{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7C8692}
+.lime{color:#C8FF3D}
+.h2{margin:0;font-weight:700;font-size:clamp(30px,4.4vw,56px);letter-spacing:-.035em;line-height:1.04}
+.p{margin:0;font-size:clamp(17px,1.5vw,19px);line-height:1.6;color:#A9B1BB;max-width:760px}
+.card{background:#11151A;border:1px solid #222830;border-radius:20px;padding:clamp(18px,3vw,32px);box-sizing:border-box}
+.take{margin:0;font-weight:600;font-size:clamp(20px,2.3vw,28px);letter-spacing:-.02em;line-height:1.22}
+.src{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.5;color:#7C8692}
+.tag{border:1px solid #222830;border-radius:999px;background:#11151A;padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#A9B1BB}
+.scroll{overflow-x:auto}
+.mono{font-family:'IBM Plex Mono',monospace}
+.ex{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:11px;letter-spacing:.1em;padding:5px 10px;border-radius:999px}
+.hi{background:#C8FF3D;color:#0B0D10}
+.pa{border:1px solid #5C6672;color:#C9CFD6}
+.lo{border:1px dashed #3A424C;color:#7C8692}
+.tr{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 110px minmax(0,1.1fr);gap:16px;align-items:center;padding:12px 4px;border-top:1px solid #1B2026;font-size:15px;color:#EDEFF2}
+.tr.gh{background:#0F1317;border-top:1px solid #222830;border-radius:12px;padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#C8FF3D;margin-top:14px}
+.tr.hd{border-top:0;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7C8692}
+.dim{color:#A9B1BB}
+.btn{display:inline-block;border:1px solid #2A3038;border-radius:999px;padding:16px 26px;text-decoration:none;color:#EDEFF2;font-size:16px}
+.btn:hover{color:#C8FF3D;border-color:#C8FF3D}
+@media (prefers-reduced-motion:reduce){
+*,*::before,*::after{animation:none!important;transition:none!important}
+.rise,.rv{opacity:1!important;transform:none!important}
+}
+</style>
+
+<style>.inds{display:flex;flex-wrap:wrap;gap:8px}.ind{display:inline-flex;align-items:center;gap:6px;border:1px solid #2A3038;border-radius:999px;padding:5px 11px 5px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:#C9CFD6;white-space:nowrap}.ind svg{width:14px;height:14px;flex:none}.ind{color:var(--c);border-color:color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}.ind-tel{--c:#7FA7D6}.ind-fin{--c:#D9B45A}.ind-mkt{--c:#6FBF9F}.ind-food{--c:#E08A5E}.ind-hr{--c:#D98AA0}.ind-x{--c:#A3ADB8}</style>
+<style>header nav a.nav-hl{color:#C8FF3D;border:1px solid #C8FF3D;border-radius:999px;padding:7px 14px;line-height:1;text-decoration:none}
+header nav a.nav-hl:hover{color:#DDFF7A;border-color:#DDFF7A}
+header nav a.nav-hl[aria-current="page"]{background:rgba(200,255,61,.14)}
+@media (max-width:640px){header nav a.nav-hl{padding:4px 8px;margin:-5px -9px}header nav a.nav-rd{display:none}}</style>
+<style>/* perf-2026-10-31 */.rise{opacity:1!important;animation:rise .25s ease-out both!important}.rise.d1,.rise.d2,.rise.d3,.rise.d4,.rise.d5{animation-delay:0s!important}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rise,.w>span{opacity:1!important;transform:none!important}.ul,.draw{transform:scaleX(1)!important}.type{clip-path:none!important;width:auto!important}}</style>
+</head>
+<body>
+<a class="skip" href="case-ai-gain.html#main">Skip to content</a>
+
+<div style="background: #0B0D10; color: #EDEFF2; font-family: 'Public Sans', system-ui, sans-serif; overflow: hidden">
+
+<header style="max-width: 1240px; margin: 0 auto; padding: 24px clamp(20px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; box-sizing: border-box">
+<a href="index.html" style="font-weight: 700; font-size: 18px; color: #EDEFF2; text-decoration: none; letter-spacing: -0.01em">Umar Jamil Sharif<span style="color: #C8FF3D">.</span></a>
+<nav style="display: flex; flex-wrap: wrap; gap: 20px 28px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em">
+<a href="index.html" style="color: #9AA3AE; text-decoration: none">Home</a>
+<a class="nav-hl" href="work.html" style="text-decoration: none">Work</a>
+<a class="nav-hl nav-rd" href="readiness.html" style="text-decoration: none">Readiness check</a>
+<a href="index.html#services" style="color: #9AA3AE; text-decoration: none">Services</a>
+<a target="_blank" rel="noopener" href="https://www.linkedin.com/in/umarmsharif" aria-label="LinkedIn" style="color: #9AA3AE; text-decoration: none">LinkedIn</a>
+<a target="_blank" rel="noopener" href="https://calendly.com/umarjamilsharif/30min" style="color: #0B0D10; background: #C8FF3D; padding: 12px 18px; border-radius: 999px; text-decoration: none; font-weight: 500">Book a call</a>
+</nav>
+</header>
+<main id="main" tabindex="-1">
+
+<!-- 1. Header strip -->
+<section class="sec" style="padding-top: clamp(32px, 6vw, 72px)">
+<div class="inds rise d1" role="list" aria-label="Industry"><span role="listitem" class="ind ind-hr"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12h.01" /><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /><path d="M22 13a18.15 18.15 0 0 1-20 0" /><rect width="20" height="14" x="2" y="6" rx="2" /></svg>HR services</span></div>
+<div class="rise d1" style="display: flex; flex-wrap: wrap; gap: 10px">
+<span class="tag">2026</span><span class="tag">Research synthesis + strategy</span><span class="tag lime" style="border-color: #C8FF3D">Proposal</span>
+</div>
+<div class="rise d2 lbl">An HR outsourcing and staffing group · Leadership briefing</div>
+<h1 class="rise d2" style="margin: 0; font-weight: 700; font-size: clamp(34px, 6vw, 72px); line-height: 1; letter-spacing: -0.04em; max-width: 1100px">Where the AI gain lands: exposure, evidence and pricing for a services firm</h1>
+<p class="rise d3" style="margin: 0; font-size: clamp(18px, 1.8vw, 22px); line-height: 1.5; color: #A9B1BB; max-width: 760px">A research synthesis and strategy proposal on how much AI helps, which roles it touches, and who keeps the saving inside headcount-priced contracts.</p>
+</section>
+
+<!-- 2. At a glance -->
+<section class="sec rise d4" style="padding-top: 40px">
+<div class="lbl">At a glance</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 16px">
+<div class="card"><svg class="ix" style="color:#6FBF9F;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" /></svg><div class="fu" style="font-size: clamp(34px, 4.2vw, 52px); font-weight: 700; letter-spacing: -0.04em; color: #C8FF3D; line-height: 1.05">−19% to +35%</div><div class="dim" style="margin-top: 10px; line-height: 1.45">measured AI effect range across 7 studies</div></div>
+<div class="card"><svg class="ix" style="color:#7FA7D6;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19" /> <circle cx="6.5" cy="6.5" r="2.5" /> <circle cx="17.5" cy="17.5" r="2.5" /></svg><div class="fu" style="font-size: clamp(34px, 4.2vw, 52px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; animation-delay: .1s">16%</div><div class="dim" style="margin-top: 10px; line-height: 1.45">of HR functions have an ROI metric for AI</div></div>
+<div class="card"><svg class="ix" style="color:#D9B45A;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /> <path d="M22 10v6" /> <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" /></svg><div class="fu" style="font-size: clamp(34px, 4.2vw, 52px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; animation-delay: .2s">26% → 41%</div><div class="dim" style="margin-top: 10px; line-height: 1.45">tool adoption after a 9½-minute training (randomised, 164 participants)</div></div>
+<div class="card"><svg class="ix" style="color:#E08A5E;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></svg><div class="fu" style="font-size: clamp(34px, 4.2vw, 52px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; animation-delay: .3s">13</div><div class="dim" style="margin-top: 10px; line-height: 1.45">role families mapped for exposure</div></div>
+</div>
+</section>
+
+<!-- 3. The problem -->
+<section class="sec rv">
+<div class="lbl lime"><svg class="ix" style="color:#6FBF9F;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <line x1="12" x2="12" y1="8" y2="12" /> <line x1="12" x2="12.01" y1="16" y2="16" /></svg>01 · The problem</div>
+<h2 class="h2" style="max-width: 980px">Automation removes billable hours before it removes cost.</h2>
+<p class="p">The leadership question was where AI value would land inside the business. The evidence on AI at work is wide and not like-for-like, measurement inside HR functions is thin, and part of the workforce sits on client sites under headcount pricing. The briefing synthesises 7 studies, maps exposure across 13 role families and proposes how to price and sequence the work.</p>
+<div class="card" style="border-color: #C8FF3D; background: #0F1317">
+<div class="lbl lime">Thesis</div>
+<p style="margin: 12px 0 0; font-size: clamp(20px, 2.4vw, 30px); line-height: 1.3; font-weight: 600; letter-spacing: -0.02em">Automation removes billable hours before it removes cost. Inside headcount-priced contracts, the saving lands with the client.</p>
+</div>
+</section>
+
+<!-- 4. The analysis -->
+<section class="sec rv">
+<div class="lbl lime"><svg class="ix" style="color:#7FA7D6;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /> <path d="M18 17V9" /> <path d="M13 17V5" /> <path d="M8 17v-3" /></svg>02 · The analysis</div>
+<div class="card" style="display: flex; flex-direction: column; gap: 24px">
+<h3 class="take">Measured effects run from −19% to +35%.</h3>
+<div class="scroll" tabindex="0" role="region" aria-label="Chart: measured AI effects in 7 studies, from −19% to +35%">
+<div style="min-width: 540px; position: relative">
+<div style="position: relative; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #A9B1BB">
+<span style="position: absolute; right: 70.5%; top: 0; white-space: nowrap">← Slower / worse</span>
+<span style="position: absolute; left: 30.5%; top: 0; white-space: nowrap" class="lime">Faster / better →</span>
+</div>
+<!-- gridlines -->
+<div style="position: absolute; left: 14.06%; top: 28px; bottom: 26px; width: 1px; background: #1B2026"></div>
+<div style="position: absolute; left: 45.31%; top: 28px; bottom: 26px; width: 1px; background: #1B2026"></div>
+<div style="position: absolute; left: 60.94%; top: 28px; bottom: 26px; width: 1px; background: #1B2026"></div>
+<div style="position: absolute; left: 76.56%; top: 28px; bottom: 26px; width: 1px; background: #1B2026"></div>
+<div style="position: absolute; left: 29.69%; top: 28px; bottom: 26px; width: 2px; background: #5C6672"></div>
+
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px">−19% slower</strong><span class="src">RCT, 16 developers, 246 tasks, tool access only</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div class="gxr" style="position: absolute; left: 0; width: 29.69%; top: 3px; height: 18px; background: #3A424C; border-radius: 4px 0 0 4px"></div><span class="mono fu" style="position: absolute; left: 31.5%; top: 2px; font-size: 14px">−19%</span></div>
+</div>
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px">−19% less likely correct</strong><span class="src">field experiment, 758 consultants, tasks outside the model's strengths</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div class="gxr" style="position: absolute; left: 0; width: 29.69%; top: 3px; height: 18px; background: #3A424C; border-radius: 4px 0 0 4px; animation-delay: .1s"></div><span class="mono fu" style="position: absolute; left: 31.5%; top: 2px; font-size: 14px; animation-delay: .1s">−19%</span></div>
+</div>
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px">~0 no task-mix shift</strong><span class="src">RCT, 7,137 workers, 66 firms, 6 months</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div style="position: absolute; left: 29.69%; width: 4px; top: 3px; height: 18px; background: #A9B1BB"></div><span class="mono fu" style="position: absolute; left: 31.5%; top: 2px; font-size: 14px; animation-delay: .2s">~0</span></div>
+</div>
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px">+12.2% more tasks</strong><span class="src">field experiment, 758 consultants</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div class="gx" style="position: absolute; left: 29.69%; width: 19.06%; top: 3px; height: 18px; background: rgba(200,255,61,.55); border-radius: 0 4px 4px 0; animation-delay: .3s"></div><span class="mono fu" style="position: absolute; left: 49.9%; top: 2px; font-size: 14px; animation-delay: .3s">+12.2%</span></div>
+</div>
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px">+13.8% issues resolved per hour</strong><span class="src">study of ~5,000 support agents, in-workflow assist</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div class="gx" style="position: absolute; left: 29.69%; width: 21.56%; top: 3px; height: 18px; background: rgba(200,255,61,.62); border-radius: 0 4px 4px 0; animation-delay: .4s"></div><span class="mono fu" style="position: absolute; left: 52.4%; top: 2px; font-size: 14px; animation-delay: .4s">+13.8%</span></div>
+</div>
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px">+26.1% more tasks</strong><span class="src">RCTs across 4,867 developers at three large firms</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div class="gx" style="position: absolute; left: 29.69%; width: 40.78%; top: 3px; height: 18px; background: rgba(200,255,61,.75); border-radius: 0 4px 4px 0; animation-delay: .5s"></div><span class="mono fu" style="position: absolute; left: 71.6%; top: 2px; font-size: 14px; animation-delay: .5s">+26.1%</span></div>
+</div>
+<div style="position: relative; padding: 12px 0 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline"><strong style="font-size: 17px" class="lime">+35% issues resolved per hour</strong><span class="src">same support deployment, least experienced agents</span></div>
+<div style="position: relative; height: 24px; margin-top: 8px"><div class="gx" style="position: absolute; left: 29.69%; width: 54.69%; top: 3px; height: 18px; background: #C8FF3D; border-radius: 0 4px 4px 0; box-shadow: 0 0 18px rgba(200,255,61,.45); animation-delay: .6s"></div><span class="mono fu lime" style="position: absolute; left: 85.6%; top: 1px; font-size: 16px; font-weight: 500; animation-delay: .6s">+35%</span></div>
+</div>
+
+<div style="position: relative; height: 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7C8692">
+<span style="position: absolute; left: 14.06%; transform: translateX(-50%); top: 6px">−10%</span>
+<span style="position: absolute; left: 29.69%; transform: translateX(-50%); top: 6px; color: #A9B1BB">0</span>
+<span style="position: absolute; left: 45.31%; transform: translateX(-50%); top: 6px">+10%</span>
+<span style="position: absolute; left: 60.94%; transform: translateX(-50%); top: 6px">+20%</span>
+<span style="position: absolute; left: 76.56%; transform: translateX(-50%); top: 6px">+30%</span>
+</div>
+</div>
+</div>
+<div class="src">Source: 7 peer-reviewed or preregistered studies, 2023–2026; not like-for-like, so no median is shown.</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px">
+<div class="card" style="display: flex; flex-direction: column; gap: 22px">
+<h3 class="take">Training lifted adoption from 26% to 41%; access without training showed no significant improvement.</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end">
+<div style="position: relative; height: 220px; grid-column: 1 / span 2; grid-row: 1; border-bottom: 1px solid #3A424C">
+<div style="position: absolute; left: 0; right: 0; top: 0; border-top: 1px solid #1B2026"></div>
+<div style="position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid #1B2026"></div>
+<span class="mono" style="position: absolute; left: 0; top: 3px; font-size: 11px; color: #7C8692">50%</span>
+<span class="mono" style="position: absolute; left: 0; top: calc(50% + 3px); font-size: 11px; color: #7C8692">25%</span>
+<div style="position: absolute; left: 14%; width: 28%; bottom: 0; height: 52%; background: #3A424C; border-radius: 6px 6px 0 0" class="gy"></div>
+<span class="mono fu" style="position: absolute; left: 14%; width: 28%; text-align: center; bottom: calc(52% + 8px); font-size: 16px">26%</span>
+<div style="position: absolute; left: 58%; width: 28%; bottom: 0; height: 82%; background: #C8FF3D; border-radius: 6px 6px 0 0; box-shadow: 0 0 18px rgba(200,255,61,.35); animation-delay: .2s" class="gy"></div>
+<span class="mono fu lime" style="position: absolute; left: 58%; width: 28%; text-align: center; bottom: calc(82% + 8px); font-size: 18px; font-weight: 500; animation-delay: .2s">41%</span>
+</div>
+<div class="mono" style="font-size: 12px; text-align: center; color: #A9B1BB; line-height: 1.4">Before training</div>
+<div class="mono" style="font-size: 12px; text-align: center; color: #C8FF3D; line-height: 1.4">After 9½-minute training</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<span class="tag lime" style="border-color: #C8FF3D">+0.27 grade improvement vs untrained access</span>
+<span class="tag">Access without training: no significant improvement</span>
+</div>
+<div class="src">Source: Randomised study, 164 participants, anonymised.</div>
+</div>
+
+<div class="card" style="display: flex; flex-direction: column; gap: 22px">
+<h3 class="take">4 in 10 HR functions use AI, yet only 16% have an ROI metric for it.</h3>
+<div style="display: flex; flex-direction: column; gap: 22px; margin-top: 4px">
+<div><div style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px; margin-bottom: 8px"><span>of HR functions use AI</span><span class="mono">39%</span></div><div style="height: 18px; background: #0F1317; border-radius: 4px"><div class="gx" style="width: 39%; height: 100%; background: #3A424C; border-radius: 4px"></div></div></div>
+<div><div style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px; margin-bottom: 8px"><span>do not formally measure AI investment success</span><span class="mono">56%</span></div><div style="height: 18px; background: #0F1317; border-radius: 4px"><div class="gx" style="width: 56%; height: 100%; background: #3A424C; border-radius: 4px; animation-delay: .15s"></div></div></div>
+<div><div style="display: flex; justify-content: space-between; gap: 12px; font-size: 15px; margin-bottom: 8px"><span class="lime">have an AI ROI metric</span><span class="mono lime" style="font-weight: 500">16%</span></div><div style="height: 18px; background: #0F1317; border-radius: 4px"><div class="gx" style="width: 16%; height: 100%; background: #C8FF3D; border-radius: 4px; box-shadow: 0 0 14px rgba(200,255,61,.4); animation-delay: .3s"></div></div></div>
+</div>
+<div class="src">Source: Survey of HR functions, anonymised.</div>
+</div>
+</div>
+</section>
+
+<!-- 5. Framework 1: role exposure inventory -->
+<section class="sec rv">
+<div class="lbl lime"><svg class="ix" style="color:#D9B45A;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" /> <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" /> <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" /></svg>03 · The framework</div>
+<h2 class="h2" style="max-width: 980px">Role exposure inventory: who works where, and who keeps the gain.</h2>
+<div class="card" style="padding: clamp(14px, 2.4vw, 28px)">
+<div class="scroll" tabindex="0" role="region" aria-label="Table: role exposure by role family, work location and who keeps the gain">
+<div style="min-width: 700px">
+<div class="tr hd"><span>Role family</span><span>Where they work</span><span>Exposure</span><span>Who keeps the gain</span></div>
+
+<div class="tr gh"><span>Own payroll</span><span></span><span></span><span>Gain kept by: the firm</span></div>
+<div class="tr"><span>Payroll officer</span><span class="dim">Own payroll</span><span><span class="ex hi">HIGH</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>HR operations administrator</span><span class="dim">Own payroll</span><span><span class="ex hi">HIGH</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Billing and invoicing analyst</span><span class="dim">Own payroll</span><span><span class="ex hi">HIGH</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Recruitment coordinator</span><span class="dim">Own payroll</span><span><span class="ex hi">HIGH</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Recruitment consultant</span><span class="dim">Own payroll</span><span><span class="ex pa">PARTIAL</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Compliance and statutory officer</span><span class="dim">Own payroll</span><span><span class="ex pa">PARTIAL</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>HR consultant</span><span class="dim">Own payroll</span><span><span class="ex pa">PARTIAL</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Product and platform engineer</span><span class="dim">Own payroll</span><span><span class="ex pa">PARTIAL</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Executive search consultant</span><span class="dim">Own payroll</span><span><span class="ex lo">LOW</span></span><span class="dim">The firm</span></div>
+<div class="tr"><span>Client relationship manager</span><span class="dim">Own payroll</span><span><span class="ex lo">LOW</span></span><span class="dim">The firm</span></div>
+
+<div class="tr gh"><span>Client sites</span><span></span><span></span><span>Gain kept by: the client</span></div>
+<div class="tr"><span>Back-office processing associate</span><span class="dim">Client sites</span><span><span class="ex hi">HIGH</span></span><span class="dim">The client (under headcount pricing)</span></div>
+<div class="tr"><span>Site supervisor and coordinator</span><span class="dim">Client sites</span><span><span class="ex pa">PARTIAL</span></span><span class="dim">The client (under headcount pricing)</span></div>
+<div class="tr"><span>Field, facilities and support staff</span><span class="dim">Client sites</span><span><span class="ex lo">LOW</span></span><span class="dim">The client (under headcount pricing)</span></div>
+</div>
+</div>
+<div class="src" style="margin-top: 16px">Exposure ratings are analyst judgement, to be validated with the firm's own role and volume data.</div>
+</div>
+</section>
+
+<!-- Framework 2: three tiers -->
+<section class="sec rv" style="padding-top: clamp(32px, 5vw, 56px)">
+<div class="card" style="display: flex; flex-direction: column; gap: 24px">
+<h3 class="take">AI work comes in 3 tiers, from assisted work up to agentic systems.</h3>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(8px, 2vw, 20px); align-items: end">
+<div class="gy" style="background: #0F1317; border: 1px solid #222830; border-radius: 16px; padding: clamp(12px, 2vw, 22px); display: flex; flex-direction: column; justify-content: flex-end; gap: 6px"><span class="mono lime" style="font-size: 13px">T1</span><strong style="font-size: clamp(15px, 2vw, 22px); letter-spacing: -0.01em">Assisted work</strong></div>
+<div class="gy" style="background: #0F1317; border: 1px solid #3A424C; border-radius: 16px; padding: clamp(12px, 2vw, 22px); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; animation-delay: .15s"><span class="mono lime" style="font-size: 13px">T2</span><strong style="font-size: clamp(15px, 2vw, 22px); letter-spacing: -0.01em">Building</strong></div>
+<div class="gy" style="background: #0F1317; border: 1px solid #C8FF3D; border-radius: 16px; padding: clamp(12px, 2vw, 22px); min-height: 230px; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; animation-delay: .3s"><span class="mono lime" style="font-size: 13px">T3</span><strong style="font-size: clamp(15px, 2vw, 22px); letter-spacing: -0.01em">Agentic systems</strong></div>
+</div>
+</div>
+</section>
+
+<!-- Framework 3: pricing -->
+<section class="sec rv" style="padding-top: clamp(32px, 5vw, 56px)">
+<div class="card" style="display: flex; flex-direction: column; gap: 24px">
+<div class="lbl lime">Pricing recommendation</div>
+<h3 class="take">Price AI work as a hybrid: fixed fee up front, a recurring charge, and a performance component only where it can be measured.</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px">
+<div style="background: #0F1317; border: 1px solid #3A424C; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono lime" style="font-size: 13px">01 · FIXED</span><strong style="font-size: 20px; letter-spacing: -0.01em">Diagnostic + implementation fee</strong></div>
+<div style="background: #0F1317; border: 1px solid #3A424C; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono lime" style="font-size: 13px">02 · RECURRING</span><strong style="font-size: 20px; letter-spacing: -0.01em">Platform / usage charge</strong></div>
+<div style="background: #0F1317; border: 1px dashed #C8FF3D; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono lime" style="font-size: 13px">03 · CONDITIONAL</span><strong style="font-size: 20px; letter-spacing: -0.01em">Performance component</strong><span class="dim" style="font-size: 15px; line-height: 1.5">Only where baselines, data access and attribution are agreed in advance.</span></div>
+</div>
+</div>
+</section>
+
+<!-- Framework 4: churn model design -->
+<section class="sec rv" style="padding-top: clamp(32px, 5vw, 56px)">
+<div class="card" style="display: flex; flex-direction: column; gap: 24px">
+<div class="lbl lime">Churn-model design · proposal</div>
+<h3 class="take">Build the churn models in order of value at risk.</h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px">
+<div style="background: #0F1317; border: 1px solid #C8FF3D; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono lime" style="font-size: 28px; font-weight: 500">1</span><strong style="font-size: 19px; letter-spacing: -0.01em">Deployed-associate attrition</strong><span class="dim" style="font-size: 15px; line-height: 1.5">30/60/90-day exit risk; survival model + gradient-boosted classifier.</span></div>
+<div style="background: #0F1317; border: 1px solid #3A424C; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono lime" style="font-size: 28px; font-weight: 500">2</span><strong style="font-size: 19px; letter-spacing: -0.01em">Client contract non-renewal</strong><span class="dim" style="font-size: 15px; line-height: 1.5">Scored monthly, ranked by probability × contract value.</span></div>
+<div style="background: #0F1317; border: 1px solid #3A424C; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono lime" style="font-size: 28px; font-weight: 500">3</span><strong style="font-size: 19px; letter-spacing: -0.01em">Placement early exit</strong><span class="dim" style="font-size: 15px; line-height: 1.5">Match-quality scoring at offer stage.</span></div>
+<div style="background: transparent; border: 1px dashed #3A424C; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px"><span class="mono" style="font-size: 28px; font-weight: 500; color: #7C8692">4</span><strong style="font-size: 19px; letter-spacing: -0.01em">Internal delivery-staff churn</strong><span class="dim" style="font-size: 15px; line-height: 1.5">Deferred: label volume is the constraint.</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; align-items: stretch">
+<div style="background: #0F1317; border: 1px solid #222830; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<div class="lbl">Design rules</div>
+<div style="display: flex; gap: 12px; align-items: baseline"><span class="mono lime">A</span><span>Set the lead time first.</span></div>
+<div style="display: flex; gap: 12px; align-items: baseline"><span class="mono lime">B</span><span>Use PR-AUC, not accuracy.</span></div>
+<div style="display: flex; gap: 12px; align-items: baseline"><span class="mono lime">C</span><span>Explain scores per person.</span></div>
+</div>
+<div style="background: #0F1317; border: 1px solid #222830; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px; justify-content: center">
+<div class="fu" style="font-size: clamp(44px, 6vw, 72px); font-weight: 700; letter-spacing: -0.05em; color: #C8FF3D; line-height: 1">99%</div>
+<div class="dim" style="line-height: 1.5">Where 1% churn, predicting nobody churns scores 99% accuracy.</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 6. What it proposes -->
+<section class="sec rv">
+<div class="lbl lime"><svg class="ix" style="color:#E08A5E;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8" /> <path d="M12 3v3" /> <path d="M2.354 10.354a1.207 1.207 0 0 1 0-1.708l2.06-2.06A2 2 0 0 1 5.828 6h12.344a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H5.828a2 2 0 0 1-1.414-.586z" /></svg>04 · What it proposes</div>
+<h2 class="h2" style="max-width: 980px">A 60-day design phase with a gate before further spend.</h2>
+<p class="p">A fixed-scope design phase produces an AI strategy and a 12-month plan. The gate sits before any further spend, and the unit measured at the gate is a workflow changed and measured, with no credit for people trained.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px">
+<div class="card"><div class="mono lime" style="font-size: 13px">DECISION 1</div><p style="margin: 12px 0 0; line-height: 1.5">Run a 60-day fixed-scope design phase that ends in an AI strategy and a 12-month plan.</p></div>
+<div class="card"><div class="mono lime" style="font-size: 13px">DECISION 2</div><p style="margin: 12px 0 0; line-height: 1.5">Gate further spend on one unit: a workflow changed and measured.</p></div>
+<div class="card"><div class="mono lime" style="font-size: 13px">DECISION 3</div><p style="margin: 12px 0 0; line-height: 1.5">Price with the hybrid model, with a performance component only where baselines, data access and attribution are agreed first.</p></div>
+<div class="card"><div class="mono lime" style="font-size: 13px">DECISION 4</div><p style="margin: 12px 0 0; line-height: 1.5">Validate the exposure ratings with the firm's own role and volume data, then build churn models in order of value at risk.</p></div>
+</div>
+<div class="src">This page describes a proposal. No outcome is claimed for it.</div>
+</section>
+
+<!-- 7. Method notes -->
+<section class="sec rv">
+<div class="lbl lime"><svg class="ix" style="color:#D98AA0;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" /> <path d="M2 6h4" /> <path d="M2 10h4" /> <path d="M2 14h4" /> <path d="M2 18h4" /> <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" /></svg>05 · Method notes</div>
+<div class="card" style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 14px; align-items: baseline"><span class="mono lime">01</span><span class="dim" style="line-height: 1.5">The 7 studies are third-party research; the synthesis and framing are mine.</span></div>
+<div style="display: flex; gap: 14px; align-items: baseline"><span class="mono lime">02</span><span class="dim" style="line-height: 1.5">The studies differ in design, population and task, so they are not like-for-like and no median is shown.</span></div>
+<div style="display: flex; gap: 14px; align-items: baseline"><span class="mono lime">03</span><span class="dim" style="line-height: 1.5">Exposure ratings are analyst judgement, to be validated with the firm's own role and volume data.</span></div>
+<div style="display: flex; gap: 14px; align-items: baseline"><span class="mono lime">04</span><span class="dim" style="line-height: 1.5">Ratings, rankings and the build order are proposals, not findings.</span></div>
+<div style="display: flex; gap: 14px; align-items: baseline"><span class="mono lime">05</span><span class="dim" style="line-height: 1.5">Public research is described by study type only.</span></div>
+</div>
+</section>
+
+<!-- 8. Next case / back / CTA -->
+<section class="sec rv" style="padding-bottom: clamp(48px, 7vw, 88px)">
+<a href="case-funnel.html" style="display: block; text-decoration: none; color: #EDEFF2; background: #11151A; border: 1px solid #222830; border-radius: 20px; padding: clamp(20px, 3vw, 36px)">
+<div class="lbl lime">Next case</div>
+<div style="margin-top: 12px; font-weight: 700; font-size: clamp(24px, 3.4vw, 44px); letter-spacing: -0.03em; line-height: 1.1">The activation bottleneck →</div>
+<div class="dim" style="margin-top: 10px; line-height: 1.5">Finding the bottleneck in a subscription funnel.</div>
+</a>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center">
+<a target="_blank" rel="noopener" class="cta" href="https://calendly.com/umarjamilsharif/30min" style="color: #0B0D10; background: #C8FF3D; padding: 18px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 17px">Book a 30-min intro call</a>
+<a class="btn" href="work.html">Back to all work</a>
+</div>
+</section>
+
+</main>
+<footer style="border-top: 1px solid #1B2026">
+<div style="max-width: 1240px; margin: 0 auto; padding: 32px clamp(20px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.5; color: #7C8692; box-sizing: border-box">
+<span style="max-width: 640px">© 2026 Umar Jamil Sharif.</span>
+<span style="display: flex; gap: 20px; flex-wrap: wrap"><a href="readiness.html" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#6FBF9F;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8" /> <path d="M13 12h8" /> <path d="M13 19h8" /> <path d="m3 17 2 2 4-4" /> <path d="m3 7 2 2 4-4" /></svg>Readiness check</a><a href="privacy.html" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#A3ADB8;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></svg>Privacy</a><a href="mailto:umarmsharif@gmail.com" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#D9B45A;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /> <rect x="2" y="4" width="20" height="16" rx="2" /></svg>Email</a><a href="https://www.linkedin.com/in/umarmsharif" aria-label="LinkedIn" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#7FA7D6;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /> <rect width="4" height="12" x="2" y="9" /> <circle cx="4" cy="4" r="2" /></svg>LinkedIn</a></span>
+</div>
+</footer>
+</div>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5f6b1672a4f170f',t:'MTc5NTUwNTI2NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5f6b1672a4f170f',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

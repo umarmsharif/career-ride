@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telecom at scale | Umar Jamil Sharif</title>
+<meta name="description" content="Loyalty, personalisation, offer design and segmentation across a national subscriber base.">
+<meta property="og:title" content="Telecom at scale | Umar Jamil Sharif">
+<meta property="og:description" content="Loyalty, personalisation, offer design and segmentation across a national subscriber base.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="case-telecom.html">
+<meta property="og:url" content="https://umarmsharif.com/case-telecom">
+<meta property="og:site_name" content="Umar Jamil Sharif">
+<meta property="og:image" content="https://umarmsharif.com/og.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Umar Jamil Sharif. AI training, AI agents and AI for growth.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Telecom at scale | Umar Jamil Sharif">
+<meta name="twitter:description" content="Loyalty, personalisation, offer design and segmentation across a national subscriber base.">
+<meta name="twitter:image" content="https://umarmsharif.com/og.png?v=2">
+<meta name="theme-color" content="#0B0D10">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"></noscript>
+<style>
+h1,h2,h3:not([style*="Plex Mono"]){font-family:'Newsreader',Georgia,serif!important}h1,h2{font-weight:500!important;letter-spacing:-.02em!important}h3:not([style*="Plex Mono"]){font-weight:600!important;letter-spacing:-.01em!important}
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:#C8FF3D;color:#0B0D10!important;padding:10px 16px;border-radius:999px;font-family:'IBM Plex Mono',monospace;font-size:14px;text-decoration:none}
+.skip:focus{top:12px}
+a:focus-visible,button:focus-visible,[tabindex="0"]:focus-visible{outline:3px solid #C8FF3D;outline-offset:3px}
+body{margin:0;background:#0B0D10}
+a{color:#C8FF3D}a:hover{color:#E4FF94}
+@keyframes rise{from{transform:translateY(8px)}to{transform:none}}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes growy{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.rise{opacity:0;animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+.d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}.d5{animation-delay:.7s}
+.sec{max-width:1240px;margin:0 auto;padding:clamp(40px,6vw,72px) clamp(20px,5vw,32px) 0;display:flex;flex-direction:column;gap:24px}
+.lab{font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#C8FF3D}
+.h2{margin:0;font-weight:700;font-size:clamp(28px,4vw,52px);letter-spacing:-.03em;line-height:1.04;max-width:900px}
+.p{margin:0;font-size:clamp(17px,1.6vw,20px);line-height:1.6;color:#A9B1BB;max-width:760px}
+.card{border:1px solid #222830;border-radius:20px;background:#11151A;padding:clamp(18px,3vw,32px)}
+.deep{border:1px solid #222830;border-radius:20px;background:#0F1317;padding:clamp(18px,3vw,32px)}
+.tag{border:1px solid #222830;border-radius:999px;padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#A9B1BB;background:#11151A}
+.mono{font-family:'IBM Plex Mono',monospace}
+.ttl{margin:0;font-size:clamp(20px,2.2vw,28px);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.cap{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#7C8692}
+.src{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.5;color:#7C8692;letter-spacing:.04em}
+.frow{display:grid;grid-template-columns:minmax(92px,170px) 1fr 64px;gap:12px;align-items:center}
+.trk{position:relative;height:34px;border-left:1px solid #1B2026;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#1B2026 calc(25% - 1px),#1B2026 25%)}
+.bx{position:absolute;left:0;top:4px;bottom:4px;border-radius:0 8px 8px 0;transform-origin:left;transform:scaleX(0);animation:growx 1.1s cubic-bezier(.2,.7,.2,1) var(--d,.3s) forwards}
+.by{transform-origin:bottom;transform:scaleY(0);animation:growy 1.1s cubic-bezier(.2,.7,.2,1) var(--d,.3s) forwards}
+.num{opacity:0;animation:fadeup .8s ease var(--d,.6s) forwards}
+.step{border:1px solid #222830;border-radius:20px;background:#0F1317;padding:20px;display:flex;flex-direction:column;gap:8px;flex:1 1 200px;min-width:0}
+.arr{font-family:'IBM Plex Mono',monospace;font-size:24px;color:#C8FF3D;align-self:center}
+.cell{aspect-ratio:1;border:1px solid #3A424C;border-radius:6px;background:transparent}
+.chip{border:1px solid #2A3038;border-radius:999px;padding:10px 18px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#EDEFF2;background:#11151A}
+.nav a{text-decoration:none}
+.nav a:hover{color:#C8FF3D}
+.li{padding:14px 0;color:#A9B1BB;line-height:1.6;border-bottom:1px solid #222830}
+@media (prefers-reduced-motion:reduce){
+*,*::before,*::after{animation:none!important;transition:none!important}
+.rise,.num{opacity:1;transform:none}
+.bx{transform:scaleX(1)}
+.by{transform:scaleY(1)}
+}
+</style>
+
+<style>.inds{display:flex;flex-wrap:wrap;gap:8px}.ind{display:inline-flex;align-items:center;gap:6px;border:1px solid #2A3038;border-radius:999px;padding:5px 11px 5px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:#C9CFD6;white-space:nowrap}.ind svg{width:14px;height:14px;flex:none}.ind{color:var(--c);border-color:color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 8%,transparent)}.ind-tel{--c:#7FA7D6}.ind-fin{--c:#D9B45A}.ind-mkt{--c:#6FBF9F}.ind-food{--c:#E08A5E}.ind-hr{--c:#D98AA0}.ind-x{--c:#A3ADB8}</style>
+<style>.cos{display:flex;flex-wrap:wrap;gap:8px}.co{display:inline-flex;align-items:center;gap:7px;border:1px solid color-mix(in srgb,var(--b) 50%,transparent);border-radius:4px;padding:4px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.2;letter-spacing:.04em;color:var(--b);background:color-mix(in srgb,var(--b) 8%,transparent);white-space:nowrap}.co::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--b);flex:none}.co-telenor{--b:#00C8FF}.co-jazz{--b:#FD2628}.co-fp{--b:#E14B8B}.co-sar{--b:#56BB2A}</style>
+<style>header nav a.nav-hl{color:#C8FF3D;border:1px solid #C8FF3D;border-radius:999px;padding:7px 14px;line-height:1;text-decoration:none}
+header nav a.nav-hl:hover{color:#DDFF7A;border-color:#DDFF7A}
+header nav a.nav-hl[aria-current="page"]{background:rgba(200,255,61,.14)}
+@media (max-width:640px){header nav a.nav-hl{padding:4px 8px;margin:-5px -9px}header nav a.nav-rd{display:none}}</style>
+<style>/* perf-2026-10-31 */.rise{opacity:1!important;animation:rise .25s ease-out both!important}.rise.d1,.rise.d2,.rise.d3,.rise.d4,.rise.d5{animation-delay:0s!important}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rise,.w>span{opacity:1!important;transform:none!important}.ul,.draw{transform:scaleX(1)!important}.type{clip-path:none!important;width:auto!important}}</style>
+</head>
+<body>
+<a class="skip" href="case-telecom.html#main">Skip to content</a>
+
+<div style="background: #0B0D10; color: #EDEFF2; font-family: 'Public Sans', system-ui, sans-serif; overflow: hidden">
+
+<header style="max-width: 1240px; margin: 0 auto; padding: 24px clamp(20px, 5vw, 32px); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+<a href="index.html" style="font-weight: 700; font-size: 18px; color: #EDEFF2; text-decoration: none; letter-spacing: -0.01em">Umar Jamil Sharif<span style="color: #C8FF3D">.</span></a>
+<nav class="nav" style="display: flex; flex-wrap: wrap; gap: 28px; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em">
+<a href="index.html" style="color: #9AA3AE">Home</a>
+<a class="nav-hl" href="work.html">Work</a>
+<a class="nav-hl nav-rd" href="readiness.html">Readiness check</a>
+<a href="index.html#services" style="color: #9AA3AE">Services</a>
+<a target="_blank" rel="noopener" href="https://www.linkedin.com/in/umarmsharif" aria-label="LinkedIn" style="color: #9AA3AE">LinkedIn</a>
+<a target="_blank" rel="noopener" href="https://calendly.com/umarjamilsharif/30min" style="color: #0B0D10; background: #C8FF3D; padding: 12px 18px; border-radius: 999px; font-weight: 500">Book a call</a>
+</nav>
+</header>
+<main id="main" tabindex="-1">
+
+<section style="max-width: 1240px; margin: 0 auto; padding: clamp(40px, 7vw, 88px) clamp(20px, 5vw, 32px) 0; display: flex; flex-direction: column; gap: 28px">
+<div class="inds rise d1" role="list" aria-label="Industry"><span role="listitem" class="ind ind-tel"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9" /><path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5" /><circle cx="12" cy="9" r="2" /><path d="M16.2 4.8c2 2 2.26 5.11.8 7.47" /><path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1" /><path d="M9.5 18h5" /><path d="m8 22 4-11 4 11" /></svg>Telecom</span></div>
+<div class="rise d1" style="display: flex; flex-wrap: wrap; gap: 10px">
+<span class="tag">Pakistan</span>
+<span class="cos" role="list" aria-label="Company"><span role="listitem" class="co co-telenor">Telenor</span><span role="listitem" class="co co-jazz">Jazz</span></span>
+<span class="tag" style="color:#C8FF3D;border-color:#2F3A1A">2010 to 2020</span>
+</div>
+<h1 class="rise d2" style="margin: 0; font-weight: 700; font-size: clamp(34px, 6vw, 72px); line-height: 1; letter-spacing: -0.04em; max-width: 1100px">Telecom at scale: loyalty, personalisation, offer design and segmentation across a national subscriber base</h1>
+<p class="rise d3" style="margin: 0; font-size: clamp(17px, 1.7vw, 22px); line-height: 1.55; color: #A9B1BB; max-width: 820px">I worked at Telenor (2012 to 2020) and Jazz (2010 to 2012, Jazz and VEON Group). At Telenor I led a team of marketing specialists across customer base management, voice of the customer, revenue, channel planning, product design and pricing for the post-paid high-value segment. At Jazz I built micro-segmentation models and frameworks for prepaid below-the-line campaigns.</p>
+</section>
+
+<section class="sec" style="padding-top: clamp(32px, 5vw, 56px)">
+<div class="lab rise d3">At a glance</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px">
+<div class="card rise d3"><svg class="ix" style="color:#6FBF9F;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.744 17.736a6 6 0 1 1-7.48-7.48" /> <path d="M15 6h1v4" /> <path d="m6.134 14.768.866-.5 2 3.464" /> <circle cx="16" cy="8" r="6" /></svg><div class="num" style="--d:.7s;font-size:clamp(44px,5vw,64px);font-weight:700;letter-spacing:-.04em;line-height:1;color:#C8FF3D">+5%</div><div style="margin-top:12px;color:#A9B1BB;line-height:1.5">ARPU over a control group, from one-to-one personalisation</div></div>
+<div class="card rise d4"><svg class="ix" style="color:#7FA7D6;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" /> <circle cx="12" cy="8" r="6" /></svg><div class="num" style="--d:.8s;font-size:clamp(44px,5vw,64px);font-weight:700;letter-spacing:-.04em;line-height:1">8%</div><div style="margin-top:12px;color:#A9B1BB;line-height:1.5">engagement for the launched loyalty programme, built with a 10-member cross-functional team</div></div>
+<div class="card rise d4"><svg class="ix" style="color:#D9B45A;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" /> <path d="M12 22V12" /> <polyline points="3.29 7 12 12 20.71 7" /> <path d="m7.5 4.27 9 5.15" /></svg><div class="num" style="--d:.9s;font-size:clamp(44px,5vw,64px);font-weight:700;letter-spacing:-.04em;line-height:1">5.4% vs 1.7%</div><div style="margin-top:12px;color:#A9B1BB;line-height:1.5">uptake, under-pitched vs over-pitched 1-day bundles</div></div>
+<div class="card rise d5"><svg class="ix" style="color:#E08A5E;width:22px;height:22px;flex:none;float:right;margin:6px 0 0 12px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></svg><div class="num" style="--d:1s;font-size:clamp(44px,5vw,64px);font-weight:700;letter-spacing:-.04em;line-height:1;color:#C8FF3D">30M+</div><div style="margin-top:12px;color:#A9B1BB;line-height:1.5">subscribers covered by micro-segmentation at Jazz</div></div>
+</div>
+</section>
+
+<!-- Section 1 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#6FBF9F;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" /> <circle cx="12" cy="8" r="6" /></svg>01 · Loyalty and post-paid growth · Telenor</div>
+<h2 class="h2">Growing post-paid share in the high-value segment at minimal operating cost.</h2>
+<p class="p">The problem was to grow post-paid share in the high-value segment without adding operating cost. Bank partnerships and a loyalty programme were the two ways to do it.</p>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>Launched the loyalty programme to 8% engagement, with a 10-member cross-functional team.</li>
+<li>Built nationwide affinity partnerships with banks around co-branded hybrid products to grow post-paid share at minimal operating cost.</li>
+<li>A national bank partner co-funded the co-branded proposition and the post-paid brand promotion.</li>
+</ul>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Schematic · The partnership loop</div>
+<h3 class="ttl">A partner bank funds a co-branded product, and the product grows post-paid at low operating cost.</h3>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:stretch">
+<div class="step rise d1"><span class="mono" style="font-size:13px;color:#C8FF3D">01</span><div style="font-size:20px;font-weight:600;line-height:1.3">Partner bank</div></div>
+<span class="arr">→</span>
+<div class="step rise d2"><span class="mono" style="font-size:13px;color:#C8FF3D">02</span><div style="font-size:20px;font-weight:600;line-height:1.3">Co-branded hybrid product</div></div>
+<span class="arr">→</span>
+<div class="step rise d3" style="border-color:#C8FF3D"><span class="mono" style="font-size:13px;color:#C8FF3D">03</span><div style="font-size:20px;font-weight:600;line-height:1.3">Post-paid growth at low operating cost</div></div>
+</div>
+<div class="src">Schematic.</div>
+</div>
+</section>
+
+<!-- Section 2 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#7FA7D6;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /> <circle cx="12" cy="12" r="6" /> <circle cx="12" cy="12" r="2" /></svg>02 · One-to-one personalisation and real-time offers · Telenor</div>
+<h2 class="h2">Matching each offer to the customer, in real time.</h2>
+<p class="p">Offers should follow each customer's product affinity, purchase propensity, channel and price. So I owned the personalisation roadmap and ran it in real time.</p>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>Owned the personalisation roadmap on SAS Campaign Management and RTDM.</li>
+<li>Offers built from product affinity, purchase propensity, channel and price; triggered in real time.</li>
+<li>Delivered across digital, USSD, IVR and retailer channels. Led a squad of 3.</li>
+<li>Result: ARPU +5% over a control group.</li>
+</ul>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Schematic · Real-time decision fan-out</div>
+<h3 class="ttl">4 customer signals feed one real-time decision, which fans out to 4 channels.</h3>
+</div>
+<div style="overflow-x:auto" tabindex="0" role="region" aria-label="Schematic: 4 customer signals feed one real-time decision that fans out to 4 channels">
+<svg viewBox="0 0 760 340" width="100%" style="min-width:600px;display:block" role="img" aria-label="Schematic: inputs product affinity, purchase propensity, channel and price feed a real-time decision node that fans out to digital, USSD, IVR and retailer channels">
+<g stroke="#3A424C" stroke-width="1.5" fill="none">
+<line x1="170" y1="44" x2="330" y2="170"/>
+<line x1="170" y1="124" x2="330" y2="170"/>
+<line x1="170" y1="204" x2="330" y2="170"/>
+<line x1="170" y1="284" x2="330" y2="170"/>
+</g>
+<g stroke="#C8FF3D" stroke-width="1.5" fill="none">
+<line x1="500" y1="170" x2="590" y2="44"/>
+<line x1="500" y1="170" x2="590" y2="124"/>
+<line x1="500" y1="170" x2="590" y2="204"/>
+<line x1="500" y1="170" x2="590" y2="284"/>
+</g>
+<g fill="#0F1317" stroke="#222830">
+<rect x="0" y="20" width="170" height="48" rx="12"/>
+<rect x="0" y="100" width="170" height="48" rx="12"/>
+<rect x="0" y="180" width="170" height="48" rx="12"/>
+<rect x="0" y="260" width="170" height="48" rx="12"/>
+<rect x="590" y="20" width="170" height="48" rx="12"/>
+<rect x="590" y="100" width="170" height="48" rx="12"/>
+<rect x="590" y="180" width="170" height="48" rx="12"/>
+<rect x="590" y="260" width="170" height="48" rx="12"/>
+</g>
+<rect x="330" y="130" width="170" height="80" rx="16" fill="#11151A" stroke="#C8FF3D" stroke-width="2"/>
+<g font-family="IBM Plex Mono, monospace" font-size="14" fill="#EDEFF2" text-anchor="middle">
+<text x="85" y="49">Product affinity</text>
+<text x="85" y="129">Purchase propensity</text>
+<text x="85" y="209">Channel</text>
+<text x="85" y="289">Price</text>
+<text x="675" y="49">Digital</text>
+<text x="675" y="129">USSD</text>
+<text x="675" y="209">IVR</text>
+<text x="675" y="289">Retailer</text>
+</g>
+<text x="415" y="176" font-family="Public Sans, sans-serif" font-size="18" font-weight="600" fill="#C8FF3D" text-anchor="middle">Real-time decision</text>
+</svg>
+</div>
+<div class="src">Schematic.</div>
+</div>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Chart · ARPU vs control group</div>
+<h3 class="ttl">Personalised customers earned 5% more ARPU than the control group.</h3>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="frow"><div style="font-size:15px;color:#EDEFF2">Control group</div><div class="trk"><div class="bx" style="width:95.2%;background:#3A424C;--d:.2s"></div></div><div class="mono num" style="font-size:14px;color:#A9B1BB;--d:.8s">100</div></div>
+<div class="frow"><div style="font-size:15px;font-weight:700;color:#C8FF3D">Personalised</div><div class="trk"><div class="bx" style="width:100%;background:#C8FF3D;--d:.45s;box-shadow:0 0 14px rgba(200,255,61,.5)"></div></div><div class="mono num" style="font-size:14px;color:#C8FF3D;font-weight:500;--d:1s">105</div></div>
+</div>
+<div class="mono" style="font-size:13px;color:#C8FF3D">+5% ARPU vs control group</div>
+<div class="src">Source: Relative index, control group = 100. ARPU uplift is measured against a control group.</div>
+</div>
+</section>
+
+<!-- Section 3 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#D9B45A;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" /> <path d="M6.453 15h11.094" /> <path d="M8.5 2h7" /></svg>03 · Offer pitch analysis and experiments · Telenor</div>
+<h2 class="h2">Which offers converted better: over-pitched or under-pitched.</h2>
+<p class="p">Some offers were over-pitched and others under-pitched relative to what customers activated. The team needed to find the best-converting mix of validity, bundle and price.</p>
+<div class="deep" style="display:flex;flex-direction:column;gap:12px">
+<div class="cap">The work done</div>
+<div style="color:#A9B1BB;line-height:1.6;font-size:18px">Analysed offer presentations against activations by validity, bundle mix and price. Ran validity, price and sale-event experiments.</div>
+</div>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>Under-pitched offers converted better.</li>
+<li>1-day bundles: 5.4% against 1.7% uptake, under-pitched against over-pitched.</li>
+<li>7-day bundles: 10.6% uptake (under-pitched).</li>
+<li>Longer validity raised uptake by up to 1.3 points.</li>
+<li>An 11.11 sale lifted activations by about 30%.</li>
+</ul>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px">
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Chart A · 1-day bundles, uptake</div>
+<h3 class="ttl">Under-pitched offers converted about 3× better in 1-day bundles.</h3>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="frow"><div style="font-size:15px;color:#EDEFF2">Over-pitched</div><div class="trk"><div class="bx" style="width:31.5%;background:#3A424C;--d:.2s"></div></div><div class="mono num" style="font-size:14px;color:#A9B1BB;--d:.8s">1.7%</div></div>
+<div class="frow"><div style="font-size:15px;font-weight:700;color:#C8FF3D">Under-pitched</div><div class="trk"><div class="bx" style="width:100%;background:#C8FF3D;--d:.45s;box-shadow:0 0 14px rgba(200,255,61,.5)"></div></div><div class="mono num" style="font-size:14px;color:#C8FF3D;font-weight:500;--d:1s">5.4%</div></div>
+</div>
+<div class="src">Source: Internal uptake figures, 1-day bundles. Bars scaled to the larger value.</div>
+</div>
+<div style="border-radius:28px;background:#C8FF3D;color:#0B0D10;padding:clamp(24px,4vw,40px);display:flex;flex-direction:column;gap:12px;justify-content:center">
+<div class="mono" style="font-size:13px;letter-spacing:.1em;text-transform:uppercase">11.11 sale</div>
+<div class="num" style="--d:.3s;font-size:clamp(48px,8vw,96px);font-weight:700;letter-spacing:-.05em;line-height:.9">about +30%</div>
+<div style="font-size:clamp(18px,2vw,24px);font-weight:700;letter-spacing:-.02em;line-height:1.2">activations</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div class="cap">Next steps</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<span class="chip">Portfolio offers</span>
+<span class="chip">A/B pitching</span>
+<span class="chip">Conjoint analysis</span>
+</div>
+</div>
+</section>
+
+<!-- Section 4 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#E08A5E;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></svg>04 · Urban and rural value study · Telenor</div>
+<h2 class="h2">Where to spend network capital.</h2>
+<p class="p">Network investment had to reach the highest-value subscribers. The study mapped value share level by level to find them.</p>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>Profiled urban and rural data subscribers.</li>
+<li>Mapped value share at district and city-neighbourhood level.</li>
+<li>Prioritised urban areas for network rollout CAPEX in 2018 and 2019.</li>
+<li>Presented at Group Technology and executive forums in Europe.</li>
+</ul>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Schematic · Value share by level</div>
+<h3 class="ttl">Value share was read at three levels, from country down to city neighbourhood.</h3>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:stretch">
+<div class="step"><span class="mono" style="font-size:13px;color:#C8FF3D">Level 1</span><div style="font-size:20px;font-weight:600">Country</div><div class="mono" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7C8692">Value share</div></div>
+<span class="arr">→</span>
+<div class="step"><span class="mono" style="font-size:13px;color:#C8FF3D">Level 2</span><div style="font-size:20px;font-weight:600">District</div><div class="mono" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7C8692">Value share</div></div>
+<span class="arr">→</span>
+<div class="step" style="border-color:#C8FF3D"><span class="mono" style="font-size:13px;color:#C8FF3D">Level 3</span><div style="font-size:20px;font-weight:600">City neighbourhood</div><div class="mono" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7C8692">Value share</div></div>
+</div>
+<div class="src">Schematic. No values shown.</div>
+</div>
+</section>
+
+<!-- Section 5 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#D98AA0;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.768 5.111 13.44 2.44a1.5 1.5 0 012.474 1.561l-1.633 4.625" /> <path d="m18.889 13.232.672-.672A1.5 1.5 0 0018.5 10h-2.844" /> <path d="m2 2 20 20" /> <path d="m7.94 7.94-3.5 3.499A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l5.5-5.5" /></svg>05 · Electricity failures and customer value, Karachi · Telenor</div>
+<h2 class="h2">When outages hit, when are customers most reachable, and what do they use?</h2>
+<p class="p">Outages hit sites unevenly. Marketing needed to know when customers were most reachable and what they used.</p>
+<div class="deep" style="display:flex;flex-direction:column;gap:12px">
+<div class="cap">Method</div>
+<div style="color:#A9B1BB;line-height:1.6;font-size:18px">Joined site-level outage logs to usage and ARPU. Clustered sites with matching outage timing within 5 km. Segmented every site into one of 26 towns.</div>
+</div>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>About 42% of affected sites had daily outages.</li>
+<li>Median outage days fell as ARPU rose.</li>
+<li>Data and voice usage rose in outage hours, most for customers unused to outages.</li>
+<li>A live World Cup super-over lifted outage-hour data by 20%.</li>
+<li>Output: an outage-aware view for timing contextual offers.</li>
+</ul>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px">
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Schematic · Town count</div>
+<h3 class="ttl">Every site was segmented into one of 26 towns.</h3>
+</div>
+<div style="display:grid;grid-template-columns:repeat(13,1fr);gap:6px;max-width:520px">
+<div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+<div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+</div>
+<div class="mono" style="font-size:13px;color:#C8FF3D">26 towns</div>
+<div class="src">Within each town, sites with matching outage timing within 5 km were clustered.</div>
+</div>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Chart · Outage-hour data usage</div>
+<h3 class="ttl">A live World Cup super-over lifted outage-hour data by 20%.</h3>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="frow"><div style="font-size:15px;color:#EDEFF2">Outage hours</div><div class="trk"><div class="bx" style="width:83.3%;background:#3A424C;--d:.2s"></div></div><div class="mono num" style="font-size:14px;color:#A9B1BB;--d:.8s">100</div></div>
+<div class="frow"><div style="font-size:15px;font-weight:700;color:#C8FF3D">Super-over</div><div class="trk"><div class="bx" style="width:100%;background:#C8FF3D;--d:.45s;box-shadow:0 0 14px rgba(200,255,61,.5)"></div></div><div class="mono num" style="font-size:14px;color:#C8FF3D;font-weight:500;--d:1s">120</div></div>
+</div>
+<div class="mono" style="font-size:13px;color:#C8FF3D">+20% data during a live World Cup super-over</div>
+<div class="src">Source: Relative index, outage-hour data usage = 100. Site-level outage logs.</div>
+</div>
+</div>
+</section>
+
+<!-- Section 6 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#A3ADB8;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" /> <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" /></svg>06 · EasyPaisa wallet portfolio and telco bundle penetration · Telenor</div>
+<h2 class="h2">Telco bundle penetration on the wallet, from 17% to 25%.</h2>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>Managed a fintech wallet portfolio on the EasyPaisa wallet with app-exclusive and regional offers.</li>
+<li>Grew telco bundle penetration from 17% to 25%.</li>
+</ul>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Chart · Bundle penetration</div>
+<h3 class="ttl">Bundle penetration grew from 17% to 25%.</h3>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="frow"><div style="font-size:15px;color:#EDEFF2">Before</div><div class="trk"><div class="bx" style="width:68%;background:#3A424C;--d:.2s"></div></div><div class="mono num" style="font-size:14px;color:#A9B1BB;--d:.8s">17%</div></div>
+<div class="frow"><div style="font-size:15px;font-weight:700;color:#C8FF3D">After</div><div class="trk"><div class="bx" style="width:100%;background:#C8FF3D;--d:.45s;box-shadow:0 0 14px rgba(200,255,61,.5)"></div></div><div class="mono num" style="font-size:14px;color:#C8FF3D;font-weight:500;--d:1s">25%</div></div>
+</div>
+<div class="src">Source: Internal figures for telco bundle penetration on the wallet. Bars scaled to the larger value.</div>
+</div>
+</section>
+
+<!-- Section 7 -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#6FBF9F;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z" /> <path d="M21.21 15.89A10 10 0 1 1 8 2.83" /></svg>07 · Micro-segmentation and management analysis · Jazz</div>
+<h2 class="h2">Segmenting prepaid customers by the offers they had taken before.</h2>
+<ul style="margin:0;padding-left:20px;color:#A9B1BB;font-size:18px;line-height:1.7;max-width:760px">
+<li>Built micro-segmentation models and frameworks for prepaid below-the-line campaigns.</li>
+<li>Included an offer-lineage model that segmented customers by the offers they had taken before.</li>
+<li>Business analysis team: produced weekly and monthly management dashboards and business-review presentations.</li>
+<li>Covered 30M+ prepaid subscribers.</li>
+</ul>
+<div class="card" style="display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="cap">Illustration · Segments by offer history</div>
+<h3 class="ttl">Customers with a similar offer history group together into segments.</h3>
+</div>
+<div style="overflow-x:auto" tabindex="0" role="region" aria-label="Illustration: customers grouped into 4 segments by offer history">
+<svg viewBox="0 0 680 280" width="100%" style="min-width:480px;display:block" role="img" aria-label="Illustration: dots clustering into four segments by offer history">
+<g fill="none" stroke="#222830" stroke-dasharray="4 5">
+<ellipse cx="118" cy="82" rx="58" ry="52"/>
+<ellipse cx="338" cy="72" rx="58" ry="52"/>
+<ellipse cx="548" cy="122" rx="58" ry="52"/>
+<ellipse cx="262" cy="202" rx="58" ry="52"/>
+</g>
+<g fill="#C8FF3D">
+<circle cx="110" cy="80" r="7"/><circle cx="128" cy="66" r="7"/><circle cx="94" cy="90" r="7"/><circle cx="134" cy="96" r="7"/><circle cx="102" cy="58" r="7"/><circle cx="120" cy="106" r="7"/>
+</g>
+<g fill="#7C8692">
+<circle cx="330" cy="70" r="7"/><circle cx="348" cy="56" r="7"/><circle cx="314" cy="80" r="7"/><circle cx="354" cy="86" r="7"/><circle cx="322" cy="48" r="7"/><circle cx="340" cy="96" r="7"/>
+</g>
+<g fill="#5C6672">
+<circle cx="540" cy="120" r="7"/><circle cx="558" cy="106" r="7"/><circle cx="524" cy="130" r="7"/><circle cx="564" cy="136" r="7"/><circle cx="532" cy="98" r="7"/><circle cx="550" cy="146" r="7"/>
+</g>
+<g fill="#A9B1BB">
+<circle cx="260" cy="200" r="7"/><circle cx="278" cy="186" r="7"/><circle cx="244" cy="210" r="7"/><circle cx="284" cy="216" r="7"/><circle cx="252" cy="178" r="7"/><circle cx="270" cy="226" r="7"/>
+</g>
+</svg>
+</div>
+<div class="src">Illustration.</div>
+</div>
+</section>
+
+<!-- Takeaway -->
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#7FA7D6;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4" /> <path d="M3 11v-1a4 4 0 0 1 4-4h14" /> <path d="m7 22-4-4 4-4" /> <path d="M21 13v1a4 4 0 0 1-4 4H3" /></svg>What carried over</div>
+<h2 class="h2">The same method runs through all of it.</h2>
+<p class="p">Segment the base, match the offer to the customer, measure against a control, and put the insight where the decision is made. I use the same pattern in my personalisation and AI agent work today.</p>
+</section>
+
+<section class="sec">
+<div class="lab"><svg class="ix" style="color:#D9B45A;width:16px;height:16px;flex:none;width:16px;height:16px;vertical-align:-3px;margin-right:10px" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" /> <path d="M2 6h4" /> <path d="M2 10h4" /> <path d="M2 14h4" /> <path d="M2 18h4" /> <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" /></svg>Method notes</div>
+<div class="deep" style="display:flex;flex-direction:column;gap:0">
+<div class="li">ARPU uplift is measured against a control group.</div>
+<div class="li">Uptake and activation figures are as reported internally.</div>
+<div class="li" style="border-bottom:none">Outage analysis used site-level logs; clustering radius 5 km.</div>
+</div>
+</section>
+
+<section style="max-width: 1240px; margin: 0 auto; padding: clamp(56px, 8vw, 96px) clamp(20px, 5vw, 32px) 0; display: flex; flex-direction: column; gap: 28px">
+<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;border-top:1px solid #222830;border-bottom:1px solid #222830;padding:24px 0">
+<a href="work.html" class="mono" style="color:#A9B1BB;text-decoration:none;font-size:13px;letter-spacing:.1em;text-transform:uppercase">← Back to all work</a>
+<a href="case-funnel.html" style="color:#EDEFF2;text-decoration:none;font-size:clamp(20px,2.6vw,32px);font-weight:700;letter-spacing:-.02em"><span class="mono" style="color:#C8FF3D;font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;margin-right:12px">Next case</span>The activation bottleneck <span style="color:#C8FF3D">→</span></a>
+</div>
+<div style="text-align:center;display:flex;flex-direction:column;gap:28px;align-items:center;padding-top:clamp(24px,4vw,48px)">
+<h2 style="margin: 0; font-size: clamp(34px, 6vw, 84px); letter-spacing: -0.045em; line-height: 0.95">Which offer reaches <span style="color: #C8FF3D">your</span> customer?</h2>
+<a target="_blank" rel="noopener" class="cta" href="https://calendly.com/umarjamilsharif/30min" style="color: #0B0D10; background: #C8FF3D; padding: 20px 34px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 18px">Book a 30-min intro call</a>
+</div>
+</section>
+
+</main>
+<footer style="border-top: 1px solid #1B2026; margin-top: clamp(56px, 8vw, 96px)"><div style="max-width: 1240px; margin: 0 auto; padding: 32px clamp(20px, 5vw, 32px); display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7C8692">
+<span>© 2026 Umar Jamil Sharif.</span>
+<span style="display: flex; gap: 20px; flex-wrap: wrap"><a href="readiness.html" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#6FBF9F;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8" /> <path d="M13 12h8" /> <path d="M13 19h8" /> <path d="m3 17 2 2 4-4" /> <path d="m3 7 2 2 4-4" /></svg>Readiness check</a><a href="privacy.html" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#A3ADB8;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></svg>Privacy</a><a href="mailto:umarmsharif@gmail.com" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#D9B45A;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /> <rect x="2" y="4" width="20" height="16" rx="2" /></svg>Email</a><a href="https://www.linkedin.com/in/umarmsharif" aria-label="LinkedIn" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px"><svg class="ix" style="color:#7FA7D6;width:14px;height:14px;flex:none;" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /> <rect width="4" height="12" x="2" y="9" /> <circle cx="4" cy="4" r="2" /></svg>LinkedIn</a></span>
+</div></footer>
+</div>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5f6b16648da170f',t:'MTc5NTUwNTI2NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5f6b16648da170f',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
