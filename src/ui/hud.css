@@ -748,3 +748,19 @@ a.btn {
 .finale-logo { display: block; max-width: 220px; max-height: 70px; margin: 0 0 10px; }
 
 .card.toast img.clip { max-height: none; height: auto; object-fit: cover; display: block; }
+
+.card.closing { position: relative; }
+.closing .avatar {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid var(--card-edge);
+  box-shadow: 0 4px 0 var(--card-edge);
+  object-fit: cover;
+  background: var(--card);
+}
+.closing .eyebrow, .closing h2 { padding-right: 116px; }
+@media (max-width: 560px) { .closing .avatar { width: 72px; height: 72px; } .closing .eyebrow, .closing h2 { padding-right: 88px; } }

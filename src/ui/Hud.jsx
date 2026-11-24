@@ -236,6 +236,7 @@ function Closing({ total }) {
   const links = career.person.links
   return (
     <section className="card closing">
+      {career.person.photo && <img className="avatar" src={career.person.photo.replace(/^\//, '')} alt={career.person.name} width="96" height="96" />}
       {last.brand.logo && <img className="finale-logo" src={last.brand.logo} alt={finale.title} />}
       <p className="eyebrow">Now</p>
       <h2>{finale.title}</h2>
