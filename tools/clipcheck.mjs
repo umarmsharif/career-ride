@@ -21,17 +21,21 @@ async function open(path, missing) {
   page.errors = []
   page.on('pageerror', (e) => page.errors.push(e.message))
   if (missing) await page.route('**/' + missing.replace(/^\//, ''), (r) => r.fulfill({ status: 404, body: 'Not found' }))
+  await watch(page)
   await page.goto(base + path)
   return page
 }
 // A real pointer press on the middle of Skip, so anything covering the button would fail the check.
 async function press(page) {
-  await page.waitForTimeout(600)
-  const [x, y] = await page.evaluate(() => { const r = document.querySelector('.clip-over .btn').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2] })
-  await (phone ? page.touchscreen.tap(x, y) : page.mouse.click(x, y))
+  const at = await page.evaluate(() => { const r = document.querySelector('.clip-over .btn')?.getBoundingClientRect(); return r && [r.x + r.width / 2, r.y + r.height / 2] })
+  if (!at) return false
+  await (phone ? page.touchscreen.tap(at[0], at[1]) : page.mouse.click(at[0], at[1]))
+  return true
 }
+// The page itself notes how far each clip got, so a short clip cannot slip past between two looks.
+const watch = (page) => page.addInitScript(() => { window.__clip = { t: 0, w: 0 }; document.addEventListener('timeupdate', (e) => { const v = e.target; if (v.closest?.('.clip-over')) { window.__clip.t = Math.max(window.__clip.t, v.currentTime); window.__clip.w = v.videoWidth } }, true) })
 // True once the clip has really moved forward, not merely been put on the page.
-const playing = (page) => page.waitForFunction(() => { const v = document.querySelector('.clip-over video'); return v && !v.paused && v.currentTime > 0.6 && v.videoWidth > 0 }, null, { timeout: 8000 }).then(() => true, () => false)
+const playing = (page) => page.waitForFunction(() => window.__clip.t > 0.6 && window.__clip.w > 0, null, { timeout: 8000 }).then(() => true, () => false)
 // Straight after Skip the clip must be gone and the next screen up, long before the clip would have ended.
 const skipped = async (page, next) => { await page.waitForTimeout(300); return page.evaluate((next) => !document.querySelector('.clip-over') && !!document.querySelector(next), next) }
 const note = (name, ok, detail = '') => { results.push(`${ok ? 'OK  ' : 'FAIL'} ${name}${detail ? ' (' + detail + ')' : ''}`); if (!ok) failed = true }
@@ -50,11 +54,15 @@ async function intro() {
   note('drive starts after the intro', await sets(page), page.errors[0] || '')
   await page.context().close()
 
-  page = await open('')
-  await page.waitForSelector('.clip-over .btn', { timeout: 30000 })
-  await press(page)
-  note('intro can be skipped', await skipped(page, '.drive-title'))
-  await page.context().close()
+  // A short clip can finish on a slow machine before Skip is reached; that try is repeated, not failed.
+  let did = null
+  for (let i = 0; i < 4 && did === null; i++) {
+    page = await open('')
+    await page.waitForSelector('.clip-over .btn', { timeout: 30000 }).catch(() => {})
+    if (await press(page)) did = await skipped(page, '.drive-title')
+    await page.context().close()
+  }
+  note('intro can be skipped', did === true, did === null ? 'the clip ended before Skip could be pressed, four times' : '')
 
   page = await open('', clips.intro)
   const t1 = Date.now()
@@ -81,18 +89,21 @@ const card = (page, ms) => page.waitForSelector('.card.closing', { timeout: ms }
 
 async function outro() {
   if (!clips.outro) return note('outro', false, 'no outro clip is set in career.json')
-  let page = await toClosing()
+  let page = await toClosing(), did
   const shown = await page.waitForSelector('.clip-over video', { timeout: 8000 }).then(() => true, () => false)
   const ok = shown && (await playing(page))
   if (shots) await page.screenshot({ path: `docs/shots/clip-${phone ? 'phone-' : ''}outro.png` })
   note('outro plays, then the closing card', ok && (await card(page, 20000)), page.errors[0] || '')
   await page.context().close()
 
-  page = await toClosing()
-  await page.waitForSelector('.clip-over .btn', { timeout: 8000 })
-  await press(page)
-  note('outro can be skipped', await skipped(page, '.card.closing'))
-  await page.context().close()
+  did = null
+  for (let i = 0; i < 3 && did === null; i++) {
+    page = await toClosing()
+    await page.waitForSelector('.clip-over .btn', { timeout: 8000 }).catch(() => {})
+    if (await press(page)) did = await skipped(page, '.card.closing')
+    await page.context().close()
+  }
+  note('outro can be skipped', did === true, did === null ? 'the clip ended before Skip could be pressed, three times' : '')
 
   page = await toClosing(clips.outro)
   note('closing card shows when the outro file is missing', await card(page, 12000))
