@@ -820,3 +820,5 @@ a.btn {
 .clip-over video { width: 100%; height: 100%; object-fit: cover; }
 .clip-over .btn { position: absolute; right: 18px; bottom: 18px; }
 @media (prefers-reduced-motion: reduce) { .drive-title { animation: none; } }
+/* On a tall screen show the whole clip with dark bars; filling the screen would crop the driver out. */
+@media (orientation: portrait) { .clip-over video { object-fit: contain; } }

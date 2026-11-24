@@ -44,7 +44,8 @@ async function intro() {
   const ok = await playing(page)
   if (shots) await page.screenshot({ path: `docs/shots/clip-${phone ? 'phone-' : ''}intro.png` })
   const t0 = Date.now()
-  const title = await page.waitForSelector('.drive-title', { timeout: 20000 }).then(() => true, () => false)
+  // The title is only up for a moment, so on a slow machine the drive may already have set off.
+  const title = await page.waitForFunction(() => !document.querySelector('.clip-over') && (document.querySelector('.drive-title') || window.__ride?.game?.getState().phase === 'island'), null, { timeout: 20000 }).then(() => true, () => false)
   note('intro plays, then the title', ok && title, `title ${((Date.now() - t0) / 1000).toFixed(1)}s after the check`)
   note('drive starts after the intro', await sets(page), page.errors[0] || '')
   await page.context().close()

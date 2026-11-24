@@ -1,8 +1,8 @@
 {
   "world": "drive",
   "clips": {
-    "intro": null,
-    "outro": null
+    "intro": "/media/enter.mp4",
+    "outro": "/media/exit.mp4"
   },
   "person": {
     "name": "Umar Muhammad Sharif",
