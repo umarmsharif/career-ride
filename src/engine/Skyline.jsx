@@ -27,8 +27,8 @@ function layout(portrait, n) {
   const dist = r + (portrait ? 92 : 78)
   const pitch = Math.atan((camY - lookY) / r) / RAD
   // The band of the picture the figures use: from near the top down to just above the title.
-  const top = camY - dist * Math.tan((pitch - half * 0.9) * RAD)
-  const bottom = camY - dist * Math.tan((pitch - half * 0.46) * RAD)
+  const top = camY - dist * Math.tan((pitch - half * 0.97) * RAD)
+  const bottom = camY - dist * Math.tan((pitch - half * 0.52) * RAD)
   const wide = 2 * dist * Math.tan(Math.atan(Math.tan(half * RAD) * aspect) * 0.84)
   const gapCols = 6
   const px = Math.min(((top - bottom) / ROWS) * 0.72, wide / (n * (COLS + 2) + (n - 1) * gapCols))
