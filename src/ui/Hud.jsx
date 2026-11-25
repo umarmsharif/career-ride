@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { useGame } from '../engine/state.js'
 import { audio } from '../engine/sound.js'
 import career from '../content/career.json'
-import { DRIVE, T } from '../engine/world.js'
+import { DRIVE, CITY, T } from '../engine/world.js'
+import { HEADLINES, opening, cue } from '../engine/headlines.js'
 
 function Gem() {
   return (
@@ -82,25 +83,40 @@ function Clip({ src, onDone }) {
   )
 }
 
-// The drive opens on its title and sets off by itself; nobody has to press anything.
+// The drive opens on its title and sets off by itself; nobody has to press anything. In the city
+// the title also states the headline results, each one appearing as its tower lights up behind.
 function DriveTitle() {
   const start = useGame((s) => s.start)
   const clip = career.clips?.intro
   const [intro, setIntro] = useState(!!clip)
+  const stats = CITY ? HEADLINES : []
+  const hold = stats.length ? Math.round((cue(stats.length - 1) + 4.6) * 1000) : 2800
   useEffect(() => {
     if (intro) return
-    const id = setTimeout(() => start('story', true), 2800)
+    opening.at = performance.now() / 1000
+    const id = setTimeout(() => start('story', true), hold)
     return () => clearTimeout(id)
   }, [intro])
   if (intro) return <Clip src={clip} onDone={() => setIntro(false)} />
   return (
-    <div className="start drive-title">
+    <div className={`start drive-title${stats.length ? ' with-stats' : ''}`} style={{ animationDuration: `${hold}ms` }}>
       <div>
         <p className="eyebrow">
           {career.person.name} · {career.islands[career.islands.length - 1].role}
         </p>
         <h1>{T.title}</h1>
         <p className="lede">{T.lede}</p>
+        {stats.length > 0 && (
+          <ul className="drive-stats">
+            {stats.map((h, i) => (
+              <li key={h.id} style={{ animationDelay: `${cue(i)}s`, '--c': h.color }}>
+                <b>{h.text}</b>
+                <span>{h.label}</span>
+                <em>{h.company}</em>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )

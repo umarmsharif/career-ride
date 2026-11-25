@@ -9,7 +9,8 @@ import { Land, Stops, Gate, Banner, Signboard, Sky, Lights, Static, Grounded, Br
 import { buildRide, rideRibbon } from './engine/rideCurve.js'
 import { rng } from './engine/kit.js'
 import { useGame } from './engine/state.js'
-import { DRIVE } from './engine/world.js'
+import { DRIVE, CITY } from './engine/world.js'
+import Skyline from './engine/Skyline.jsx'
 import Car from './engine/Car.jsx'
 import Cinematic, { sceneCost } from './engine/Cinematic.jsx'
 
@@ -136,6 +137,7 @@ export default function World({ entries }) {
       <Sky />
       <Lights />
       <Backdrop />
+      {CITY && <Skyline />}
       <group ref={worldRef}>
         {mounted.map((i) => (
           <group key={islands[i].id} position={origins[i]}>
