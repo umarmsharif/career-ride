@@ -5,6 +5,8 @@ import career from '../content/career.json'
 const asked = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('world') : null
 export const WORLD = asked ?? career.world ?? 'ride'
 export const DRIVE = WORLD === 'drive'
+// The night-city look for the drive's stations. ?city=0 shows the earlier island scenery.
+export const CITY = DRIVE && !(typeof location !== 'undefined' && new URLSearchParams(location.search).get('city') === '0')
 
 // The words that change with the vehicle.
 export const T = DRIVE

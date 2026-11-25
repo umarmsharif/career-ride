@@ -67,6 +67,12 @@ const colliders = [
   { x: scoreboard.x, z: scoreboard.z, r: 1.6, h: 4.6 },
 ]
 
+// The hands-free route: it visits every stop and stays clear of everything solid.
+const tour = [
+  [-38, 0], [-35.6, 0.2], [-29.5, -2.6], [-25, 0.6], [-22, 3.4], [-17.5, 0], [-11.5, -3],
+  [-4, -0.8], [3, 0.6], [11.5, 3.4], [17, 4.4], [22, 4.6], [31.5, 3.2], [38, 0.8], [45.5, 0],
+]
+
 // Positions only. `index.js` hands these to defineIsland.
 const L = {
   outline: makeOutline(),
@@ -80,6 +86,7 @@ const L = {
   colliders,
   stops: pickupSpots.map(([x, z]) => ({ x, z })),
   pickupSpots,
+  tour,
   len: 47,
 }
 export default L
