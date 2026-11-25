@@ -1,7 +1,7 @@
 {
   "world": "drive",
   "clips": {
-    "intro": "/media/enter.mp4",
+    "intro": null,
     "outro": "/media/exit.mp4"
   },
   "person": {
@@ -199,7 +199,9 @@
           "theme": "Restaurant fronts with menu boards and a help desk",
           "pickups": [
             {
-              "fact": "A Llama model wrote dish descriptions across the catalogue, lifting orders by 18%"
+              "fact": "A Llama model wrote dish descriptions across the catalogue, lifting orders by 18%",
+              "headline": "18%",
+              "headlineLabel": "more orders from an AI model"
             },
             {
               "fact": "Partner NPS grew fivefold; escalations fell 70%"
@@ -229,9 +231,7 @@
       "theme": "A small airfield ringed by 18 plain coloured flags, with roads forking toward different regions",
       "pickups": [
         {
-          "fact": "Merchant strategy across 18 countries, reporting to C-level",
-          "headline": "18",
-          "headlineLabel": "countries, merchant strategy"
+          "fact": "Merchant strategy across 18 countries, reporting to C-level"
         },
         {
           "fact": "Designed and launched the Regional Incubation Program in all 18 markets"

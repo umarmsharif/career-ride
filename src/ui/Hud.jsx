@@ -109,7 +109,7 @@ function DriveTitle() {
         {stats.length > 0 && (
           <ul className="drive-stats">
             {stats.map((h, i) => (
-              <li key={h.id} style={{ animationDelay: `${cue(i)}s`, '--c': h.color }}>
+              <li key={h.text} style={{ animationDelay: `${cue(i)}s`, '--c': h.color }}>
                 <b>{h.text}</b>
                 <span>{h.label}</span>
                 <em>{h.company}</em>

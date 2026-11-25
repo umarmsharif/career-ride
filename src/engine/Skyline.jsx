@@ -128,7 +128,7 @@ export default function Skyline() {
   return (
     <group>
       {HEADLINES.map((h, i) => (
-        <Tower key={h.id} item={h} spot={spots[i]} index={i} fade={fade} />
+        <Tower key={h.text} item={h} spot={spots[i]} index={i} fade={fade} />
       ))}
     </group>
   )

@@ -2,6 +2,8 @@
 // Facts always come from career.json; a spec only says where things are.
 import career from '../content/career.json'
 import { makeGround } from './terrain.js'
+import { CITY } from './world.js'
+import { planCity } from './city.js'
 
 function makeOutline({ len, wid, neck, seed }) {
   const pts = []
@@ -43,7 +45,21 @@ export function defineIsland(spec) {
   const road = spec.road ?? [[-len, 0], [-len * 0.5, 0], [0, 0], [len * 0.5, 0], [len, 0]]
   const sign = { radius: 7.5, ...(spec.sign ?? { x: entranceGate.x + 3.5, z: 6.2, face: -2.2 }) }
   const gatePillars = [entranceGate, exitGate].filter(Boolean).flatMap((g) => [{ x: g.x, z: 4.4, r: 0.7 }, { x: g.x, z: -4.4, r: 0.7 }])
-  const colliders = [...(spec.colliders ?? []), { x: sign.x, z: sign.z, r: 1.5, h: 5 }, ...gatePillars]
+  // In the city the station's own scenery gives way to a planned block of buildings and a tower.
+  const cityStops = spec.stops.map(([x, z]) => [x, z])
+  const city = CITY
+    ? planCity({
+        id: spec.id, len, outline, road, stops: cityStops, terrain: spec.terrain,
+        tour: spec.tour ?? cityStops,
+        keep: [
+          { x: sign.x, z: sign.z, r: 6.5 },
+          ...(spec.banners ?? []).map((b) => ({ x: b.x, z: b.z, r: 4 })),
+          ...[entranceGate, exitGate].filter(Boolean).map((g) => ({ x: g.x, z: g.z, r: 8 })),
+          ...(spec.finish ? [{ x: spec.finish.x, z: spec.finish.z, r: 9 }] : []),
+        ],
+      })
+    : null
+  const colliders = [...(city ? city.colliders : spec.colliders ?? []), { x: sign.x, z: sign.z, r: 1.5, h: 5 }, ...gatePillars]
   const blockers = [entranceGate, exitGate].filter(Boolean).flatMap((g) => [-3.2, 0, 3.2].map((z) => ({ x: g.x, z, r: 2.1, h: 12 })))
   const signView = spec.signView ?? [spawn.x + 3, 0.2]
   // The company profile waits on a small stand between the road and the signboard.
@@ -74,7 +90,8 @@ export function defineIsland(spec) {
     profileStand,
     ground,
     h: ground.h,
-    brandSign: spec.brandSign ?? null,
+    // In the city the company name stands on top of the company's tower.
+    brandSign: city?.tower ? { x: city.tower.x, z: city.tower.z, y: city.tower.h + 1.5, face: -Math.PI / 2, scale: 1.7 } : spec.brandSign ?? null,
     stops,
     colliders,
     blockers,
@@ -83,10 +100,10 @@ export function defineIsland(spec) {
     districts,
     districtAt: spec.districtAt ?? ((x) => (districts.length > 1 && x >= 0 ? 1 : 0)),
     banners: spec.banners ?? [],
-    grass: spec.grass ?? '#a5d86e',
-    land: spec.land ?? { lip: '#86c765', dirt: '#c98a5e', rock: '#a86b47', rock2: '#7d5241' },
+    grass: city ? '#232a4c' : spec.grass ?? '#a5d86e',
+    land: city ? { lip: '#2f3763', dirt: '#1c2242', rock: '#161a34', rock2: '#10132a' } : spec.land ?? { lip: '#86c765', dirt: '#c98a5e', rock: '#a86b47', rock2: '#7d5241' },
     // How the road to the NEXT island behaves: where that island sits and the shape of the ride.
     ride: spec.ride ?? { dy: 10, dz: -40, style: 'spiral' },
-    extra: spec.extra ?? {},
+    extra: { ...(spec.extra ?? {}), city },
   }
 }

@@ -4,6 +4,8 @@
 import { defineIsland } from '../engine/defineIsland.js'
 import career from '../content/career.json'
 import DefaultScenery from '../engine/DefaultScenery.jsx'
+import CityScenery from '../engine/CityScenery.jsx'
+import { CITY } from '../engine/world.js'
 
 const FOLDERS = { 1: 'workshop', 2: 'campusHill', 3: 'signalValley', 4: 'telecomCity', 5: 'parcelPort', 6: 'kitchenStreet', 7: 'airfield', 8: 'aiLab', 9: 'classroom' }
 const loaders = import.meta.glob('./*/index.js')
@@ -31,7 +33,7 @@ export async function loadIslands() {
     if (loaders[path] && (!only || +only === id)) {
       try {
         const mod = await loaders[path]()
-        entry = { island: mod.island, Scenery: mod.Scenery }
+        entry = { island: mod.island, Scenery: CITY ? CityScenery : mod.Scenery }
       } catch (err) {
         console.warn(`Island ${id} failed to load, using a placeholder`, err)
       }

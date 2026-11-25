@@ -1,21 +1,20 @@
-// Food Delivery Street as a night city block. Dark buildings line the road, and the company's
+// A station as a night city block. Dark buildings line the road, and the company's
 // tower shows the chapter filling up: each stop lights a band of its windows in the company
 // colour, and the headline result is spelled across them.
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { ribbonXZ, rng } from '../../engine/kit.js'
-import { baseRoad } from '../../engine/props.js'
-import { Static } from '../../engine/IslandParts.jsx'
-import { sinceOf } from '../../engine/state.js'
-import { tower, blocks } from './city.js'
-import { spell } from '../../engine/dots.js'
+import { ribbonXZ, rng } from './kit.js'
+import { baseRoad } from './props.js'
+import { Static } from './IslandParts.jsx'
+import { sinceOf } from './state.js'
+import { spellLines } from './dots.js'
 
-const since = sinceOf(6)
 const WALLS = ['#3d477c', '#444f8a', '#363f70']
 const NEON = ['#ff4fa3', '#4fe3ff', '#ffb347', '#b8ff4f']
 
 function buildCity(island) {
+  const { tower, blocks } = island.extra.city
   return (k) => {
     k.add(ribbonXZ(island.road, 13.5, 0.015), '#2e3558')
     baseRoad(k, island, { color: '#1d2138', edge: '#565d86', dash: '#f1e6c0' })
@@ -31,22 +30,30 @@ function buildCity(island) {
       })
     }
     const t = tower
-    k.at({ p: [t.x, 0, t.z] }, () => {
-      k.box(t.w + 1.6, 3.6, t.d + 1.6, '#2a3052', { p: [0, -1.5, 0] })
-      k.box(t.w + 0.8, 1.0, t.d + 0.8, '#232a4e', { p: [0, 0.7, 0] })
-      k.box(t.w, t.h, t.d, '#0f1330', { p: [0, t.h / 2 + 0.2, 0] })
-      k.box(t.w + 0.4, 0.5, t.d + 0.4, island.data.brand.primary, { p: [0, t.h + 0.45, 0] })
-    })
-    // The square in front of the tower: paving bands and a few low planters.
-    for (let i = 0; i < 5; i++) k.box(0.25, 0.04, 9, '#39416a', { p: [11 + i * 4.2, 0.04, -6.5] })
-    for (const [x, z] of [[12, -9.5], [19, -11], [25.5, -9.5]]) {
-      k.at({ p: [x, 0, z] }, () => {
-        k.box(2.2, 0.6, 2.2, '#343c66', { p: [0, 0.3, 0] })
-        k.ball(0.9, '#2f6e5a', { p: [0, 1.1, 0] }, 0)
+    if (t) {
+      k.at({ p: [t.x, 0, t.z] }, () => {
+        k.box(t.w + 1.6, 3.6, t.d + 1.6, '#2a3052', { p: [0, -1.5, 0] })
+        k.box(t.w + 0.8, 1.0, t.d + 0.8, '#232a4e', { p: [0, 0.7, 0] })
+        k.box(t.w, t.h, t.d, '#0f1330', { p: [0, t.h / 2 + 0.2, 0] })
+        k.box(t.w + 0.4, 0.5, t.d + 0.4, island.data.brand.primary, { p: [0, t.h + 0.45, 0] })
       })
+      // The square beside the tower: a few low planters on the open ground.
+      for (const dx of [-9, -15, -21]) {
+        const x = t.x + dx
+        const z = t.z + t.side * 1.5
+        if (Math.abs(island.h(x + 1.2, z) - island.h(x - 1.2, z)) > 0.3) continue
+        k.at({ p: [x, 0, z] }, () => {
+          k.box(2.2, 0.6, 2.2, '#343c66', { p: [0, 0.3, 0] })
+          k.ball(0.9, '#2f6e5a', { p: [0, 1.1, 0] }, 0)
+        })
+      }
     }
+    LANDMARKS[island.id]?.(k, island)
   }
 }
+
+// Extra landmarks for particular stations, keyed by station number.
+const LANDMARKS = {}
 
 const tmp = { m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(), c: new THREE.Color() }
 const Y = new THREE.Vector3(0, 1, 0)
@@ -55,6 +62,7 @@ const Y = new THREE.Vector3(0, 1, 0)
 function BlockLights({ island }) {
   const ref = useRef()
   const lights = useMemo(() => {
+    const { blocks } = island.extra.city
     const out = []
     for (const b of blocks) {
       const r = rng(b.seed)
@@ -111,14 +119,16 @@ function BlockLights({ island }) {
   )
 }
 
-// The tower's windows. Each stop found lights the next band in the company colour; the stop
-// marked as the headline spells its figure across the upper floors.
+// The tower's windows. Each stop found lights the next band in the company colour. A stop marked
+// as a headline spells its figure across the lower floors; the latest one found is the one shown.
 function TowerLights({ island }) {
   const ref = useRef()
+  const tower = island.extra.city.tower
   const { cols, rows } = tower
+  const since = useMemo(() => sinceOf(island.id), [island])
+  const count = island.stops.length
   const picks = useMemo(() => (island.data.districts ? island.data.districts.flatMap((d) => d.pickups) : island.data.pickups || []), [island])
-  const headline = picks.findIndex((p) => p.headline)
-  const figure = useMemo(() => (headline >= 0 ? spell(picks[headline].headline, cols) : null), [picks, headline, cols])
+  const figures = useMemo(() => picks.map((p) => (p.headline ? spellLines(p.headline, cols).slice(0, 7) : null)), [picks, cols])
   const brand = useMemo(() => new THREE.Color(island.data.brand.primary), [island])
   // The figure sits on the lower floors: the camera behind the car cuts off anything higher.
   const top = 9
@@ -126,17 +136,19 @@ function TowerLights({ island }) {
     const y0 = island.h(tower.x, tower.z) + 2.4
     const out = []
     const pitchY = (tower.h - 3.2) / rows
+    // The face the driver sees on the way in, and the face beside the road.
     for (const west of [true, false]) {
       const span = (west ? tower.d : tower.w) - 0.7
       const pitch = span / cols
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           const along = (col - (cols - 1) / 2) * pitch
+          const road = -tower.side
           out.push({
-            x: west ? tower.x - tower.w / 2 - 0.05 : tower.x + along,
+            x: west ? tower.x - tower.w / 2 - 0.05 : tower.x + along * road,
             y: y0 + row * pitchY,
-            z: west ? tower.z + along : tower.z + tower.d / 2 + 0.05,
-            face: west ? -Math.PI / 2 : 0, sx: pitch * 0.74, sy: pitchY * 0.66, row, col,
+            z: west ? tower.z + along : tower.z + road * (tower.d / 2 + 0.05),
+            face: west ? -Math.PI / 2 : road > 0 ? 0 : Math.PI, sx: pitch * 0.74, sy: pitchY * 0.66, row, col,
           })
         }
       }
@@ -151,14 +163,18 @@ function TowerLights({ island }) {
       cells.forEach((c, i) => mesh.setMatrixAt(i, tmp.m.compose(tmp.p.set(c.x, c.y, c.z), tmp.q.setFromAxisAngle(Y, c.face), tmp.s.set(c.sx, c.sy, 1))))
       mesh.instanceMatrix.needsUpdate = true
     }
-    const times = picks.map((_, i) => since(i))
+    const times = Array.from({ length: count }, (_, i) => since(i))
     // Nothing to redraw once every light has settled.
     const key = times.map((t) => (t < 0 ? 'x' : t > 2.6 ? 'd' : t.toFixed(2))).join()
     if (mesh.userData.key === key) return
     mesh.userData.key = key
-    const tf = headline >= 0 ? times[headline] : -1
+    // The headline found most recently.
+    let shown = -1
+    figures.forEach((f, i) => { if (f && times[i] >= 0 && (shown < 0 || times[i] < times[shown])) shown = i })
+    const figure = shown >= 0 ? figures[shown] : null
+    const tf = shown >= 0 ? times[shown] : -1
     cells.forEach((c, i) => {
-      const stop = Math.min(picks.length - 1, Math.floor((c.row * picks.length) / rows))
+      const stop = Math.min(count - 1, Math.floor((c.row * count) / rows))
       const t = times[stop]
       // Bands sweep on from left to right.
       const lit = t < 0 ? 0 : Math.min(1, Math.max(0, (t - c.col * 0.03) / 0.7))
@@ -166,7 +182,7 @@ function TowerLights({ island }) {
       let g = 0.04 + (brand.g * 1.15 - 0.04) * lit
       let b = 0.09 + (brand.b * 1.15 - 0.09) * lit
       const fy = top - c.row
-      if (figure && tf >= 0 && fy >= 0 && fy < 7) {
+      if (figure && fy >= 0 && fy < 7) {
         const f = Math.min(1, Math.max(0, (tf - c.col * 0.04) / 0.9))
         const on = figure[fy][c.col]
         // The figure's own lights go bright; the ones around it stay low so it reads.
@@ -192,7 +208,7 @@ export default function CityScenery({ island }) {
     <group>
       <Static build={build} deps={[build]} />
       <BlockLights island={island} />
-      <TowerLights island={island} />
+      {island.extra.city.tower && <TowerLights island={island} />}
     </group>
   )
 }
