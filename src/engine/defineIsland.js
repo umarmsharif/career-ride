@@ -51,6 +51,7 @@ export function defineIsland(spec) {
     ? planCity({
         id: spec.id, len, outline, road, stops: cityStops, terrain: spec.terrain,
         tour: spec.tour ?? cityStops,
+        last: !!spec.last,
         keep: [
           { x: sign.x, z: sign.z, r: 6.5 },
           ...(spec.banners ?? []).map((b) => ({ x: b.x, z: b.z, r: 4 })),

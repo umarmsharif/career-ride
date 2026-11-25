@@ -103,13 +103,16 @@
           "theme": "Rooftops and antennas, with offers flying to individual houses",
           "pickups": [
             {
-              "fact": "+5% incremental ARPU against control through one-to-one personalisation"
+              "fact": "+5% incremental ARPU against control through one-to-one personalisation",
+              "kpi": "+5%"
             },
             {
-              "fact": "Loyalty programme for high-value customers reached 8% engagement, built with a 10-member cross-functional team"
+              "fact": "Loyalty programme for high-value customers reached 8% engagement, built with a 10-member cross-functional team",
+              "kpi": "8%"
             },
             {
-              "fact": "Secured PKR 50M investment from JS Bank for a co-branded proposition"
+              "fact": "Secured PKR 50M investment from JS Bank for a co-branded proposition",
+              "kpi": "PKR 50M"
             }
           ]
         },
@@ -123,7 +126,8 @@
               "headlineLabel": "per month fintech portfolio"
             },
             {
-              "fact": "Grew telco bundle penetration from 17% to 25%"
+              "fact": "Grew telco bundle penetration from 17% to 25%",
+              "kpi": "25%"
             },
             {
               "fact": "Go Getter Award 2018 and 2019; Employee of the Quarter 2018"
@@ -150,13 +154,16 @@
       "theme": "A port and depot with delivery routes drawn across the island as glowing lines",
       "pickups": [
         {
-          "fact": "Modelled 10,000+ origin-destination permutations across 10 logistics partners"
+          "fact": "Modelled 10,000+ origin-destination permutations across 10 logistics partners",
+          "kpi": "10K+"
         },
         {
-          "fact": "Cut customer promise times by 40%"
+          "fact": "Cut customer promise times by 40%",
+          "kpi": "40%"
         },
         {
-          "fact": "Payment risk model raised transaction success by 3% and cut shipping costs by 4%"
+          "fact": "Payment risk model raised transaction success by 3% and cut shipping costs by 4%",
+          "kpi": "+3%"
         }
       ],
       "brand": {
@@ -182,7 +189,8 @@
           "theme": "Houses with kitchen windows that open into food stalls",
           "pickups": [
             {
-              "fact": "Built the Home Kitchens vertical from zero to 15,000 orders a day at peak, with 4,000+ active merchants"
+              "fact": "Built the Home Kitchens vertical from zero to 15,000 orders a day at peak, with 4,000+ active merchants",
+              "kpi": "15K"
             },
             {
               "fact": "Became the platform's second most profitable unit; the playbook was exported to Malaysia and Singapore"
@@ -204,10 +212,12 @@
               "headlineLabel": "more orders from an AI model"
             },
             {
-              "fact": "Partner NPS grew fivefold; escalations fell 70%"
+              "fact": "Partner NPS grew fivefold; escalations fell 70%",
+              "kpi": "70%"
             },
             {
-              "fact": "Partner fail rates down 33% and order delays down 30%"
+              "fact": "Partner fail rates down 33% and order delays down 30%",
+              "kpi": "33%"
             }
           ]
         }
@@ -231,10 +241,12 @@
       "theme": "A small airfield ringed by 18 plain coloured flags, with roads forking toward different regions",
       "pickups": [
         {
-          "fact": "Merchant strategy across 18 countries, reporting to C-level"
+          "fact": "Merchant strategy across 18 countries, reporting to C-level",
+          "kpi": "18"
         },
         {
-          "fact": "Designed and launched the Regional Incubation Program in all 18 markets"
+          "fact": "Designed and launched the Regional Incubation Program in all 18 markets",
+          "kpi": "18"
         },
         {
           "fact": "Relaunched the partner health score and set OKR cycles across Product, Finance and Operations"

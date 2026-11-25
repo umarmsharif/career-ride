@@ -12,7 +12,7 @@ const zAt = (pts, x) => {
   return pts[pts.length - 1][1]
 }
 
-export function planCity({ id, len, outline, road, tour, stops, terrain, keep }) {
+export function planCity({ id, len, outline, road, tour, stops, terrain, keep, last }) {
   const h = terrain || (() => 0)
   // Everything the car may drive over.
   const paths = [...road, ...tour, ...stops]
@@ -39,11 +39,11 @@ export function planCity({ id, len, outline, road, tour, stops, terrain, keep })
   // The company's tower: towards the far end, on whichever side has room, with open ground
   // on its near side so the road has a clear view of it.
   let tower = null
-  const th = 4.25
+  const th = 4.6
   for (const side of [-1, 1]) {
     for (let x = len * 0.72; x > -len * 0.2 && !tower; x -= 1.5) {
       const z = setBack(x, side, th, 3.6)
-      if (free(x, z, th)) tower = { x, z, w: th * 2, d: th * 2, h: 13.5, cols: 17, rows: 14, side }
+      if (free(x, z, th)) tower = { x, z, w: th * 2, d: th * 2, h: last ? 17 : 13.5, cols: 23, rows: last ? 18 : 14, side }
     }
     if (tower) break
   }
@@ -61,6 +61,11 @@ export function planCity({ id, len, outline, road, tour, stops, terrain, keep })
       if (tower && side === tower.side && x > tower.x - 25 && x < tower.x + th + half + 1.5) continue
       blocks.push({ x, z, half, h: tall, side, tone, seed })
     }
+  }
+  // Station 1 gives two of its lots to the squares of the two European cities worked in.
+  if (id === 1) {
+    const south = blocks.filter((b) => b.side > 0 && b.x > -30)
+    for (const [i, name] of [[0, 'brussels'], [Math.min(3, south.length - 1), 'madrid']]) if (south[i]) south[i].landmark = name
   }
   const colliders = [...blocks.map((b) => ({ x: b.x, z: b.z, r: b.half + 0.7, h: b.h })), ...(tower ? [{ x: tower.x, z: tower.z, r: 5.4, h: tower.h }] : [])]
   return { tower, blocks, colliders }

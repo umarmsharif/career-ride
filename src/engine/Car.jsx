@@ -1,4 +1,4 @@
-// The car: the same journey as the bicycle, driven. It takes each company's colour, carries the
+// The car: an open-top two-seater with the driver at the wheel. The same journey as the bicycle, driven. It takes each company's colour, carries the
 // company profiles on its roof rack, slides its tail out on hard corners, and at the very end
 // the driver's door opens and the driver steps out.
 import { useMemo, useRef } from 'react'
@@ -56,8 +56,9 @@ export default function Car({ ids }) {
     // +Z is the nose. The driver sits on the left (+X).
     const g = new THREE.BoxGeometry(2.0, 0.55, 4.4)
     g.translate(0, 0.66, 0)
-    const roof = new THREE.BoxGeometry(1.74, 0.08, 2.0)
-    roof.translate(0, 1.44, -0.25)
+    // No roof: a folded hood sits behind the seats.
+    const roof = new THREE.BoxGeometry(1.74, 0.22, 0.5)
+    roof.translate(0, 1.02, -1.25)
     const wing = new THREE.BoxGeometry(1.7, 0.09, 0.32)
     wing.translate(0, 1.3, -2.12)
     const k = new Kit()
@@ -70,12 +71,27 @@ export default function Car({ ids }) {
   }, [])
   const dark = useMemo(() => {
     const k = new Kit()
-    k.box(1.72, 0.52, 1.96, '#0c1020', { p: [0, 1.15, -0.25] })
+    // The open cabin: floor, two seats, the dash and a windscreen frame.
+    k.box(1.72, 0.06, 1.96, '#0c1020', { p: [0, 0.95, -0.25] })
+    for (const sx of [0.45, -0.45]) {
+      k.box(0.6, 0.16, 0.6, '#2a1c1c', { p: [sx, 1.04, -0.45] })
+      k.box(0.6, 0.62, 0.14, '#2a1c1c', { p: [sx, 1.3, -0.8] })
+    }
+    k.box(1.7, 0.2, 0.3, '#151a2c', { p: [0, 1.06, 0.62] })
+    k.box(1.74, 0.07, 0.07, '#aab4c0', { p: [0, 1.52, 0.72] })
+    for (const sx of [0.84, -0.84]) k.box(0.07, 0.5, 0.07, '#aab4c0', { p: [sx, 1.28, 0.74], r: [-0.25, 0, 0] })
     k.box(2.06, 0.2, 0.5, '#0c1020', { p: [0, 0.46, 2.14] })
     k.box(2.06, 0.2, 0.4, '#0c1020', { p: [0, 0.46, -2.14] })
     for (const sx of [1, -1]) k.box(0.1, 0.34, 0.1, '#0c1020', { p: [sx * 0.7, 1.12, -2.1] })
-    // Roof rack for the company profiles.
-    for (const sx of [1, -1]) k.box(0.06, 0.1, 1.9, '#aab4c0', { p: [sx * 0.74, 1.53, -0.25] })
+    // The driver, seated on the left: navy suit, white shirt, dark hair and beard.
+    k.box(0.5, 0.56, 0.3, '#1b2644', { p: [0.45, 1.4, -0.52] })
+    k.box(0.16, 0.3, 0.06, '#f2f2f2', { p: [0.45, 1.5, -0.36] })
+    k.box(0.12, 0.12, 0.5, '#1b2644', { p: [0.24, 1.42, -0.2] })
+    k.box(0.12, 0.12, 0.5, '#1b2644', { p: [0.66, 1.42, -0.2] })
+    k.ball(0.19, '#c99672', { p: [0.45, 1.88, -0.5] }, 1)
+    k.box(0.36, 0.14, 0.36, '#1a1a1c', { p: [0.45, 2.02, -0.54] })
+    k.box(0.3, 0.16, 0.14, '#1a1a1c', { p: [0.45, 1.76, -0.36] })
+    k.cyl(0.17, 0.17, 0.04, '#0c1020', { p: [0.45, 1.3, 0.3], r: [1.1, 0, 0] })
     return k.build()
   }, [])
 
@@ -158,7 +174,7 @@ export default function Car({ ids }) {
             <mesh geometry={shell} material={paint} castShadow />
             <mesh geometry={dark} material={trim} castShadow />
             {/* A stripe in the colour of the route */}
-            {[[0.945, 1.55, 1.3], [1.49, -0.25, 2.0], [0.945, -1.75, 0.9]].map(([y, z, len]) => (
+            {[[0.945, 1.55, 1.3], [0.945, -1.85, 0.7]].map(([y, z, len]) => (
               <mesh key={z} position={[0, y, z]}>
                 <boxGeometry args={[0.44, 0.02, len]} />
                 <meshBasicMaterial color={lime} toneMapped={false} />
@@ -174,10 +190,10 @@ export default function Car({ ids }) {
               <boxGeometry args={[1.8, 0.14, 0.06]} />
               <meshBasicMaterial color={new THREE.Color(2.4, 0.15, 0.2)} toneMapped={false} />
             </mesh>
-            {/* One folder on the roof rack for every company profile picked up */}
+            {/* The company profiles picked up so far, stacked on the passenger seat */}
             {profiles.map((id, i) => (
-              <mesh key={id} position={[0, 1.62, -1.08 + i * 0.21]} rotation={[0.12, 0, 0]}>
-                <boxGeometry args={[1.3, 0.2, 0.17]} />
+              <mesh key={id} position={[-0.45, 1.2 + i * 0.07, -0.42]} rotation={[0, 0, 0]}>
+                <boxGeometry args={[0.5, 0.06, 0.4]} />
                 <meshStandardMaterial color={brandOf(id).primary} roughness={0.6} emissive={brandOf(id).primary} emissiveIntensity={0.25} />
               </mesh>
             ))}
@@ -204,7 +220,7 @@ export default function Car({ ids }) {
           <group ref={driver} visible={false}>
             <mesh position={[0, 1.0, 0]} castShadow>
               <capsuleGeometry args={[0.3, 0.9, 4, 8]} />
-              <meshStandardMaterial color="#1b2238" roughness={0.6} flatShading />
+              <meshStandardMaterial color="#1b2644" roughness={0.6} flatShading />
             </mesh>
             <mesh position={[0, 1.95, 0]}>
               <sphereGeometry args={[0.27, 10, 8]} />

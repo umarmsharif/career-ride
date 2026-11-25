@@ -4,11 +4,11 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { ribbonXZ, rng } from './kit.js'
+import { ribbonXZ, rng, textTexture } from './kit.js'
 import { baseRoad } from './props.js'
 import { Static } from './IslandParts.jsx'
-import { sinceOf } from './state.js'
-import { spellLines } from './dots.js'
+import { sinceOf, clock } from './state.js'
+import { spell } from './dots.js'
 
 const WALLS = ['#3d477c', '#444f8a', '#363f70']
 const NEON = ['#ff4fa3', '#4fe3ff', '#ffb347', '#b8ff4f']
@@ -19,6 +19,7 @@ function buildCity(island) {
     k.add(ribbonXZ(island.road, 13.5, 0.015), '#2e3558')
     baseRoad(k, island, { color: '#1d2138', edge: '#565d86', dash: '#f1e6c0' })
     for (const b of blocks) {
+      if (b.landmark) continue
       const w = b.half * 2
       k.at({ p: [b.x, 0, b.z] }, () => {
         // The footing goes well below ground so no gap shows where the land slopes.
@@ -35,7 +36,7 @@ function buildCity(island) {
         k.box(t.w + 1.6, 3.6, t.d + 1.6, '#2a3052', { p: [0, -1.5, 0] })
         k.box(t.w + 0.8, 1.0, t.d + 0.8, '#232a4e', { p: [0, 0.7, 0] })
         k.box(t.w, t.h, t.d, '#0f1330', { p: [0, t.h / 2 + 0.2, 0] })
-        k.box(t.w + 0.4, 0.5, t.d + 0.4, island.data.brand.primary, { p: [0, t.h + 0.45, 0] })
+        k.box(t.w + 0.4, 0.5, t.d + 0.4, island.finish ? island.data.brand.secondary : island.data.brand.primary, { p: [0, t.h + 0.45, 0] })
       })
       // The square beside the tower: a few low planters on the open ground.
       for (const dx of [-9, -15, -21]) {
@@ -53,10 +54,43 @@ function buildCity(island) {
 }
 
 // Extra landmarks for particular stations, keyed by station number.
-const LANDMARKS = {}
+const LANDMARKS = {
+  1: (k, island) => {
+    for (const b of island.extra.city.blocks) {
+      if (b.landmark === 'brussels') {
+        // A row of tall guild houses with stepped gables and gilded trim, and a slim spire.
+        k.at({ p: [b.x, 0, b.z] }, () => {
+          k.box(7.2, 3.2, 6.2, '#3a3350', { p: [0, -1.4, 0] })
+          ;[-2.4, 0, 2.4].forEach((x, i) => {
+            const h = 6.4 + (i % 2) * 1.1
+            k.box(2.2, h, 3.2, ['#6b5a4a', '#75624e', '#5f5246'][i], { p: [x, h / 2 + 0.2, 1] })
+            for (let s = 0; s < 3; s++) k.box(2.2 - s * 0.62, 0.55, 3.2, '#7d6a52', { p: [x, h + 0.45 + s * 0.55, 1] })
+            k.box(2.3, 0.14, 0.2, '#e0b84a', { p: [x, h + 0.2, -0.62] })
+            k.ball(0.18, '#e0b84a', { p: [x, h + 2.05, 1] }, 0)
+          })
+          k.box(1.5, 9.5, 1.5, '#5a4f48', { p: [0, 4.95, -1.9] })
+          k.cone(1.0, 4.2, '#3f4a66', { p: [0, 11.8, -1.9] }, 6)
+        })
+      }
+      if (b.landmark === 'madrid') {
+        // A long red-brick front with a white clock turret over the middle.
+        k.at({ p: [b.x, 0, b.z] }, () => {
+          k.box(7.4, 3.2, 6.2, '#3a3350', { p: [0, -1.4, 0] })
+          k.box(7.0, 4.6, 4.0, '#8a4a3c', { p: [0, 2.5, 0.6] })
+          k.box(7.2, 0.3, 4.2, '#d9d2c4', { p: [0, 4.95, 0.6] })
+          k.box(2.0, 2.6, 2.0, '#d9d2c4', { p: [0, 6.4, 0.6] })
+          k.disc(0.62, '#f4efe2', { p: [0, 6.6, -0.42], r: [Math.PI / 2, 0, 0] })
+          k.cone(1.25, 1.5, '#4a566e', { p: [0, 8.45, 0.6] }, 4)
+          k.cyl(0.05, 0.05, 1.2, '#c9c2b4', { p: [0, 9.7, 0.6] })
+        })
+      }
+    }
+  },
+}
 
 const tmp = { m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(), c: new THREE.Color() }
 const Y = new THREE.Vector3(0, 1, 0)
+const VIOLET = new THREE.Color('#7a3cff')
 
 // Lit windows and shopfronts of the ordinary buildings: one mesh for the whole block.
 function BlockLights({ island }) {
@@ -65,6 +99,7 @@ function BlockLights({ island }) {
     const { blocks } = island.extra.city
     const out = []
     for (const b of blocks) {
+      if (b.landmark) continue
       const r = rng(b.seed)
       const y0 = island.h(b.x, b.z)
       const w = b.half * 2
@@ -128,7 +163,8 @@ function TowerLights({ island }) {
   const since = useMemo(() => sinceOf(island.id), [island])
   const count = island.stops.length
   const picks = useMemo(() => (island.data.districts ? island.data.districts.flatMap((d) => d.pickups) : island.data.pickups || []), [island])
-  const figures = useMemo(() => picks.map((p) => (p.headline ? spellLines(p.headline, cols).slice(0, 7) : null)), [picks, cols])
+  // Each stop's own figure, as one picture per line; a two-part figure shows its parts in turn.
+  const figures = useMemo(() => picks.map((p) => (p.headline || p.kpi ? (p.headline || p.kpi).split(' ').map((line) => spell(line, cols)) : null)), [picks, cols])
   const brand = useMemo(() => new THREE.Color(island.data.brand.primary), [island])
   // The figure sits on the lower floors: the camera behind the car cuts off anything higher.
   const top = 9
@@ -165,22 +201,28 @@ function TowerLights({ island }) {
     }
     const times = Array.from({ length: count }, (_, i) => since(i))
     // Nothing to redraw once every light has settled.
-    const key = times.map((t) => (t < 0 ? 'x' : t > 2.6 ? 'd' : t.toFixed(2))).join()
-    if (mesh.userData.key === key) return
+    const turn = Math.floor(clock.t / 1.5)
+    const key = times.map((t) => (t < 0 ? 'x' : t > 2.6 ? 'd' : t.toFixed(2))).join() + turn
+    if (mesh.userData.key === key && !island.finish) return
     mesh.userData.key = key
-    // The headline found most recently.
+    // The figure of the stop found most recently.
     let shown = -1
     figures.forEach((f, i) => { if (f && times[i] >= 0 && (shown < 0 || times[i] < times[shown])) shown = i })
-    const figure = shown >= 0 ? figures[shown] : null
+    const figure = shown >= 0 ? figures[shown][turn % figures[shown].length] : null
     const tf = shown >= 0 ? times[shown] : -1
     cells.forEach((c, i) => {
       const stop = Math.min(count - 1, Math.floor((c.row * count) / rows))
       const t = times[stop]
       // Bands sweep on from left to right.
       const lit = t < 0 ? 0 : Math.min(1, Math.max(0, (t - c.col * 0.03) / 0.7))
-      let r = 0.03 + (brand.r * 1.15 - 0.03) * lit
-      let g = 0.04 + (brand.g * 1.15 - 0.04) * lit
-      let b = 0.09 + (brand.b * 1.15 - 0.09) * lit
+      // The last station is the destination: its tower glows from pink at the foot to violet at
+      // the top the whole time, and brightens as its stops are found.
+      const hue = island.finish ? tmp.c.set('#ff36a9').lerp(VIOLET, c.row / rows) : brand
+      const on0 = island.finish ? 0.42 + 0.14 * Math.sin(clock.t * 1.3 - c.row * 0.35) : 0
+      const amt = Math.max(lit, on0)
+      let r = 0.03 + (hue.r * 1.15 - 0.03) * amt
+      let g = 0.04 + (hue.g * 1.15 - 0.04) * amt
+      let b = 0.09 + (hue.b * 1.15 - 0.09) * amt
       const fy = top - c.row
       if (figure && fy >= 0 && fy < 7) {
         const f = Math.min(1, Math.max(0, (tf - c.col * 0.04) / 0.9))
@@ -202,12 +244,25 @@ function TowerLights({ island }) {
   )
 }
 
+function PlaceName({ island, b, text }) {
+  const map = useMemo(() => textTexture(text, { w: 512, h: 128, bg: '#161b38', fg: '#f1e6c0', size: 78 }), [text])
+  return (
+    <mesh position={[b.x, 1.5, b.z - b.side * (b.half + 1.3)]} rotation={[0, b.side > 0 ? Math.PI : 0, 0]}>
+      <planeGeometry args={[3.6, 0.9]} />
+      <meshBasicMaterial map={map} toneMapped={false} side={THREE.DoubleSide} />
+    </mesh>
+  )
+}
+
 export default function CityScenery({ island }) {
   const build = useMemo(() => buildCity(island), [island])
   return (
     <group>
       <Static build={build} deps={[build]} />
       <BlockLights island={island} />
+      {island.extra.city.blocks.filter((b) => b.landmark).map((b) => (
+        <PlaceName key={b.landmark} island={island} b={b} text={b.landmark === 'brussels' ? 'Brussels' : 'Madrid'} />
+      ))}
       {island.extra.city.tower && <TowerLights island={island} />}
     </group>
   )
