@@ -35,6 +35,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     introT: 0,
     closeT: 0,
     lastPhase: '',
+    camPhase: '',
     lastReset: -1,
     lastAuto: false,
     snap: true,
@@ -330,6 +331,10 @@ export default function Controller({ islands, origins, rides, worldRef }) {
   }
 
   function updateCamera(dt, phase, island) {
+    // When the title gives way to the drive, cut straight to the camera behind the car: flying
+    // down from the overview would pass through the buildings.
+    if (s.camPhase === 'intro' && phase !== 'intro') s.snap = true
+    s.camPhase = phase
     const portrait = size.width / size.height < 0.9
     const fov = portrait ? 62 : 46
     if (camera.fov !== fov) {
@@ -421,6 +426,16 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     }
     camera.position.copy(s.camPos)
     camera.lookAt(s.look)
+    // Test hook: `window.__peek = { at: [x, y, z], look: [x, y, z] }` holds the camera on a spot
+    // in the current island's own coordinates, for close-up screenshots.
+    const peek = typeof window !== 'undefined' && window.__peek
+    if (peek && worldRef.current) {
+      const w = worldRef.current.position
+      const c0 = worldRef.current.children[0]?.position || { x: 0, y: 0, z: 0 }
+      const o = { x: w.x + c0.x, y: w.y + c0.y, z: w.z + c0.z }
+      camera.position.set(o.x + peek.at[0], o.y + peek.at[1], o.z + peek.at[2])
+      camera.lookAt(o.x + peek.look[0], o.y + peek.look[1], o.z + peek.look[2])
+    }
   }
 
   useFrame((_, dtRaw) => {

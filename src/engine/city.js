@@ -51,7 +51,9 @@ export function planCity({ id, len, outline, road, tour, stops, terrain, keep, l
   const r = rng(id * 53 + 8)
   const blocks = []
   for (const side of [-1, 1]) {
-    for (let x = -len + 6.5; x <= len - 6; x += 6.9) {
+    // The first stretch past the entrance stays open, so the camera behind the car starts with
+    // a clear view down the street.
+    for (let x = -len + 15; x <= len - 6; x += 6.9) {
       const half = 2.7 + r() * 0.5
       const tall = 5.5 + r() * 8.5
       const tone = Math.floor(r() * 3)

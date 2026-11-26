@@ -4,7 +4,7 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { ribbonXZ, rng, textTexture } from './kit.js'
+import { Kit, ribbonXZ, rng, textTexture } from './kit.js'
 import { baseRoad } from './props.js'
 import { Static } from './IslandParts.jsx'
 import { sinceOf, clock } from './state.js'
@@ -13,8 +13,21 @@ import { spell } from './dots.js'
 const WALLS = ['#3d477c', '#444f8a', '#363f70']
 const NEON = ['#ff4fa3', '#4fe3ff', '#ffb347', '#b8ff4f']
 
+// The company colour used for lights: the primary, or the secondary when the primary is too dark
+// to glow, brought up to full brightness.
+function accentOf(brand) {
+  const c = new THREE.Color(brand.primary)
+  const lum = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b
+  if (lum < 0.1 && brand.secondary) c.set(brand.secondary)
+  const top = Math.max(c.r, c.g, c.b) || 1
+  return c.multiplyScalar(1 / top)
+}
+
 function buildCity(island) {
   const { tower, blocks } = island.extra.city
+  // Each station's buildings lean slightly towards its company colour, so no two blocks match.
+  const accent = accentOf(island.data.brand)
+  const walls = WALLS.map((w) => '#' + new THREE.Color(w).lerp(accent, 0.14).getHexString())
   return (k) => {
     k.add(ribbonXZ(island.road, 13.5, 0.015), '#2e3558')
     baseRoad(k, island, { color: '#1d2138', edge: '#565d86', dash: '#f1e6c0' })
@@ -24,8 +37,13 @@ function buildCity(island) {
       k.at({ p: [b.x, 0, b.z] }, () => {
         // The footing goes well below ground so no gap shows where the land slopes.
         k.box(w + 0.5, 3.4, w + 0.5, '#2a3052', { p: [0, -1.5, 0] })
-        k.box(w, b.h, w, WALLS[b.tone], { p: [0, b.h / 2 + 0.2, 0] })
+        k.box(w, b.h, w, walls[b.tone], { p: [0, b.h / 2 + 0.2, 0] })
         k.box(w + 0.3, 0.3, w + 0.3, '#2d3560', { p: [0, b.h + 0.35, 0] })
+        // Some of the taller buildings step in near the top.
+        if (b.seed % 5 === 2 && b.h > 9) {
+          k.box(w * 0.62, 2.4, w * 0.62, walls[(b.tone + 1) % 3], { p: [0, b.h + 1.7, w * 0.1 * b.side] })
+          k.box(w * 0.66, 0.22, w * 0.66, '#2d3560', { p: [0, b.h + 3.0, w * 0.1 * b.side] })
+        }
         if (b.seed % 3 === 0) k.box(1.4, 1.1, 1.4, '#232a4e', { p: [w * 0.18, b.h + 1.0, -w * 0.15] })
         if (b.seed % 4 === 1) k.cyl(0.05, 0.05, 2.6, '#3a4270', { p: [-w * 0.25, b.h + 1.8, w * 0.2] })
       })
@@ -49,11 +67,11 @@ function buildCity(island) {
         })
       }
     }
-    LANDMARKS[island.id]?.(k, island)
   }
 }
 
-// Extra landmarks for particular stations, keyed by station number.
+// Extra landmarks for particular stations, keyed by station number. They are drawn floodlit, so
+// their real colours show at night.
 const LANDMARKS = {
   1: (k, island) => {
     for (const b of island.extra.city.blocks) {
@@ -63,43 +81,84 @@ const LANDMARKS = {
           k.box(7.2, 3.2, 6.2, '#3a3350', { p: [0, -1.4, 0] })
           ;[-2.4, 0, 2.4].forEach((x, i) => {
             const h = 6.4 + (i % 2) * 1.1
-            k.box(2.2, h, 3.2, ['#6b5a4a', '#75624e', '#5f5246'][i], { p: [x, h / 2 + 0.2, 1] })
-            for (let s = 0; s < 3; s++) k.box(2.2 - s * 0.62, 0.55, 3.2, '#7d6a52', { p: [x, h + 0.45 + s * 0.55, 1] })
-            k.box(2.3, 0.14, 0.2, '#e0b84a', { p: [x, h + 0.2, -0.62] })
-            k.ball(0.18, '#e0b84a', { p: [x, h + 2.05, 1] }, 0)
+            k.box(2.2, h, 3.2, ['#b8925e', '#c49d66', '#a88654'][i], { p: [x, h / 2 + 0.2, 1] })
+            for (let s = 0; s < 3; s++) k.box(2.2 - s * 0.62, 0.55, 3.2, '#cfa86c', { p: [x, h + 0.45 + s * 0.55, 1] })
+            k.box(2.3, 0.14, 0.2, '#ffd24a', { p: [x, h + 0.2, -0.62] })
+            k.ball(0.18, '#ffd24a', { p: [x, h + 2.05, 1] }, 0)
+            // Tall windows, a few lit.
+            for (let row = 0; row < 3; row++) {
+              for (const wx of [-0.5, 0.5]) {
+                const lit = (row + i + (wx > 0 ? 1 : 0)) % 3 === 0
+                k.box(0.42, 0.9, 0.06, lit ? '#ffcf6a' : '#3a2f44', { p: [x + wx, 1.5 + row * 1.7, -0.62] })
+              }
+            }
           })
-          k.box(1.5, 9.5, 1.5, '#5a4f48', { p: [0, 4.95, -1.9] })
-          k.cone(1.0, 4.2, '#3f4a66', { p: [0, 11.8, -1.9] }, 6)
+          k.box(1.4, 10.5, 1.4, '#8a7c6c', { p: [3.2, 5.45, 2.6] })
+          k.cone(0.95, 4.2, '#4a5a80', { p: [3.2, 12.8, 2.6] }, 6)
+          k.ball(0.22, '#ffd24a', { p: [3.2, 15.0, 2.6] }, 0)
         })
       }
       if (b.landmark === 'madrid') {
         // A long red-brick front with a white clock turret over the middle.
         k.at({ p: [b.x, 0, b.z] }, () => {
           k.box(7.4, 3.2, 6.2, '#3a3350', { p: [0, -1.4, 0] })
-          k.box(7.0, 4.6, 4.0, '#8a4a3c', { p: [0, 2.5, 0.6] })
-          k.box(7.2, 0.3, 4.2, '#d9d2c4', { p: [0, 4.95, 0.6] })
-          k.box(2.0, 2.6, 2.0, '#d9d2c4', { p: [0, 6.4, 0.6] })
-          k.disc(0.62, '#f4efe2', { p: [0, 6.6, -0.42], r: [Math.PI / 2, 0, 0] })
-          k.cone(1.25, 1.5, '#4a566e', { p: [0, 8.45, 0.6] }, 4)
-          k.cyl(0.05, 0.05, 1.2, '#c9c2b4', { p: [0, 9.7, 0.6] })
+          k.box(7.0, 4.6, 4.0, '#b0563f', { p: [0, 2.5, 0.6] })
+          k.box(7.2, 0.3, 4.2, '#efe6d4', { p: [0, 4.95, 0.6] })
+          for (let col = 0; col < 6; col++) {
+            for (let row = 0; row < 2; row++) {
+              k.box(0.6, 0.95, 0.06, (col + row) % 3 === 1 ? '#ffcf6a' : '#3a2a30', { p: [-2.9 + col * 1.16, 1.5 + row * 1.7, -1.42] })
+            }
+          }
+          k.box(2.0, 2.6, 2.0, '#efe6d4', { p: [0, 6.4, 0.6] })
+          k.disc(0.62, '#fff8e8', { p: [0, 6.6, -0.42], r: [Math.PI / 2, 0, 0] })
+          k.cone(1.25, 1.5, '#56657f', { p: [0, 8.45, 0.6] }, 4)
+          k.cyl(0.05, 0.05, 1.2, '#efe6d4', { p: [0, 9.7, 0.6] })
         })
       }
     }
   },
 }
 
-const tmp = { m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(), c: new THREE.Color() }
+// The landmarks as one unlit mesh: lit as if by floodlights.
+function Landmarks({ island }) {
+  const geo = useMemo(() => {
+    const draw = LANDMARKS[island.id]
+    if (!draw) return null
+    const k = new Kit()
+    draw(k, island)
+    return k.build()
+  }, [island])
+  if (!geo) return null
+  return (
+    <mesh geometry={geo}>
+      <meshBasicMaterial vertexColors />
+    </mesh>
+  )
+}
+
+const tmp = { m: new THREE.Matrix4(), q: new THREE.Quaternion(), p: new THREE.Vector3(), s: new THREE.Vector3(), c: new THREE.Color(), a: new THREE.Color() }
 const Y = new THREE.Vector3(0, 1, 0)
 const VIOLET = new THREE.Color('#7a3cff')
 
-// Lit windows and shopfronts of the ordinary buildings: one mesh for the whole block.
+// Windows, shopfronts and roof signs of the ordinary buildings: one mesh for the whole block.
+// Every window is drawn, lit or not, which gives the walls their texture. When a stop is found,
+// the building nearest to it lights all its windows in the company colour, floor by floor.
 function BlockLights({ island }) {
   const ref = useRef()
+  const since = useMemo(() => sinceOf(island.id), [island])
+  const accent = useMemo(() => accentOf(island.data.brand), [island])
   const lights = useMemo(() => {
     const { blocks } = island.extra.city
     const out = []
     for (const b of blocks) {
       if (b.landmark) continue
+      // The stop this building answers to: the nearest one within reach of the road.
+      let stop = -1
+      let best = 16
+      island.stops.forEach((p, i) => {
+        const d = Math.hypot(p.x - b.x, p.z - b.z)
+        if (d < best) { best = d; stop = i }
+      })
       const r = rng(b.seed)
       const y0 = island.h(b.x, b.z)
       const w = b.half * 2
@@ -113,37 +172,55 @@ function BlockLights({ island }) {
       faces.forEach((f, fi) => {
         for (let row = 0; row < rows; row++) {
           for (let col = 0; col < cols; col++) {
-            if (r() > 0.34) continue
             const along = (col - (cols - 1) / 2) * (w / cols)
+            const on = r() < 0.34
             const warm = r() > 0.25
             const lum = 0.5 + r() * 0.45
             out.push({
               x: b.x + f.nx * (b.half + 0.04) + (f.nx ? 0 : along),
               y: y0 + 2.9 + row * 1.45,
               z: b.z + f.nz * (b.half + 0.04) + (f.nz ? 0 : along),
-              face: f.face, sx: (w / cols) * 0.46, sy: 0.66,
-              color: warm ? [1.0 * lum, 0.78 * lum, 0.42 * lum] : [0.45 * lum, 0.85 * lum, 1.0 * lum],
+              face: f.face, sx: (w / cols) * 0.46, sy: 0.66, stop, row,
+              color: !on ? [0.05, 0.055, 0.1] : warm ? [1.0 * lum, 0.78 * lum, 0.42 * lum] : [0.45 * lum, 0.85 * lum, 1.0 * lum],
             })
           }
         }
         // A lit shopfront at street level on the road side.
         if (fi === 0 && r() > 0.3) {
           const c = new THREE.Color(NEON[b.seed % NEON.length])
-          out.push({ x: b.x, y: y0 + 1.25, z: b.z + f.nz * (b.half + 0.05), face: f.face, sx: w * 0.7, sy: 1.0, color: [c.r * 0.95, c.g * 0.95, c.b * 0.95] })
+          out.push({ x: b.x, y: y0 + 1.25, z: b.z + f.nz * (b.half + 0.05), face: f.face, sx: w * 0.7, sy: 1.0, stop: -1, row: 0, color: [c.r * 0.95, c.g * 0.95, c.b * 0.95] })
+        }
+        // A thin sign in the company colour along the top of some road-side fronts.
+        if (fi === 0 && b.seed % 3 !== 1) {
+          out.push({ x: b.x, y: y0 + b.h - 0.35, z: b.z + f.nz * (b.half + 0.06), face: f.face, sx: w * 0.86, sy: 0.18, stop: -1, row: 0, color: [accent.r * 0.9, accent.g * 0.9, accent.b * 0.9] })
         }
       })
     }
     return out
-  }, [island])
+  }, [island, accent])
+  const stops = useMemo(() => [...new Set(lights.map((l) => l.stop).filter((i) => i >= 0))], [lights])
   useFrame(() => {
     const mesh = ref.current
-    if (!mesh || mesh.userData.placed) return
-    mesh.userData.placed = true
+    if (!mesh) return
+    if (!mesh.userData.placed) {
+      mesh.userData.placed = true
+      lights.forEach((l, i) => mesh.setMatrixAt(i, tmp.m.compose(tmp.p.set(l.x, l.y, l.z), tmp.q.setFromAxisAngle(Y, l.face), tmp.s.set(l.sx, l.sy, 1))))
+      mesh.instanceMatrix.needsUpdate = true
+    }
+    const times = {}
+    for (const i of stops) times[i] = since(i)
+    // Nothing to redraw once every light has settled.
+    const key = stops.map((i) => (times[i] < 0 ? 'x' : times[i] > 3 ? 'd' : times[i].toFixed(2))).join()
+    if (mesh.userData.key === key) return
+    mesh.userData.key = key
     lights.forEach((l, i) => {
-      mesh.setMatrixAt(i, tmp.m.compose(tmp.p.set(l.x, l.y, l.z), tmp.q.setFromAxisAngle(Y, l.face), tmp.s.set(l.sx, l.sy, 1)))
-      mesh.setColorAt(i, tmp.c.setRGB(l.color[0], l.color[1], l.color[2]))
+      const t = l.stop >= 0 ? times[l.stop] : -1
+      // The windows come on from the ground floor up.
+      const f = t < 0 ? 0 : Math.min(1, Math.max(0, (t - l.row * 0.07) / 0.5))
+      tmp.c.setRGB(l.color[0], l.color[1], l.color[2])
+      if (f > 0) tmp.c.lerp(tmp.a.setRGB(accent.r * 1.2, accent.g * 1.2, accent.b * 1.2), f)
+      mesh.setColorAt(i, tmp.c)
     })
-    mesh.instanceMatrix.needsUpdate = true
     mesh.instanceColor.needsUpdate = true
   })
   return (
@@ -260,6 +337,7 @@ export default function CityScenery({ island }) {
     <group>
       <Static build={build} deps={[build]} />
       <BlockLights island={island} />
+      <Landmarks island={island} />
       {island.extra.city.blocks.filter((b) => b.landmark).map((b) => (
         <PlaceName key={b.landmark} island={island} b={b} text={b.landmark === 'brussels' ? 'Brussels' : 'Madrid'} />
       ))}
