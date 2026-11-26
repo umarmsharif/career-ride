@@ -315,7 +315,7 @@ function Closing({ total }) {
       {career.person.photo && <img className="avatar" src={career.person.photo.replace(/^\//, '')} alt={career.person.name} width="96" height="96" />}
       <p className="eyebrow">Now</p>
       <h2 className="finale-title">
-        {last.brand.logo && <img className="finale-logo" src={last.brand.logo.replace(/^\//, '')} alt="" width="48" height="48" />}
+        {last.brand.logo && <img className="finale-logo" src={last.brand.logo.replace(/^\//, '')} alt={last.brand.label} height="44" />}
         {finale.title}
       </h2>
       <p>{finale.body}</p>

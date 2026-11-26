@@ -246,8 +246,9 @@ export function Signboard({ id, x, y = 0, z, face, brand }) {
 // The company name on a rooftop board, in the company's colour. If career.json names a logo
 // file for the island, the logo is shown instead.
 export function BrandSign({ brand, x, y, z, face = 0, scale = 1 }) {
-  const w = Math.min(13, Math.max(5, brand.label.length * 0.62 + 2)) * scale
-  const hgt = 2.3 * scale
+  // A board carrying a logo is taller and shaped to fit it; a name-only board fits the name.
+  const hgt = (brand.logo ? 3.2 : 2.3) * scale
+  const w = brand.logo ? hgt * 2.9 : Math.min(13, Math.max(5, brand.label.length * 0.62 + 2)) * scale
   const tex = useMemo(() => {
     const canvas = document.createElement('canvas')
     canvas.width = 1024
@@ -258,7 +259,10 @@ export function BrandSign({ brand, x, y, z, face = 0, scale = 1 }) {
     const ctx = canvas.getContext('2d')
     const W = canvas.width
     const H = canvas.height
+    // Once the logo has been drawn, a late font load must not paint the plain name over it.
+    let logoDrawn = false
     const drawName = () => {
+      if (logoDrawn) return
       ctx.fillStyle = brand.primary
       ctx.fillRect(0, 0, W, H)
       ctx.fillStyle = brand.secondary
@@ -279,6 +283,21 @@ export function BrandSign({ brand, x, y, z, face = 0, scale = 1 }) {
     if (brand.logo) {
       const img = new Image()
       img.onload = () => {
+        logoDrawn = true
+        // A wide logo already carries the company's name, and is drawn for a dark ground: it
+        // fills a dark board on its own.
+        if (img.width / img.height > 1.6) {
+          ctx.fillStyle = '#0b0d10'
+          ctx.fillRect(0, 0, W, H)
+          ctx.fillStyle = brand.secondary
+          ctx.fillRect(0, H * 0.92, W, H * 0.08)
+          const fit = Math.min((W * 0.88) / img.width, (H * 0.8) / img.height)
+          const lw = img.width * fit
+          const lh = img.height * fit
+          ctx.drawImage(img, (W - lw) / 2, H * 0.46 - lh / 2, lw, lh)
+          t.needsUpdate = true
+          return
+        }
         // The logo sits beside the name on a white board.
         ctx.fillStyle = '#f4ead6'
         ctx.fillRect(0, 0, W, H)

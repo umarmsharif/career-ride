@@ -92,7 +92,7 @@ export function defineIsland(spec) {
     ground,
     h: ground.h,
     // In the city the company name stands on top of the company's tower.
-    brandSign: city?.tower ? { x: city.tower.x, z: city.tower.z, y: city.tower.h + 1.5, face: -Math.PI / 2, scale: 1.7 } : spec.brandSign ?? null,
+    brandSign: city?.tower ? { x: city.tower.x, z: city.tower.z, y: city.tower.h + (data.brand.logo ? 3.6 : 2.4), face: -Math.PI / 2, scale: 1.7 } : spec.brandSign ?? null,
     stops,
     colliders,
     blockers,
