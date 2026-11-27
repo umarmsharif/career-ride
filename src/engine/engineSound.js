@@ -1,10 +1,35 @@
-// The car's engine, made in code: a growl that follows the revs, a sequential gearbox with quick
-// paddle-style shifts (a short cut and a pop going up, a throttle blip coming down), and tyre
-// squeal while the tail is out. Works with any audio context, including an offline one for a
-// rendered preview.
+// The car's engine: recordings of a real engine at six steady revs, blended and pitched to follow
+// the revs, through a sequential gearbox with quick paddle-style shifts (a short cut and a pop
+// going up, a throttle blip coming down), and tyre squeal while the tail is out. Until the
+// recordings have loaded, or if they cannot, a growl made in code stands in. Works with any audio
+// context, including an offline one for a rendered preview.
 
 const GEARS = [0, 2.6, 4.8, 7.0, 9.2, 13] // speed at which each gear runs out
 const IDLE = 0.16
+// The recordings, lowest revs first, with the pitch each was recorded at (measured, in Hz).
+export const REVS = [
+  ['media/engine/rev-0.wav', 43.5],
+  ['media/engine/rev-1.wav', 60.9],
+  ['media/engine/rev-2.wav', 65.4],
+  ['media/engine/rev-3.wav', 69.2],
+  ['media/engine/rev-4.wav', 72.2],
+  ['media/engine/rev-5.wav', 76.6],
+]
+
+// Fetches and decodes the recordings. Resolves to null if any fails, so the made-in-code engine stays.
+export async function loadRevs(ctx, base = '') {
+  try {
+    return await Promise.all(
+      REVS.map(async ([url, f0]) => {
+        const res = await fetch(base + url)
+        if (!res.ok) throw new Error(url)
+        return { buffer: await ctx.decodeAudioData(await res.arrayBuffer()), f0 }
+      })
+    )
+  } catch {
+    return null
+  }
+}
 
 export function makeEngine(ctx, out) {
   const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
@@ -63,6 +88,15 @@ export function makeEngine(ctx, out) {
 
   for (const n of [a, b, sub, throb, breath, squeal]) n.start()
 
+  // The recorded engine, once its loops are handed over with useRecordings().
+  const rec = ctx.createBiquadFilter()
+  rec.type = 'lowpass'
+  rec.Q.value = 0.8
+  const recGain = ctx.createGain()
+  recGain.gain.value = 0
+  rec.connect(recGain).connect(out)
+  let layers = null
+
   const st = { gear: 1, rpm: IDLE, lastSpeed: 0, shiftUntil: 0, blipUntil: 0 }
 
   function pop(t, loud) {
@@ -80,6 +114,19 @@ export function makeEngine(ctx, out) {
   }
 
   return {
+    useRecordings(revs) {
+      if (!revs || layers) return
+      layers = revs.map(({ buffer, f0 }) => {
+        const src = ctx.createBufferSource()
+        src.buffer = buffer
+        src.loop = true
+        const g = ctx.createGain()
+        g.gain.value = 0
+        src.connect(g).connect(rec)
+        src.start()
+        return { src, g, f0 }
+      })
+    },
     // speed: forward speed; dt: seconds since the last call; drift: the tail is out;
     // running: the engine is on; cruise: on the open road between stations.
     update(t, { speed, dt, drift, running, cruise }) {
@@ -110,6 +157,30 @@ export function makeEngine(ctx, out) {
       const r = st.rpm
       const cut = t < st.shiftUntil
       const on = running ? 1 : 0
+
+      if (layers) {
+        // Pick the two recordings either side of the wanted pitch, play both at that pitch, and
+        // cross-fade between them so the sound never jumps.
+        const want = 38 + r * 68
+        let i = 0
+        while (i < layers.length - 2 && want > layers[i + 1].f0) i++
+        const lo = layers[i]
+        const hi = layers[i + 1]
+        const x = Math.min(1, Math.max(0, (want - lo.f0) / (hi.f0 - lo.f0)))
+        layers.forEach((l, j) => {
+          const g = j === i ? Math.cos((x * Math.PI) / 2) : j === i + 1 ? Math.sin((x * Math.PI) / 2) : 0
+          l.g.gain.setTargetAtTime(g, t, 0.04)
+          l.src.playbackRate.setTargetAtTime(want / l.f0, t, 0.03)
+        })
+        // Off the throttle the sound is duller; on it, brighter.
+        rec.frequency.setTargetAtTime(900 + r * 2200 + load * 3500, t, 0.05)
+        const level = (0.2 + r * 0.08 + load * 0.1) * on * (cut ? 0.3 : 1)
+        recGain.gain.setTargetAtTime(level, t, cut ? 0.012 : 0.05)
+        body.gain.setTargetAtTime(0, t, 0.05)
+        breathGain.gain.setTargetAtTime((0.001 + load * 0.004) * on, t, 0.08)
+        squealGain.gain.setTargetAtTime(drift && running ? 0.045 : 0, t, drift ? 0.05 : 0.12)
+        return { gear: st.gear, rpm: st.rpm }
+      }
 
       const f = 34 + r * 96
       a.frequency.setTargetAtTime(f, t, 0.03)

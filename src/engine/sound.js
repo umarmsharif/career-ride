@@ -1,6 +1,6 @@
 // A small soundscape made entirely in code. Silent until the visitor switches it on.
 import { DRIVE } from './world.js'
-import { makeEngine } from './engineSound.js'
+import { makeEngine, loadRevs } from './engineSound.js'
 let ctx = null
 let master = null
 let pad = null
@@ -64,7 +64,12 @@ export const audio = {
         pad.a.start()
         pad.b.start()
         padIsland = -1
-        if (DRIVE) engine = makeEngine(ctx, master)
+        if (DRIVE) {
+          engine = makeEngine(ctx, master)
+          // The recorded engine takes over as soon as its loops arrive.
+          const e = engine
+          loadRevs(ctx).then((revs) => e.useRecordings(revs))
+        }
       }
       ctx.resume()
       this.on = true

@@ -1,0 +1,4 @@
+Engine sound loops rev-0.wav to rev-5.wav: "racing car engine sound loops",
+made for www.banditracer.eu and published on OpenGameArt by qubodup,
+https://opengameart.org/content/racing-car-engine-sound-loops
+Licence: CC0 (public domain dedication). Files renamed; audio unchanged.
