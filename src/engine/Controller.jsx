@@ -53,7 +53,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     const onKey = (down) => (e) => {
       const k = map[e.code]
       if (!k) return
-      if (e.target?.closest?.('button, a')) return
+      // The arrow keys and W A S D always drive the car, wherever the focus is.
       e.preventDefault()
       input[k] = down
       const g = useGame.getState()
@@ -62,6 +62,13 @@ export default function Controller({ islands, origins, rides, worldRef }) {
     const kd = onKey(true)
     const ku = onKey(false)
     const blur = () => Object.keys(input).forEach((k) => (input[k] = false))
+    // A button clicked with the mouse lets go of the focus, so Space or Enter cannot press it again
+    // by accident while driving. Tabbing to a button still works as before.
+    const release = (e) => {
+      const b = e.target?.closest?.('button, a')
+      if (b && e.pointerType !== '') setTimeout(() => b.blur(), 0)
+    }
+    window.addEventListener('pointerup', release)
     window.addEventListener('keydown', kd)
     window.addEventListener('keyup', ku)
     window.addEventListener('blur', blur)
@@ -69,6 +76,7 @@ export default function Controller({ islands, origins, rides, worldRef }) {
       window.removeEventListener('keydown', kd)
       window.removeEventListener('keyup', ku)
       window.removeEventListener('blur', blur)
+      window.removeEventListener('pointerup', release)
     }
   }, [])
 

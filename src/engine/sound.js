@@ -1,10 +1,14 @@
 // A small soundscape made entirely in code. Silent until the visitor switches it on.
+import { DRIVE } from './world.js'
+import { makeEngine } from './engineSound.js'
 let ctx = null
 let master = null
 let pad = null
 let wind = null
 let lastPedal = 0
 let padIsland = -1
+let engine = null
+let lastT = 0
 
 function noiseBuffer() {
   const b = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate)
@@ -60,6 +64,7 @@ export const audio = {
         pad.a.start()
         pad.b.start()
         padIsland = -1
+        if (DRIVE) engine = makeEngine(ctx, master)
       }
       ctx.resume()
       this.on = true
@@ -108,7 +113,21 @@ export const audio = {
       pad.a.frequency.setTargetAtTime(root, t, 0.8)
       pad.b.frequency.setTargetAtTime(root * 1.5, t, 0.8)
     }
-    pad.gain.gain.setTargetAtTime(0.035, t, 1.5)
+    // In the car the music sits lower, under the engine.
+    pad.gain.gain.setTargetAtTime(DRIVE ? 0.02 : 0.035, t, 1.5)
+    if (engine) {
+      const dt = lastT ? Math.min(0.1, t - lastT) : 0
+      lastT = t
+      engine.update(t, {
+        speed: riding ? 8 : rider.speed,
+        dt,
+        drift: !!rider.drift,
+        // The engine stops when the driver steps out at the end.
+        running: !(rider.out > 0.05),
+        cruise: riding,
+      })
+      return
+    }
     // A soft click for each half turn of the pedals.
     const half = Math.floor(rider.pedal / Math.PI)
     if (rider.pedalling && half !== lastPedal) {
